@@ -40,3 +40,9 @@
      * Tailwind Intellisense
 7. Create the Github Repository
    - Let's create it in root directory 
+   - Type: git init
+   - Type: git add . (with point to add/update the whole project).
+   - Type: git commit -m "Setting up React, TailWind and created the first template of the blog."
+   - Type: git remote add origin https://github.com/svei00/blogExcelSolutionsV.git
+   - Type: git branch -M main
+   - Type: git push -u origin main
