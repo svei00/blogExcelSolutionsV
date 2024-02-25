@@ -1,3 +1,4 @@
+# Client Side
 1. Create the folder of the project ex. **mern-blog**.
 2. Open it in Visual Studio Code **vscode**
 3. Install React: **npm create vite@latest** or **yarn create vite@latest**
@@ -145,6 +146,28 @@
         </Navbar.Collapse>
        `
        **Note** We put the as={"div"} since the browser cannot have two <a> tags. We have two of them since Navbar.Link and Link creates two different links so as DIV fixs that.
+
+# Server Side
+1. Go back to the root directory since when deploy it points to the root.
+2. Type **npm init -y** or **yarn init -y**to initialize the Packages and create file package.json
+3. Create a Folder called **api** and inside it the file **index.js**
+4. Install Express **npm i express** or **yarn add express** then:
+   `
+   import express from "express";
+
+     const app = express();
+
+     app.listen(3000, () => {
+          console.log("Server is running on port 3000");
+     });
+    `
+5. Run the server typing in the console: **node api/index.js**
+   - If we got an error go to file **package.json** add the line of code: **"type": "module",** Reason is that we're using **import** instead **require** now it would work
+6. In order to keep working while server is still running without restart it install **npm i nodemon** or **yarn add nodemon**
+   - Then add on **packages.json** the script: **"dev": "nodemon api/index.js"**
+   - Also we add the script to have this ready when deploy: **"start": "start api/index.js"**
+   - Finally run **npm run dev** or **yarn run dev**
+7. Move the **.gitignore** file from client to root in order to don't upload the whole folder to gitHub
 
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
