@@ -68,3 +68,87 @@
                     <Route path="/projects" element={<Projects />}/>        
                </Routes>
           </BrowserRouter>
+11. Inside **SRC** Folder create folder **components** tne create the file **Header.jsx**
+    - RFC to create React Functional Component.  
+    - Very important in App.jsx file inside <BrouserRoute> tag but outside the <Routes> tag add the Header in order to have the header in all the pages.
+12. For the Next Step search in Google **Flowbite React** for quick reference here's the link [Flowbite](https://www.flowbite-react.com/docs/getting-started/quickstart)
+    - Install the package **npm i flowbite-react** or **yarn add flowbite-react**
+    - Add this line of code `'node_modules/flowbite-react/lib/esm/**/*.js',` on file **tailwind.config.js**:
+          `
+          export default {
+               content: [
+                    "./index.html",
+                    "./src/**/*.{js,ts,jsx,tsx}",
+                    "node_modules/flowbite-react/lib/esm/**/*.js",
+               ],
+          }
+          `
+     - Add `require('flowbite/plugin'),` too inside the:
+       `
+       plugins: [require("flowbite/plugin")],
+       `
+13. On File Header type: <Navbar><Navbar> to create the navbar
+    - <Navbar className="border-b-2">Home!</Navbar>; to add a border between the page and the navbar
+    - Import **import { Link } from "react-router-dom";** so you can go to the page without updating the whole page.
+    - Install React Icons **npm i react-icons** or **yarn add react-icons**
+      * Import the Icon **import {AiOutlineSearch} from 'react-icons/ai';** 
+    - Create a form and inside the form:
+    - Import a TextInput from Flowbite with a self closing tag:
+      `<TextInput
+          type="text"
+          placeholder="Search..."
+          rightIcon={AiOutlineSearch}
+          className="hidden lg:inline"
+      />`
+     - For small screens we're going to add a Button:
+       `<Button className="w-12 h-10 lg:hidden" color="gray" pill>
+        <AiOutlineSearch />
+       </Button>`
+     - Add a <div> tag for the dark mode toggle button:
+       `<div>
+        <Button className="w-12 h-10 hidden sm:inline" color="gray" pill>
+          <FaMoon />
+        </Button>
+      </div>`
+     - Add another Link Element to add the Sign In button:
+       `<Link to={"/sign-in"}>
+          <Button className="bg-gradient-to-r from-blueEx to-greenEx">
+            Sign In
+          </Button>
+        </Link>`
+     - For the Hambuerger button lets add **<Navbar.Collapse></Navbar.Collapse>** after the Sign In Link and outside the div
+       `<Navbar.Collapse>
+        <Navbar.Link>
+          <Link to="/">Home</Link>
+        </Navbar.Link>
+        <Navbar.Link>
+          <Link to="/about">About</Link>
+        </Navbar.Link>
+        <Navbar.Link>
+          <Link to="/projects">Projects</Link>
+        </Navbar.Link>
+      </Navbar.Collapse>
+
+        **Important** Inside the div add the line of code: **<Navbar.toggle/>** to make the hamburger work
+     - On the imports add **useLocation** like **import { Link, useLocation } from "react-router-dom";** to Activate or select the current page as follows:
+       * Between export and return: **const path = useLocation().pathname;** then:
+       `<Navbar.Collapse>
+          <Navbar.Link active={path === "/"} as={"div"}>
+               <Link to="/">Home</Link>
+          </Navbar.Link>
+          <Navbar.Link active={path === "/about"} as={"div"}>
+               <Link to="/about">About</Link>
+          </Navbar.Link>
+          <Navbar.Link active={path === "/projects"} as={"div"}>
+               <Link to="/projects">Projects</Link>
+          </Navbar.Link>
+        </Navbar.Collapse>
+       `
+       **Note** We put the as={"div"} since the browser cannot have two <a> tags. We have two of them since Navbar.Link and Link creates two different links so as DIV fixs that.
+
+# Biblography
+* https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
+* https://www.markdownguide.org/cheat-sheet/ - Markdown cheatsheet
+* https://levelup.gitconnected.com/display-images-in-react-8ff1f5b1cf9a - Displays Images
+* https://nerdcave.com/tailwind-cheat-sheet - Tailwind CheatSheet
+* https://tailwindcss.com/docs/customizing-colors - Custom Colors in Tailwind
