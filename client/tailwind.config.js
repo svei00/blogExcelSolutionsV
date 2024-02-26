@@ -14,10 +14,10 @@ export default {
     },
     extend: {
       // Override The active
-      active: {
-        textColor: "blue",
-        backgroundColor: "#21B868",
-      },
+      // active: {
+      //   textColor: "blue",
+      //   backgroundColor: "#21B868",
+      // },
     },
   },
   plugins: [import("flowbite/plugin")],

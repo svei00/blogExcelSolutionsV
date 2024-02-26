@@ -1,4 +1,5 @@
-# Client Side
+# Excel Solutions Blog
+## Client Side
 1. Create the folder of the project ex. **mern-blog**.
 2. Open it in Visual Studio Code **vscode**
 3. Install React: **npm create vite@latest** or **yarn create vite@latest**
@@ -147,7 +148,7 @@
        `
        **Note** We put the as={"div"} since the browser cannot have two <a> tags. We have two of them since Navbar.Link and Link creates two different links so as DIV fixs that.
 
-# Server Side
+## Server Side
 1. Go back to the root directory since when deploy it points to the root.
 2. Type **npm init -y** or **yarn init -y**to initialize the Packages and create file package.json
 3. Create a Folder called **api** and inside it the file **index.js**
@@ -167,7 +168,49 @@
    - Then add on **packages.json** the script: **"dev": "nodemon api/index.js"**
    - Also we add the script to have this ready when deploy: **"start": "start api/index.js"**
    - Finally run **npm run dev** or **yarn run dev**
-7. Move the **.gitignore** file from client to root in order to don't upload the whole folder to gitHub
+7. Move the **.gitignore** file from client to root in order to don't upload the whole folder to gitHub.
+
+## Connect the Database
+1. Into the root folder instal MongoDB **npm i mongose** or **yarn add mongoose**
+2. Import mongoose on the top of index.js **import mongoose from "mongoose";**
+3. Go to Goolge and search for [MongoDB](https://account.mongodb.com/account/login) and create the Database
+   - Select **M0** which is **Free**
+   - Provider **AWS**
+   - Select Region near to your country in this case **Oregon**(West Coast).
+   - Change Cluster 0 to **ExcelSolutionsV-Blog**
+   - Hit in **Create**
+   - Once created select **Username and Password**
+   - Create and **username** and **password**
+   - Select cloud enviroment since we're using a cloud base enviroment.
+   - For testing the database on **IP Address** write **0.0.0.0** to gain access everywhere hit **Add Entry**
+   - Hit in **Finish and Close** then hit **Go to Overview**
+   - Done!
+4. Hit in Connect.
+  - **Click** on **Drivers** and in option 3 to get the URL: **mongodb+srv://excelsolucionesv:<password>@excelsolutionsv-blog.ad5tzmg.mongodb.net/?retryWrites=true&w=majority&appName=ExcelSolutionsV-Blog** and paste on the line of code: 
+  - `mongoose.connect("mongodb+srv://excelsolucionesv:<password>@excelsolutionsv-blog.ad5tzmg.mongodb.net/?retryWrites=true&w=majority&appName=ExcelSolutionsV-Blog")
+`
+  - Also if you want to know that conections is stablished you can can add the line and also if there's an error: 
+    `
+    mongoose
+     .connect(
+     "mongodb+srv://excelsolucionesv:4eZzzCjN5duxSnPs@excelsolutionsv-blog.ad5tzmg.mongodb.net/ExcelSolutionsV-Blog?                   retryWrites=true&w=majority&appName=ExcelSolutionsV-Blog"
+     )
+          .then(() => {
+               console.log("Database conection is Stablished.");
+     })
+     .catch((err) => {
+          console.log(err);
+     });
+  `
+5. Create an Enviromental variable to keep the passwords safe
+   - Create **.env** file on the root directory.
+   - Change the connect string to **process.env.MongoDB**:
+     `.connect(process.env.MongoDB)`
+   - In order to keep working on the directori instal the packge dotenv **npm i dotenv** or **yarn add dotenv**
+   - Import that package: **import dotenv from "dotenv";** and add in index.js:
+     `dotenv.config();`
+6. Add to **.gitignore** file the .env file in order to do not upload the .env files and thus our passwords
+
 
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
