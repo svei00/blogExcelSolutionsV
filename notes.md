@@ -242,6 +242,39 @@
 
      export default User;`
 
+## Create a Test API route
+1. Go back to the **index.js** file
+     app.get("/test", (req, res) => {
+          res.json({ message: "API is Working!!" });
+     });
+2. Go to your localhost address (could be your IP) and test:
+   **localhost:3000/test**
+3. A Good practice is create a file for each section.
+   - So inside **api** folder lets create **routes** folder
+   - Inside routes create **user.route.js** file
+   - Code:
+     `import { express } from "express";
+          const router = express.Router();
+          router.get("/test", (req, res) => {
+               res.json({ message: "API is Working!!" });
+          });
+
+          export default router;
+     `
+4. Go back to index.js and import it.
+   - **import userRoutes from "./routes/user.route.js";** // Important to add file extension on backend!!
+   - **app.use("/api/user", userRoutes);**
+5. For beter practice create folder **controllers** in the **api** directory.
+6. Create the file **user.controller.js**
+   export const test = (req, res) => {
+     res.json({ message: "API is Working!!" });
+   };
+7. On **user.route.js** change to:
+   - **import { test } from "../controllers/user.controller.js";**
+   - Code: **router.get("/test", test);**
+   
+
+ 
 
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
