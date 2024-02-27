@@ -209,7 +209,38 @@
    - In order to keep working on the directori instal the packge dotenv **npm i dotenv** or **yarn add dotenv**
    - Import that package: **import dotenv from "dotenv";** and add in index.js:
      `dotenv.config();`
-6. Add to **.gitignore** file the .env file in order to do not upload the .env files and thus our passwords
+6. Add to **.gitignore** file the .env file in order to do not upload the .env files and thus our passwords.
+
+## Create User Model
+1. Inside **api** folder Create folder **models** and then the file **users.model.js**
+   - We're using the extension **model** for searchability. It will be easier to locate the files.
+   - import mongoose and write the code:
+     import { timeStamp } from "console";
+     `import mongoose from "mongoose";
+
+     const userSchema = new mongoose.Schema(
+     {
+     username: {
+          type: String,
+          required: true,
+          unique: true,
+     },
+     email: {
+          type: String,
+          required: true,
+          unique: true,
+     },
+     password: {
+          type: String,
+          required: true,
+     },
+     },
+     { timeStamps: true }
+     );
+
+     const User = mongoose.model("User", userSchema);
+
+     export default User;`
 
 
 # Biblography

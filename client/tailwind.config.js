@@ -12,13 +12,7 @@ export default {
       blueEx: "#3182DF",
       greenEx: "#21B868",
     },
-    extend: {
-      // Override The active
-      // active: {
-      //   textColor: "blue",
-      //   backgroundColor: "#21B868",
-      // },
-    },
+    extend: {},
   },
-  plugins: [import("flowbite/plugin")],
+  plugins: [require("flowbite/plugin")],
 };
