@@ -272,7 +272,64 @@
 7. On **user.route.js** change to:
    - **import { test } from "../controllers/user.controller.js";**
    - Code: **router.get("/test", test);**
-   
+8. Type this address to your Browser: **http://localhost:3000/api/user/test**
+
+## Create SignUp API Route
+1. On folder **api/routes** create the file **auth.route.js**
+2. Write the following code:
+     `router.post("/signup", signup);
+     export default router;`
+3. On folder **api/controllers** create the file **auth.controller.js**
+4. Write an asyncronous function since we have to wait until MongoDB (Our Database responds):
+  - First of all we're going to test the API.
+  - If you don't have installed **Thunderclient** please install from VSCode Extensions.
+  - You can use **[Insomnia](https://insomnia.rest/)** the main disvantage of this is you have to signup and install.
+  - Write the Following code to test the API:   
+     `export const signup = async (req, res) => {
+          console.log(req.body);};`
+  - Export the function to **auth.route.js**:
+    * Import the route: **import { signup } from "../controllers/auth.controller.js";** plese **don't** forget the **.js**
+    * Then on **index.js** write the following line of code: **app.use("/api/auth", authRoutes);** and don't forget to import it if not autoimport **import authRoutes from "./routes/auth.route.js";** 
+    * For testing the app use the route: **http://localhost:3000/api/auth/signup** in Thunder Client
+    * Since it is using JSON we have to authorize it so in **index.js** write: **app.use(express.json());**
+  - In Mongo go to **Database -> Browse Collections -> Collections** and you will see the Sync data!
+  - This is the **auth.controller.js**:
+    `import User from "../models/user.model.js";
+
+          export const signup = async (req, res) => {
+          // console.log(req.body); This line was added for testing purpouses.
+
+          const { username, email, password } = req.body;
+
+          if (
+          !username ||
+          !email ||
+          !password ||
+          username === "" ||
+          email === "" ||
+          password === ""
+          ) {
+          return res.status(400).json({ message: "All fields are required" });
+          }
+
+          const newUser = new User({ username, email, password });
+
+          try {
+          await newUser.save();
+          res.json("Signup Successful!!");
+
+          // const user = await User.create({ 
+               username, 
+               email, 
+               password // After JS6 We don't have to write password: password 
+               });
+          // res.status(201).json({ user: user._id });
+          } catch (error) {
+          res.status(500).json({ message: error.message });
+          }
+          };`
+5. We have to hash the information of our users so for that we have:
+  - Install package bcryptjs **npm i bcryptjs** or **yarn add bcryptjs**  
 
  
 
