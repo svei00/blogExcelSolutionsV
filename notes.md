@@ -330,6 +330,37 @@
           };`
 5. We have to hash the information of our users so for that we have:
   - Install package bcryptjs **npm i bcryptjs** or **yarn add bcryptjs**  
+  - Import the library: **import bcryptjs from "bcryptjs";** it is very importa to import as bcryptjs since bcrypt will cause problems at the deploy
+  - between all fields requiered and new user code write: **const hashedPassword = bcryptjs.hashSync(password, 10); // 10 mens the number of salts** 
+  - Finally in password: **password: hashedPassword,**
+
+## Add a Middleware and a Function to Handle Errors.
+1. On file **api/index.js** write the middleware after user.auth.js
+   - Code:
+     `app.use((err, req, res, next) => {
+          const statusCode = err.statusCode || 500;
+          const message = err.message || "Internal Server Error";
+          res.status(statusCode).json({
+          suceess: false,
+          statusCode,
+          message,
+         });
+     });`
+   - On file **api/controllers/auth.controller.js** add res in sigup variable:
+     * **export const signup = async (req, res, next) => {** remember that next its to go to the next middeware
+     * Then change on the cath error the line of code of **res.status(500).json({ message: error.message });** for **next(error);** 
+  2. Inside **api** folder create another folder called **utils**
+     - add the functions/file **error.util.js**
+     - The code:
+       `export const errorHandler = (statusCode, message) => {
+          const error = new Error();
+          errors.statusCode = statusCode;
+          error.message = message;
+          return error;
+        };`
+     - on file **auth.controller.js** change the line of code: **return res.status(400).json({ message: "All fields are required" });** for **next(errorHandler(400, "All fields are required"));** if not auto import import: **import { errorHandler } from "../utils/error.util.js";**
+
+## Create Signup Page UI
 
  
 
