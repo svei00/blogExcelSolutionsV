@@ -354,14 +354,63 @@
      - The code:
        `export const errorHandler = (statusCode, message) => {
           const error = new Error();
-          errors.statusCode = statusCode;
+          error.statusCode = statusCode;
           error.message = message;
           return error;
         };`
      - on file **auth.controller.js** change the line of code: **return res.status(400).json({ message: "All fields are required" });** for **next(errorHandler(400, "All fields are required"));** if not auto import import: **import { errorHandler } from "../utils/error.util.js";**
+    - Run the test on **Thunder Client**
 
 ## Create Signup Page UI
-
+1. Open the **SignUp** page on **client/src/pages**
+2. Write the code:
+   **Pro Tip** with CTRL-P you can find between your files.
+   `<div className="min-h-screen mt-20">
+      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center">
+        {/* Left */}
+        <div className="">
+          <Link
+            to="/"
+            className="text-sm sm:text-4xl font-bold dark:text-white"
+          >
+            <span className="flex items-end">
+              <img src={logo} alt="Logo Excel Solutions" className="h-20" />
+              <span className="text-greenEx"> Blog</span>
+            </span>
+            {/* <span className="px-2 py-1 bg-gradient-to-r from-blueEx to-greenEx rounded-lg text-white">
+          Excel Solutions®
+        </span>
+        Blog */}
+          </Link>
+          <p className="text-sm mt-5 text-justify">
+            Discover the ultimate Excel resource! Sign up now to access
+            exclusive tips, tutorials, and updates. Whether you're a beginner or
+            an expert, elevate your skills with our curated content. Join our
+            community with your Email or Google Account.
+          </p>
+        </div>
+        {/* rigth */}
+        <div className=""></div>
+      </div>
+    </div>`
+  - Create a form in the right side. 
+  - Import the Label from flowbite.
+  - Import TextInput from flowbite:
+  - Import Button from flowbite:
+    `form>
+      <div>
+        <Label value="What's your name: " />
+        <TextInput type="text" placeholder="Username" id="username" />
+      </div>
+      <div>
+        <Label value="Type your Email: " />
+        <TextInput type="text" placeholder="Email" id="email" />
+      </div>
+      <div>
+        <Label value="What's your name: " />
+        <TextInput type="text" placeholder="Password" id="password" />
+      </div>
+     </form>`
  
 
 # Biblography
