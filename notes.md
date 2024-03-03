@@ -577,10 +577,149 @@
 15. After loading we need to go to the Sign in page we achieve this by adding in import **useNavigate**:
     `import { useState, useNavigate } from "react";`
     - Then initialize the variable: **const navigate = useNavigate();**
+    - befire the catch write the code:
+
+
       `if (res.ok) {
         navigate("/sign-in");
       }`
 
+## Create and Add the Footer Component
+1. In forlder **/client/src/componets** create file **Footer.jsx**
+2. With **RFC** (React Function Component) create the code:
+   `export default function FooterComponent() {
+  return (
+    <div>Footer</div>
+    )
+  }
+  `
+3. On **App.jsx** file  in **/client/src** foldeer add the folder outside the <Routes> same way we did with Header. Don't forget to import it. `<Footer />` 
+4. on file Footer.jsx import the **Footer** component from **Flowbite**:
+   `import { Footer } from "flowbite-react";
+
+      export default function FooterComponent() {
+      return <Footer>Footer</Footer>;
+    }
+    `
+5. Make it a conanier: **<Footer container className="border border-t-8 border-blueEx">**
+6. In the third div add the Link tag and don't forget to import it to add the logo:
+   `<Link
+              to="/"
+              className="self-center whitespace-nowrap text-lg sm:text-xl font-semibold dark:text-white"
+            >
+              <span className="flex items-end justify-center ">
+                <img src={logo} alt="Logo Excel Solutions" className="h-10" />
+                <span className="text-greenEx"> Blog</span>
+              </span>
+              {/* <span className="px-2 py-1 bg-gradient-to-r from-blueEx to-greenEx rounded-lg text-white">
+          Excel Solutions®
+        </span>
+        Blog */}
+            </Link>`
+7. After the div with the logo code:
+   - A new <div> where we set up the columns **className="grid grid-cols-2 gap-3 sm, mt-4 sm:grid-cols-3 sm:gap-6">**
+   - Wrap the following code in another <div>
+   - Footer.Title from Flowbite with the title: **<Footer.Title title="About" />**
+   - Footer.LinkGroup group where we going to put a column organization: **<Footer.LinkGroup col>**
+   - Footer.Link to add links to another pages.
+   - The code will look like this:
+    `<div>
+              <Footer.Title title="About" />
+              <Footer.LinkGroup col>
+                <Footer.Link
+                  href="https://portfolio.excelsolutionsv.com"
+                  target="_blank"             // Blank and rel will help us to open the page in different tab.
+                  rel="noopener noreferrer"
+                >
+                  Portfolio
+                </Footer.Link>
+                <Footer.Link
+                  href="/about"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Excel SolutionsV® Blog
+                </Footer.Link>
+              </Footer.LinkGroup>
+            </div>`
+  - Do the Same for the Follow Us and Legal:
+    ` <div className="grid grid-cols-2 gap-3 mt-4 sm:grid-cols-3 sm:gap-6">
+            <div>
+              <Footer.Title title="About" />
+              <Footer.LinkGroup col>
+                <Footer.Link
+                  href="https://portfolio.excelsolutionsv.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Portfolio
+                </Footer.Link>
+                <Footer.Link
+                  href="/about"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Excel SolutionsV® Blog
+                </Footer.Link>
+              </Footer.LinkGroup>
+            </div>
+            <div>
+              <Footer.Title title="Follow Us" />
+              <Footer.LinkGroup row className="text-xl">
+                <Footer.Link
+                  href="https://www.github.com/svei00"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaGithub className="hover:text-github" />
+                </Footer.Link>
+                <Footer.Link
+                  href="https://www.linkedin.com/in/ivan-e-villanueva-26253157/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaLinkedin className="hover:text-linkedin" />
+                </Footer.Link>
+                <Footer.Link
+                  href="https://www.youtube.com/svei00"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaYoutube className="hover:text-red-600" />
+                </Footer.Link>
+                <Footer.Link
+                  href="https://x.com/svei00"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaXTwitter className="hover:text-xTwitter" />
+                </Footer.Link>
+              </Footer.LinkGroup>
+            </div>
+            <div>
+              <Footer.Title title="Legal" />
+              <Footer.LinkGroup col>
+                <Footer.Link href="#" target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </Footer.Link>
+                <Footer.Link href="#" target="_blank" rel="noopener noreferrer">
+                  Terms & Conditions
+                </Footer.Link>
+              </Footer.LinkGroup>
+            </div>
+          </div>
+        </div>`
+8. Adding the year and copyright. Add a Footer Dividier after the third div **<Footer.Divider />**
+9. Add another <div> to put the data:
+   `<Footer.Copyright
+            href="excelsolucionesv@gmail.com"
+            year={new Date().getFullYear()}
+            by=<span className="px-2 py-1 bg-gradient-to-r from-greenEx to-blueEx font-semi-bold font-serif rounded-lg text-white">
+              Ivan E. Villanueva
+            </span>
+          />`
+10. Add Social Media Icons:
+  
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
 * https://www.markdownguide.org/cheat-sheet/ - Markdown cheatsheet
