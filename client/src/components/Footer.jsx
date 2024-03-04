@@ -102,17 +102,30 @@ export default function FooterComponent() {
           />
           <div className="flex gap-6 sm-mt-0 mt-4 sm:justify-center">
             <Footer.Icon
+              className="hover:text-instagram"
               href="https://Instragram.com/svei00"
               icon={FaInstagram}
             />
-            <Footer.Icon href="#" icon={FaFacebook} />
-            <Footer.Icon href="#" icon={FaTiktok} />
+            <Footer.Icon
+              className="hover:text-facebook"
+              href="#"
+              icon={FaFacebook}
+            />
+            <Footer.Icon
+              className="hover:text-tiktok"
+              href="#"
+              icon={FaTiktok}
+            />
             <Footer.Icon
               className="hover:text-xTwitter"
               href="https://x.com/svei00"
               icon={FaXTwitter}
             />
-            <Footer.Icon href="#" icon={FaDribbble} />
+            <Footer.Icon
+              className="hover:text-dribbble"
+              href="#"
+              icon={FaDribbble}
+            />
           </div>
         </div>
       </div>

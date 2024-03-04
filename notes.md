@@ -718,7 +718,88 @@
               Ivan E. Villanueva
             </span>
           />`
-10. Add Social Media Icons:
+10. Add Social Media Icons in another <div>:
+    `<div className="flex gap-6 sm-mt-0 mt-4 sm:justify-center">
+            <Footer.Icon
+              className="hover:text-instagram"
+              href="https://Instragram.com/svei00"
+              icon={FaInstagram}
+            />
+            <Footer.Icon
+              className="hover:text-facebook"
+              href="#"
+              icon={FaFacebook}
+            />
+            <Footer.Icon
+              className="hover:text-tiktok"
+              href="#"
+              icon={FaTiktok}
+            />
+            <Footer.Icon
+              className="hover:text-xTwitter"
+              href="https://x.com/svei00"
+              icon={FaXTwitter}
+            />
+            <Footer.Icon
+              className="hover:text-dribbble"
+              href="#"
+              icon={FaDribbble}
+            />
+          </div>`
+
+## Create signin API route
+1. Go to the **/api/routes** folder.
+2. Open file **auth.route.js** 
+3. Create the route of signin **router.post("/signin", signin);**
+   - Don't forget to import the function **signin** from **auth.controller.js**
+4. Install package **jsonwebtoken** via **npm i jsonwebtoken** or **yarn add jsonwebtoken**
+   - import it to the file: **import jwt from "jsonwebtoken";**
+5. On **.env** file, create the variable **JWT_SECRET** with the value **mysecretkey**
+6. Go to the file **auth.controller.js** on folder **/api/controllers**
+  - We're going to export: 
+  - `export const signin = async (req, res, next) => {}`
+     * Where **async** is because we'll  need to wait for the server response.
+     * **req** to sent the request 
+     * **res** which is the response of the request.
+     * **next** to pass the control to the next middleware and handle errors.
+     * **Pro TIP** with CTRL + D and selecting the words you want to change you can do it in a snap!
+     * Code will look like this:   
+      `export const signin = async (req, res, next) => { // Requiremente, response and Next to manage m 
+        const { email, password } = req.body;
+
+        if (!email || !password || email === "" || password === "") {
+          next(errorHandler(400, "All fields are required"));
+        }
+        try {
+          const validUser = await User.findOne({ email });
+          if (!validUser) {
+            // next(errorHandler(404, "User not found =(")); We comment this part because it was an example it is not a good idea to give to hackers a clue of which is the password and which the email or username
+            next(errorHandler(400, "Invalid credentials =("));
+          }
+          const validPassword = bcryptjs.compareSync(password, validUser.password);
+          next(errorHandler(400, "Invalid credentials =("));
+
+          const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+          const { password: pass, ...rest } = validUser._doc; // With this we separate the password from the file and only send the user for a good practice.
+
+          res
+            .status(200)
+            .cookie("access_token", token, {
+              httpOnly: true,
+            })
+            .json(validUser);
+        } catch (error) {
+          next(error);
+        }
+      };
+      `
+7. On Thunder Client run the test: **localhost:3000/api/auth/signin**
+   - Parameters are:
+   - {
+        "email": "test@test.com"
+        "password": "test123"
+    }
+ 
   
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
@@ -726,3 +807,4 @@
 * https://levelup.gitconnected.com/display-images-in-react-8ff1f5b1cf9a - Displays Images
 * https://nerdcave.com/tailwind-cheat-sheet - Tailwind CheatSheet
 * https://tailwindcss.com/docs/customizing-colors - Custom Colors in Tailwind
+* https://usbrandcolors.com/
