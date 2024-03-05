@@ -771,7 +771,7 @@
           next(errorHandler(400, "All fields are required"));
         }
         try {
-          const validUser = await User.findOne({ email });
+          const validUser = await User.findOne({ email }); // FindOn help us to find data
           if (!validUser) {
             // next(errorHandler(404, "User not found =(")); We comment this part because it was an example it is not a good idea to give to hackers a clue of which is the password and which the email or username
             next(errorHandler(400, "Invalid credentials =("));
@@ -799,7 +799,8 @@
         "email": "test@test.com"
         "password": "test123"
     }
- 
+
+## Complete signin page functionality - MERN Blog
   
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
