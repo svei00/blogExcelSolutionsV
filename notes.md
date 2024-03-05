@@ -801,6 +801,20 @@
     }
 
 ## Complete signin page functionality - MERN Blog
+1. Go to **/client/src/pages** and open the file **SigIn.jsx**
+2. Go to **SignUp.jsx** page and copy everything to **SigIn.jsx** page
+3. Starting from top to botton start to making changes, so change **SignUp** to **SignIn** you can use **CTRL + F** to find or **CTRL + H** to find and replace.
+4. Around line of code **15** remove username field.
+5. Around line of code **30** change the route in **navigate** from **/signin** to home I mean **/**
+6. Around line of code **60** change **Sign up** to **Sign in**
+7. Around line of code **70** inside the form remove the div that refers to **username**.
+8. Around line of code **80** change the **placeholder** text from password to ************** 
+9. Around line of code **100** change Button from **Sign Up** to **Sign In**
+10. Around the same line of code change **Do you have an account?** to **Don't have an account?**
+11. In the same line of code **<Link to=/sign-up>**
+12. Try it. Sign in with one of the accounts created and test.
+
+## Add Redux Toolkit
   
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"

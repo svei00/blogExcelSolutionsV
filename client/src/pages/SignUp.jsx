@@ -86,7 +86,7 @@ const SignUp = () => {
               />
             </div>
             <div className="">
-              <Label value="What's your name: " />
+              <Label value="What's your Password: " />
               <TextInput
                 type="password"
                 placeholder="Password"
