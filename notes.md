@@ -815,7 +815,96 @@
 12. Try it. Sign in with one of the accounts created and test.
 
 ## Add Redux Toolkit
-  
+1. Search in Google **Redux Toolkit** or go to [Redux Toolkit](https://redux-toolkit.js.org/).
+2. Hit on **Get Started** then on the left side **Quick Start**.
+3. Install the package via NPM **npm install @reduxjs/toolkit react-redux** or Yarn **yarn add @reduxjs/toolkit react-redux** on the Front end folder (/client).
+4. Create **Redux Store** you can copy the snippet on Redux oficial page.
+   - Go to **/client/src** and create **redux** folder.
+   - Indide the **/redux** folder create the file **store.js** and paste the code:
+     `import { configureStore } from '@reduxjs/toolkit'
+
+        export const store = configureStore({
+        reducer: {},
+      })`
+  5. Go to the **/client** folder and open the **main.jsx** file to continue with the third step of installing redux tool kit that way it would be avalieble of all the application.
+  - So import **import { store } from './redux/store.js'** and **import { Provider } from 'react-redux'**
+  - It should look like this:
+    ` import ReactDOM from "react-dom/client";
+      import App from "./App.jsx";
+      import "./index.css";
+      import { store } from "./redux/store.js";
+      import { Provider } from "react-redux";
+
+      ReactDOM.createRoot(document.getElementById("root")).render(
+        <Provider store={store}>
+          <App />
+        </Provider>
+        );` 
+6. Create a Reduce State Slice.
+  - Go to **/client/src/redux** and create a folder called **user**.
+  - Inside the folder create the file **userSlice.js** and paste the code:
+    `import { createSlice } from "@reduxjs/toolkit";
+
+      const initialState = { // Those are null when we load the page.
+        currentUser: null,
+        error: null,
+        loading: false,
+      };
+
+      const userSlice = createSlice({
+        name: "user",
+        initialState,
+        reducers: {
+          signInStart: (state) => {
+            state.loading = true;
+            state.error = null;
+          },
+          signInSuccess: (state, action) => {
+            state.currentUser = action.payload; // It is the same payload we can find in the Inspect/Network on our browser.
+            state.loading = false;
+            state.error = null;
+          },
+          signInFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+          },
+        },
+      });
+
+      export const { signInStart, signInSuccess, signInFailure } = userSlice.actions;
+
+      export default userSlice.reducer; // We can change the name later`
+7. On file **store.js** add the reducer.
+   - Import the reducer `import { useReducer } from "./user/userSlice";`
+   - The code should look like this:
+      ` import { configureStore } from "@reduxjs/toolkit";
+        import { useReducer } from "./user/userSlice";
+
+        export const store = configureStore({
+          reducer: {
+            user: useReducer,
+          },
+        });`
+   - Now we can use it inside the **SignIn.jsx**
+8. On file **SignIn.jsx** import the reducer and the action.
+   - `import { useDispatch } from "react-redux";`
+   - `import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";`
+9. Initialize the **useDispatch** hook.
+  - Initialize the dispatch`const dispatch = useDispatch();`
+  - In the **try and catch** statement change around line of code **30** **setLoading(true);** and **setErrorMessage(null);** to **dispatch(signInStart());**
+  - Around line of code **20** replace **setErrorMessage("Please fill out all the fields!");** to **dispatch(signInFailure("Please fill out all the fields!"));** the return remains the same.
+  - Around the same line of code **30** change **return setErrorMessage(data.message);** to **dispatch(signInFailure(data.message));**
+  - Now between **if (res.ok) {** and **navigate("/");** around line of code **40** write **dispatch(signInSuccess(data));** also delete the **setLoading(false);** which is above.
+  - In the **catch** section around line of code **40** replace **setErrorMessage(error.message);** and **setLoading(false);** for **dispatch(signInFailure(error.message));**
+10. For manage erros and change line of code **{errorMessage && (** arond line of code **110**
+    - Add **useSelector** on the **react-reduc** import like this: `import { useDispatch, useSelector } from "react-redux";`
+    - Get rid of line **const [errorMessage, setErrorMessage] = useState(null);** around line of code **10** and replace for **const { loading, error: errorMessage } = useSelector(state => state.user);** remember that we get user from file **userSlice.js** in the name around line **10**.
+11. To verify if it is working install **Redux DevTools** on your browser if you're using Chrome like go to ... > Extensions > Manage Extensions and find and install **Redux DevTools** 
+12. Now You can use the Redux DevToolkit in the Inspect menu
+13. Run your test. You know wrong password, wrong username, no user, etc. in the Redux Toolkit you can se the chantes on **State** tab and in **Action** tab you can see the payload. Also you can run the step by step.
+
+## Adding Redux Persist.
+
 # Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
 * https://www.markdownguide.org/cheat-sheet/ - Markdown cheatsheet
