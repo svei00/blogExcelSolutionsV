@@ -952,7 +952,31 @@
           </PersistGate>
         );
         `
+8.  Now you can run your test and see how it works with Redux DevTookKit.
+   
 
+## Add Google OAuth Functionality.
+1. Create the Component of the Button. That way you can use it in both places (Sign-in and Sign-up pages).
+   - Go to **/client/src/components/** folder.
+   - Create the file **OAuth.jsx** file.
+   - Using RFC create the React Functional Component:
+      `export default function OAuth() {
+        return <div>OAuth</div>;
+      }`
+   -  Now go to **/client/src/pages/SignIn.jsx** file and Add the Component directy under the closing tag of **<Button>** and don't forget to import it if it does not import it automatically. 
+   -  Same thing with the **SignUp.jsx** file.
+   -  Check if it renders.
+2. In the OAuth component add the **<Buttom>** from Flowbite instead the **<div>**
+3. Customize the button:
+   ` <Button
+        type="button"
+        className="px-2 py-1 bg-gradient-to-r from-greenEx to-blueEx font-semi-bold font-serif rounded-lg text-white"
+        outline
+      >
+        <AiFillGoogleCircle className="w-6 h-6 mr-2" />
+        Continue with Google 3:17
+      </Button>`
+      
 
 
 ## Biblography
