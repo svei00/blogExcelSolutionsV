@@ -904,9 +904,60 @@
 13. Run your test. You know wrong password, wrong username, no user, etc. in the Redux Toolkit you can se the chantes on **State** tab and in **Action** tab you can see the payload. Also you can run the step by step.
 
 ## Adding Redux Persist.
+1. In the same page of [Redux Toolkit](https://redux-toolkit.js.org/) search for persist. Persist its a function that you can use to save the state of your application in the local storage of your browser. That help us to don{t lose data.
+2. Install the package **redux-persist** via **npm i redux-persist** or **yarn add redux-persist**
+3. on file **/redux/store** in the import @reduxjs/toolkit import combineReducers **import { configureStore, combineReducers } from "@reduxjs/toolkit";**
+4. Create a root reducer:
+   `const rootReducer = combineReducers({
+      user: userReducer;
+    }`
+5. Create a persistConfig object (configurarion):
+   - First of all import the storage: **import storage from "redux-persist/lib/storage";**
+   - `const persistConfig = {
+        key: "root",
+        storage,
+        version: 1,
+      }
 
-# Biblography
-* https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code"
+      const persistedReducer = persistReducer(persistConfig, rootReducer);`
+6. In order to avoid to make one reducer per event just use the **rootReducer**
+   `const rootReducer = combineReducers({
+        user: userReducer;
+      });
+
+      const persistConfig = {
+        key: "root",
+        storage,
+        version: 1,
+      },
+
+      const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+      export const store = configureStore({
+        reducer: persistedReducer,
+        middleware: (getDefaultMiddleware) => 
+        getDefaultMiddleware({serializableCheck: false}),
+      });
+
+      export const persistor = persistStore(store);`
+7. Now in folder **/client/src** open the **main.jsx** file.
+   - On **./redux/store.jsx** import, import the **persistor**:
+   - Then **import { PersistGate } from "redux-persist/integration/react";**
+   - Cover everything with the **PersistGate** tag:
+      `ReactDOM.createRoot(document.getElementById("root")).render(
+          <PersistGate persistor={persistor}>
+            <Provider store={store}>
+              <App />
+            </Provider>
+          </PersistGate>
+        );
+        `
+
+
+
+## Biblography
+* https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
+* https://github.com/sahandghavidel/mern-blog - "Github Source Code"
 * https://www.markdownguide.org/cheat-sheet/ - Markdown cheatsheet
 * https://levelup.gitconnected.com/display-images-in-react-8ff1f5b1cf9a - Displays Images
 * https://nerdcave.com/tailwind-cheat-sheet - Tailwind CheatSheet

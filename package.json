@@ -17,6 +17,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.0",
     "nodemon": "^3.1.0",
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "redux-persist": "^6.0.0"
   }
 }
