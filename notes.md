@@ -970,13 +970,48 @@
 3. Customize the button:
    ` <Button
         type="button"
-        className="px-2 py-1 bg-gradient-to-r from-greenEx to-blueEx font-semi-bold font-serif rounded-lg text-white"
-        outline
+         className="px-2 py-1 border-2 border-blueEx font-semibold rounded-lg text-black hover:bg-gradient-to-r hover:from-greenEx hover:to-blueEx hover:text-white"
       >
         <AiFillGoogleCircle className="w-6 h-6 mr-2" />
         Continue with Google 3:17
       </Button>`
-      
+4. Adding Functionality to the Button:
+   - Add **onClick={handleGoogleClick}** on opening button tag.
+   - Add an Asyncronus functions before the return:
+     * First go to [Firebase](https://firebase.google.com/).
+     * Go to **Console** (Top Right).
+     * **+ Add Project/Create Project** Add a name of your project ex. mern-blog. If it is your first time accept the terms and conditions and usage confirmation.
+     * At this time do not Enable Google Analytics and hit in create project.
+     * Create a new **Web** Project.
+     * Add an **App Nick Name** you can leave the same name of the project, do not check the Firebase Hosting and **Register the App**
+     * Install de Firebase via npm **npm install firebase** or yarn **yarn add firebase** on client/frontend folder.
+     * Now copy the code from the **SDK** for that inside the **/client/src/** and create the file **firebase.js** and paste the code inside.
+     * Check it out this code in the file **firebase.js**
+       `// apiKey: process.env.REACT_APP_FIREBASE_API_KEY, // For React
+           apiKey: import.meta.env.REACT_APP_FIREBASE_API_KEY, // For Vite`
+     * Hit in continue to console.
+     * Now go to Autentication > Get Started > Aditional Providers > Select Google > In the toggle button select enable > Public Facing name can put the same name of the project and email select the account you signed in and **Save**.
+     * Create another **.env** file inside the **/client** to hide the apiKey. Make sure to create the file in the client root directory if not it won't work.
+     * Since we're using Vite we need to create the enviromental variable using that keyword. **VITE_FIREBASE_API_KEY="your_api_key"**
+     * On **firebase.js** change the key for: **apiKey: process.env.VITE_FIREBASE_API_KEY,**
+     * Export the **firebase** object from the **firebase.js** file.
+     `import { getAuth, GoogleAuthProvider } from "firebase/auth"; // Import the functions
+      import { app } from "../firebase";
+
+      export default function OAuth() {
+        const auth = getAuth(app); // Remember this comes from our firebase.js file
+        const handleGoogleClick = async () => { // It is asyncronus function since we have to wait for the answer of the server
+          const provider = new GoogleAuthProvider();
+
+          try {
+            const resultsFromGoogle = await auth.signInWithPopup(auth, provider);
+            console.log(resultsFromGoogle); // For testing purposes
+          } catch (error) {
+            console.log(error); // not so important just for testing
+          }
+        };
+      `
+      **3:25:41**
 
 
 ## Biblography
