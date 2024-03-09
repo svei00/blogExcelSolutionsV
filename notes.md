@@ -956,6 +956,7 @@
    
 
 ## Add Google OAuth Functionality.
+### FrontEnd
 1. Create the Component of the Button. That way you can use it in both places (Sign-in and Sign-up pages).
    - Go to **/client/src/components/** folder.
    - Create the file **OAuth.jsx** file.
@@ -1011,7 +1012,93 @@
           }
         };
       `
-      **3:25:41**
+5. Fetching the information. In file **OAuth.jsx** on the try bloc remove the console.log for test purposes for:
+   `const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: resultsFromGoogle.user.displayName,
+          email: resultsFromGoogle.user.email,
+          googlePhotoUrl: resultsFromGoogle.user.photoURL,
+        }),
+      });
+      const data = await res.json();`
+6. Then we'll need to import **useDispatch** from **react-redux** in order to dispatch the information to the store. `import {useDispatch} from "react-redux";`
+   - Initialize the **dispatch** function between getAuth and handleGoogleClick:
+      `const dispatch = useDispatch();` 
+    - Import **import {signInSuccess} from "../redux/user/userSlice";** 
+    - Also Import **navitage** like this `import { navigate } from "react-router-dom";`
+      * Initialize it writing the code after the dispatch:
+        `const navigate = useNavigate();`
+7. The code should se like this:
+   `const data = await res.json();
+      if (res.ok) {
+        dispatch(signInSuccess(data));
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }`
+    
+   }
+### BackEnd.
+1. Go to the folder **/api/routes** 
+2. Open the file **auth.route.js**
+   - Add `router.post("/google", google);`
+3. Create the function **google** on file **auth.controller.js** (**/api/controllers**)
+   - `export const google = async (req, res, next) => {};`
+   - import in into **auth.route.js** file. It should look like: `import { signup, signin, google } from "../controllers/auth.controller.js";`
+   - Add to the model **/api/models/user.model.js** the photo.
+     `profilePicture: {
+      type: String,
+      default:
+        "https://t4.ftcdn.net/jpg/05/42/36/11/360_F_542361185_VFRJWpR2FH5OiAEVveWO7oZnfSccZfD3.jpg", // Can use a defaul image taked from Google
+    },`
+   - Continue with the function:
+     `export const google = async (req, res, next) => {
+  const { email, name, googleProtoUrl } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (User) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = user._doc; // Substract the password
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    } else {
+      // Math.randon will generate password 36 means any number between 1-9 and letters a-z Slice(-8) will take the last 8 characters
+      const generatePassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatePassword, 10);
+      const newUser = new User({
+        username:
+          name.toLowerCase().split(" ").join("") +
+          Math.random().toString(9).slice(-4), // We put 9 to use only numers
+        email,
+        password: hashedPassword,
+        profilePicture: googlePhotoUrl,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
+  }
+};`
+
+## Update Header Component with User Data
+ 
 
 
 ## Biblography
