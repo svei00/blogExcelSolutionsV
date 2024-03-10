@@ -1098,6 +1098,36 @@
 };`
 
 ## Update Header Component with User Data
+1. Close all the Visual Studio Tabs, then open **/client/src/components/Header.jsx**
+2. Import **useSelector** from **react-redux** `import { UseSelector } from "react-redux";`
+3. Initialize the useSelector after the useLocation initializatin: `const { currentUser } = useSelector((state) => state.user);`
+4. Modify the line of code where is the <Link to> which is between the closin </Button> and the open of <Navbar.Toggle>:
+   - Write: 
+     `{currentUser ? () :
+        }`
+   - Then inside move the <Link to> tag inside the false statement in the ternary if.
+   - Now in the true statement write the **<Dropdown></Dropdown>** tag. Remember to import it if VScode don't auto import it.
+   - Working in the Dropdown it shoul se like:
+     `<Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar alt="user" img={currentUser.profilePicture} rounded /> // Remember to Import the Avatar from Flowbite if it won't autoimport.
+            }
+          ></Dropdown>`
+    - For the <Dropdown.Header>:
+      `<Dropdown.Header>
+              <span className="block text-sm">@{currentUser.name}</span>
+              <span className="block text-sm font-medium truncate">
+                {currentUser.email}
+              </span>
+            </Dropdown.Header>`
+    - Add the link section that should look like this:
+      `<Link to="/dashboard?tab=profile">
+              <Dropdown.Item>Profile</Dropdown.Item>
+            </Link>
+            <Dropdown.Divider />
+            <Dropdown.Item>Sign Out</Dropdown.Item>`
  
 
 
