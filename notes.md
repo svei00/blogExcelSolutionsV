@@ -1056,10 +1056,10 @@
     },`
    - Continue with the function:
      `export const google = async (req, res, next) => {
-  const { email, name, googleProtoUrl } = req.body;
+  const { email, name, googlePhotoUrl } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (User) {
+    if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = user._doc; // Substract the password
       res
@@ -1128,7 +1128,8 @@
             </Link>
             <Dropdown.Divider />
             <Dropdown.Item>Sign Out</Dropdown.Item>`
- 
+
+## Complete Dark Mode Functionality. 
 
 
 ## Biblography

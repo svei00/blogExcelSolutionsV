@@ -70,10 +70,12 @@ export const signin = async (req, res, next) => {
 };
 
 export const google = async (req, res, next) => {
-  const { email, name, googleProtoUrl } = req.body;
+  const { email, name, googlePhotoUrl } = req.body; // Corrected variable name
+
   try {
     const user = await User.findOne({ email });
-    if (User) {
+    if (user) {
+      // Corrected variable name
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = user._doc; // Substract the password
       res
@@ -94,7 +96,7 @@ export const google = async (req, res, next) => {
           Math.random().toString(9).slice(-4), // We put 9 to use only numers
         email,
         password: hashedPassword,
-        profilePicture: googlePhotoUrl,
+        profilePicture: googlePhotoUrl, // Corrected variable name
       });
       await newUser.save();
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
