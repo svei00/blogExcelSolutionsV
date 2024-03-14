@@ -1130,6 +1130,9 @@
             <Dropdown.Item>Sign Out</Dropdown.Item>`
 
 ## Complete Dark Mode Functionality. 
+1. Go to **/client/src/redux** folder then create a folder called **theme**
+2. In the folder create the file **themeSlice.js**
+   - Then `import { createSlice } from "@reduxjs/toolkit";`
 
 
 ## Biblography
