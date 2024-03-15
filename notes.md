@@ -1133,6 +1133,26 @@
 1. Go to **/client/src/redux** folder then create a folder called **theme**
 2. In the folder create the file **themeSlice.js**
    - Then `import { createSlice } from "@reduxjs/toolkit";`
+   - The code should be like this:
+     `const initialState = {
+        theme: "light",
+      };
+
+      const themeSlice = createSlice({
+        name: "theme",
+        initialState,
+        reducers: {
+          toggleTheme: (state) => {
+            state.theme = state.theme === "light" ? "dark" : "light";
+          },
+        },
+      });
+
+      export const { toggleTheme } = themeSlice.actions;
+
+      export default themeSlice.reducer;`
+
+3:47
 
 
 ## Biblography
