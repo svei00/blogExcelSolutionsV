@@ -1152,7 +1152,52 @@
 
       export default themeSlice.reducer;`
 
-3:47
+3. Open the file **store.js** file on **/client/src/redux** folder.
+   - On the rootReducer add the following code. Don't forget to `import {themeReducer} from "./theme/themeSlice"`
+   - Inside the rootReducer add the following code:
+    `theme: themeReducer`
+4. Open folder **/client/src/components** create the file: **ThemeProvider.jsx**
+   - Create a RFC (React Functional Component). Type RFC:
+     `import { useSelector } from "react-redux";
+
+      export default function ThemeProvider({ children }) {
+        const { theme } = useSelector((state) => state.theme);
+
+        return (
+          <div className={theme}>
+            <div className="bg-white text-gray-700 dark:bg-[rgb(16,23,42)] dark:text-gray-200">
+              {children}
+            </div>
+          </div>
+        );
+      }`
+5. In order to change all the pages when toggle the button go **/client/** folder 
+   - Open **App.jsx** file and enclose in tags the ThemeProvider.
+   - Code should look like this:
+     `ReactDOM.createRoot(document.getElementById("root")).render(
+          <PersistGate persistor={persistor}>
+            <Provider store={store}>
+              <ThemeProvider>
+                <App />
+              </ThemeProvider>
+            </Provider>
+          </PersistGate>
+        );
+        `
+6. Go to **Header.jsx** on **/client/src/components**
+   - Import the **useDispatch** `import { useSelector, useDispatch } from "react-redux";`
+   - Now import the togleTheme `import { toggleTheme } from "../redux/theme/themeSlice";`
+   - Go to **<FaMoon>** button and add onClick event `onClick={() => dispatch(toggleTheme())}`
+   - afther path add: `const dispatch = useDispatch();`
+   - Test the code.
+7. To know which theme we're using add the line of code: 
+   -   - After currentUser line code the useState:`const { theme } = useSelector((state) => state.theme);`
+8. Add the icon of sun by importing **FaSun** `import { FaMoon, FaSun } from "react-icons/fa";`
+   - Then replace **<FaMoon>** to:
+     `{theme === "light" ? <FaSun /> : <FaMoon />}`
+9. If you want to cover all the page add to the time provider **min-h-screen**: `<div className="bg-white text-gray-700 dark:bg-[rgb(16,23,42)] dark:text-gray-200 min-h-screen">`
+
+## Make the Dashboard Private
 
 
 ## Biblography
