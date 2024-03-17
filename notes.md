@@ -1198,6 +1198,28 @@
 9. If you want to cover all the page add to the time provider **min-h-screen**: `<div className="bg-white text-gray-700 dark:bg-[rgb(16,23,42)] dark:text-gray-200 min-h-screen">`
 
 ## Make the Dashboard Private
+1. In order to make some pages private, like the dashboard we need to create a new page.
+   - Go to **/client/src/components/** 
+   - create the file **PrivateRoute.jsx**
+   - Create the RFC (React Functional Component).
+   - Import the useSelector since we want to know if the user is logged in or not
+   - Code should look like:  
+     `import { useSelector } from "react-redux";
+      import { Navigate, Outlet } from "react-router-dom";
+
+      export default function PrivateRoute() {
+        const { currentUser } = useSelector((state) => state.user);
+
+        return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;
+      }
+      `
+2. Cover the dashboard on **/client/App.jsx** with the **<PrivateRoute>** tags.
+   `<Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>`
+        ** Remember to `import PrivateRoute from "./components/PrivateRoute";`
+
+## Complete Sidebar of the Dashboard
 
 
 ## Biblography
