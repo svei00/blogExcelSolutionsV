@@ -1117,7 +1117,7 @@
           ></Dropdown>`
     - For the <Dropdown.Header>:
       `<Dropdown.Header>
-              <span className="block text-sm">@{currentUser.name}</span>
+              <span className="block text-sm">@{currentUser.username}</span>
               <span className="block text-sm font-medium truncate">
                 {currentUser.email}
               </span>
@@ -1153,7 +1153,7 @@
       export default themeSlice.reducer;`
 
 3. Open the file **store.js** file on **/client/src/redux** folder.
-   - On the rootReducer add the following code. Don't forget to `import {themeReducer} from "./theme/themeSlice"`
+   - On the rootReducer add the following code. Don't forget to `import themeReducer from "./theme/themeSlice"`
    - Inside the rootReducer add the following code:
     `theme: themeReducer`
 4. Open folder **/client/src/components** create the file: **ThemeProvider.jsx**
