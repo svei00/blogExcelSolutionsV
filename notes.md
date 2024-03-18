@@ -1220,6 +1220,81 @@
         ** Remember to `import PrivateRoute from "./components/PrivateRoute";`
 
 ## Complete Sidebar of the Dashboard
+1. Open the **Dashboard.jsx** file from **/client/src/pages**
+2. import `import { useLocation } from "react-router-dom";`
+3. Create a function that will return the active class for the sidebar. It should look likle this:
+   `import { useEffect, useState } from "react";
+    import { useLocation } from "react-router-dom";
+
+    export default function Dashboard() {
+      const location = useLocation();
+      const [tab, setTab] = useState(""); // Remember to import it if VSCode doesn't do it 
+      useEffect(() => { // Remember to import it
+        const urlParams = new URLSearchParams(location.search);
+        const tabFromUrl = urlParams.get("tab");
+        // console.log(tabFromUrl); for testing purposes.
+      }, [location.search]);
+      return (
+        <div>
+          <div className="">{/* SideBar */}</div>
+          {/* Profile */}
+        </div>
+      );
+    }
+`
+4. Inside folder **/client/src/component** create:
+   - File called **DashProfile.jsx**
+   - File called **DashSidebar.jsx**
+   - Create the RFC in each one.
+5. Import the files in **Dashboard.jsx** if when you add <DashSidebar/> and <DashProfile/> doesn't do automatically.
+6. On file **Dashboard** comment or delete the console.log and add:
+   `  if (tabFromUrl) {
+      setTab(tabFromUrl);
+    }`
+### Working on DashSidebar
+7. Use **<Sidebar/>** from Flowbite, remember if not auto import do it.
+8. Page should look like this:
+   `import { Sidebar } from "flowbite-react";
+    import { useEffect, useState } from "react";
+    import { HiArrowSmRight, HiUser } from "react-icons/hi";
+    import { Link, useLocation } from "react-router-dom";
+
+    export default function DashSidebar() {
+      const location = useLocation(); // We bring this 10 lines of code from Dashboard.jsx and import the necesary libraries
+      const [tab, setTab] = useState("");
+      useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        const tabFromUrl = urlParams.get("tab");
+        // console.log(tabFromUrl);
+        if (tabFromUrl) {
+          setTab(tabFromUrl);
+        }
+      }, [location.search]);
+      return (
+        <Sidebar className="w-full md:w-56"> // To divide the side bar from the profile
+          <Sidebar.Items>
+            <Sidebar.ItemGroup>
+              <Link to="/dashboard?tab=profile">
+                <Sidebar.Item
+                  active={tab === "profile"} // To make the page active
+                  icon={HiUser}
+                  label={"Change Later"}
+                  labelColor="dark"
+                >
+                  Profile
+                </Sidebar.Item>
+              </Link>
+              <Sidebar.Item icon={HiArrowSmRight} className="cursor-pointer"> // No need to make it active
+                Sign Out
+              </Sidebar.Item>
+            </Sidebar.ItemGroup>
+          </Sidebar.Items>
+        </Sidebar>
+      );`
+
+
+## Complete Profile Page UI
+
 
 
 ## Biblography
