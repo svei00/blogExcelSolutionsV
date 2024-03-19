@@ -1294,6 +1294,59 @@
 
 
 ## Complete Profile Page UI
+1. We're gont to work on file **DashproFile.jsx** on folder **/client/src/components**
+2. Code should look like this:
+   `import { useSelector } from "react-redux";
+    import { TextInput, Button } from "flowbite-react";
+
+    export default function DahsProfile() {
+      const { currentUser } = useSelector((state) => state.user);
+      return (
+        <div className="max-w-lg mx-auto p-3 w-full"> // This line is to center the image in larger screen
+          <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1> //Set the header text
+          <form className="flex flex-col gap-4"> // We make it flex in order to center in small screen and put a gap between text inputs
+            <div className="w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"> // Complementary style to center, remember the parent should be flex
+              <img
+                src={currentUser.profilePicture} // get the image from firebase
+                alt="User Image"
+                className="rounded-full w-full h-full object-cover border-8 border-[lightgray]"
+              />
+            </div>
+            <TextInput // If TextInput doesn't autoimport, import them from flowbite
+              type="text"
+              id="username"
+              placeholder="Username"
+              defaultValue={currentUser.username}
+            />
+            <TextInput
+              type="text"
+              id="email"
+              placeholder="Email"
+              defaultValue={currentUser.email}
+            />
+            <TextInput
+              type="password"
+              id="password"
+              placeholder="Would you like to change your Password?"
+            />
+            <Button // The same, if not auto import do it manually.
+              type="submit"
+              className="bg-gradient-to-r from-blueEx to-greenEx"
+              outline
+            >
+              Update
+            </Button>
+          </form>
+          <div className="text-red-500 flex justify-between mt-5 font-semibold">
+            <span className="cursor-pointer hover:text-blueEx">Delete Account</span>
+            <span className="cursor-pointer  hover:text-greenEx">Sign Out</span>
+          </div>
+        </div>
+      );
+    }
+    `
+
+## Complete user image upload functionality
 
 
 
