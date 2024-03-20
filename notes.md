@@ -1346,7 +1346,7 @@
     }
     `
 
-## Complete user image upload functionality
+## Complete User Image Upload Functionality
 
 
 

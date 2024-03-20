@@ -38,7 +38,8 @@ export default function OAuth() {
   return (
     <Button
       type="button"
-      className="px-2 py-1 border-2 border-blueEx font-semibold rounded-lg text-black hover:bg-gradient-to-r hover:from-greenEx hover:to-blueEx hover:text-white"
+      className="bg-gradient-to-r from-greenEx to-blueEx"
+      outline
       onClick={handleGoogleClick}
     >
       <AiFillGoogleCircle className="w-6 h-6 mr-2" />
