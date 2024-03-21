@@ -1347,6 +1347,21 @@
     `
 
 ## Complete User Image Upload Functionality
+1. We'll keep working on the same file **DashProfile.jsx** 
+2. After the **<form>** opening tag add the input:
+   - `<input type="file" accept="image/*" />` // The image/* means that it will aceept any of the supported image files.
+3. Then add an useState hook to store the image file after the {currentUser} variable:
+   - `const [imageFile, setImageFile] = useState(null);`
+   - Add an onChange event onto the **<Input/>** so code should be:
+     `<input type="file" accept="image/*" onChange={handleImageChange} />`
+4. Create the function **handleImageChange** after the useState:
+   - ` const handleImageChange = (e) => {
+      setImageFile(e.target.files[0]);
+    };
+    console.log(imageFile); // This console log is to get img information.
+    `
+
+4:18:56
 
 
 
