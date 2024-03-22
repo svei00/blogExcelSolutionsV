@@ -54,7 +54,8 @@ export default function FooterComponent() {
             </div>
             <div>
               <Footer.Title title="Follow Us" />
-              <Footer.LinkGroup row className="text-xl">
+              <Footer.LinkGroup className="text-xl">
+                {/* was <Footer.LinkGroup row className="text-xl"> */}
                 <Footer.Link
                   href="https://www.github.com/svei00"
                   target="_blank"
