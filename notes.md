@@ -1280,6 +1280,7 @@
                   icon={HiUser}
                   label={"Change Later"}
                   labelColor="dark"
+                  as="div"
                 >
                   Profile
                 </Sidebar.Item>
@@ -1360,8 +1361,18 @@
     };
     console.log(imageFile); // This console log is to get img information.
     `
-
-4:18:56
+5. Convert the image into a temporary image url.
+   - After the imageFile variable add the following code: `const { imageFileUrl, setImageFileUrl } = useState(null);`
+   - Change the handleImageChange function to the following code:
+     `const handleImageChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setImageFile(file);
+        setImageFileUrl(URL.createObjectURL(file));
+      }
+    };`
+  - change the console.log for `console.log(imageFile, imageFileUrl);`
+  - For now change the **src** from src={currentUser.profilePicture} to `src={imageFileUrl || currentUser.profilePicture}`
 
 
 
