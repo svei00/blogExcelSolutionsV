@@ -666,6 +666,7 @@
             <div>
               <Footer.Title title="Follow Us" />
               <Footer.LinkGroup row className="text-xl">
+              {/* was <Footer.LinkGroup row className="text-xl"> */}
                 <Footer.Link
                   href="https://www.github.com/svei00"
                   target="_blank"
@@ -1373,6 +1374,14 @@
     };`
   - change the console.log for `console.log(imageFile, imageFileUrl);`
   - For now change the **src** from src={currentUser.profilePicture} to `src={imageFileUrl || currentUser.profilePicture}`
+6. Now we want to pick the picture so for that:
+   - Create the variable filePickerRef and import useRef it it doesn't do automatically.
+     * ` const filePickerRef = useRef();`
+   - Add in the <Input> so change <input type="file" accept="image/*" onChange={handleImageChange} /> for `<input type="file" accept="image/*" onChange={handleImageChange} ref={filePickerRef}/>`
+   - In the next div add in at the final `onClick={() => filePickerRef.current.click()}`
+   - Make the input hidden by adding **hidden** at the end of the input tag.
+  
+  4:23:32
 
 
 
