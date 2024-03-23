@@ -1380,9 +1380,44 @@
    - Add in the <Input> so change <input type="file" accept="image/*" onChange={handleImageChange} /> for `<input type="file" accept="image/*" onChange={handleImageChange} ref={filePickerRef}/>`
    - In the next div add in at the final `onClick={() => filePickerRef.current.click()}`
    - Make the input hidden by adding **hidden** at the end of the input tag.
-  
-  4:23:32
+7. After the **handleImageChange** function add an **useEffect** to know if there is a new function.
+   - Code should look like this:
+     `useEffect(() =>{
+        if(imageFile) {
+          uploadImage();
+        }
+      }, [imageFile]);`
+8. Create an **Asyncronous** function since we need to interact with the server.
+   - For now we create the function and console.log to see if it will work:
+     ` const uploadImage = async () => {
+          console.log("Uploading image...");
+        };`
+   - Go back to Firebase and sign in with your proper accont.
+   - Hit in **Go to console**
+   - Select the blog project
+   - Hit in **Built** → **Storage** → **Get Started**
+   - Select **Production Mode** and hit next
+     * In Location select the one is near your audience. in this case us-west4 and hit **Done**
+     * When ready hit the tab **rules** and create them.
+     * After line of core **match /{allPaths=**}** apply the code that should look like this:
+       `rules_version = '2';
 
+        // Craft rules based on data in your Firestore database
+        // allow write: if firestore.get(
+        //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+        service firebase.storage {
+          match /b/{bucket}/o {
+            match /{allPaths=**} {
+              allow read; 
+              allow write: if
+              request.resourse.size < 2 * 1024 * 1024 &&
+              request.resourse.contentType.matches('image/.*')
+            }
+          }
+        }`
+     * **Publish** it.
+       
+4:26:54
 
 
 ## Biblography

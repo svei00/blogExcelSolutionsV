@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { TextInput, Button } from "flowbite-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function DahsProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -16,7 +16,16 @@ export default function DahsProfile() {
     }
   };
 
-  console.log(imageFile, imageFileUrl);
+  // console.log(imageFile, imageFileUrl); Testing purposes
+  useEffect(() => {
+    if (imageFile) {
+      uploadImage();
+    }
+  }, [imageFile]);
+
+  const uploadImage = async () => {
+    console.log("Uploading image...");
+  };
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
