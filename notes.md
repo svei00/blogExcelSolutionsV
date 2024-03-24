@@ -1415,7 +1415,16 @@
             }
           }
         }`
-     * **Publish** it.
+    - Create the variable **getStorage** `const storage = getStorage(app);` if not auto import import it: `import getStorage from "firebase/storage";` We can use getStorage directly since Firebase v9.
+       * Import tha **app** aplication to from the one we have created, if not auto import do it manually
+        `import { app } from "../firebase";`
+    - Create **fileName** variable by adding the current date to the name in order to allow unique files: `const fileName = new Date().getTime() + imageFile.name;`
+    - Create **storageRef** variable `const storageRef = ref(storage, fileName);` import ref, if it doesn't auto import do in mannaally: `import { getStorage, ref } from "firebase/storage";` code should look like: `const storageRef = ref(storage, fileName);`
+    - Create **UploadTask** Variable `const uploadTask = uploadBytesResumable(storageRef, imageFile)` to track about the bytes, don't forget to import the **uploadBytesResumable** manually if it won't do automatically.
+    - Create a pieces of state after imageFileUrle state:
+      `const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);`
+    - Create another state for hannling errors after the imageFileUploadPreogress state.
+      `const [imageFileUploadError, setImageFileUploadError] = useState(null);`
        
 4:26:54
 

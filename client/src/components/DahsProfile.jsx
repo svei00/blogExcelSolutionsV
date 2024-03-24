@@ -1,11 +1,20 @@
 import { useSelector } from "react-redux";
 import { TextInput, Button } from "flowbite-react";
 import { useState, useRef, useEffect } from "react";
+import { app } from "../firebase";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 export default function DahsProfile() {
   const { currentUser } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
+  const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const filePickerRef = useRef();
 
   const handleImageChange = (e) => {
@@ -24,7 +33,31 @@ export default function DahsProfile() {
   }, [imageFile]);
 
   const uploadImage = async () => {
-    console.log("Uploading image...");
+    // console.log("Uploading image..."); Testing Purposes.
+    const storage = getStorage(app); // Since Firebase Version 9 we can use getStore directly
+    const fileName = new Date().getTime() + imageFile.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+    uploadTask.on(
+      // To get the information
+      "state_changed", // To track the changes
+      (snapshot) => {
+        // Piece of information when we upload byte by byte.
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImageFileUploadProgress(progress.toFixed(0)); // We use toFixed(0) to round the quantity
+      },
+      (error) => {
+        setImageFileUploadError(
+          "Could not Upload Image (File must be less than 2MB)."
+        );
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageFileUrl(downloadURL);
+        });
+      }
+    );
   };
 
   return (
