@@ -1425,8 +1425,60 @@
       `const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);`
     - Create another state for hannling errors after the imageFileUploadPreogress state.
       `const [imageFileUploadError, setImageFileUploadError] = useState(null);`
-       
-4:26:54
+    - After the variable: **imageFileUploadError** console.log for testing:
+      `console.log(imageFileUploadProgress, imageFileUploadError);`
+    - Import from Flowbyte and **<Alert/>** component at the end of the <TextInput> of the Img:
+      `{imageFileUploadError && <Alert color="failure">{imageFileUploadError}</Alert>}`
+    - Install package react-circular-progressbar
+      * You can search at Google like this [react-circular-progressbar](https://www.npmjs.com/package/react-circular-progressbar)
+      * Install in the client side via npm **npm install --save react-circular-progressbar** or via yarn **yarn add react-circular-progressbar** 
+      * Import the following components on your app:
+        `import { CircularProgressbar } from 'react-circular-progressbar';
+         import 'react-circular-progressbar/dist/styles.css';`
+    - Before the IMG element write:
+      * Change from`lassName="w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"` to `lassName="relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"`
+      * Change the IMG Classname from `className="rounded-full w-full h-full object-cover"
+            style={{ border: "8px solid lightgray" }}` to `<img
+            src={imageFileUrl || currentUser.profilePicture}
+            alt="User Image"
+            className={`rounded-full w-full h-full object-cover ${
+              imageFileUploadProgress &&
+                imageFileUploadProgress < 100 &&
+                "opacity-60"
+            }`}
+            style={{ border: "8px solid lightgray" }} // Set border style here
+          />`
+      * Write the code:
+        `{imageFileUploadProgress && (
+            <CircularProgressbar
+              value={imageFileUploadProgress || 0}
+              text={`${imageFileUploadProgress}%`}
+              strokeWidth={5}
+              styles={{
+                root: {
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                },
+                path: {
+                  stroke: `rgba(62, 152, 199, ${
+                    imageFileUploadProgress / 100
+                  })`,
+                },
+              }}
+            />
+          )}`          
+     - In order to avoid to freeze the upload effect when error add after 2MB text:
+       `setImageFileUploadProgress(null);`
+     - To remove the error message when upload a succes image before the variable **getStorage** add:
+       `setImageFileUploadError(null);` 
+     - After **setImageFileUploadProgress(null)** around line 58 add:
+       `setImageFile(null);
+        setImageFileUrl(null);`
+
+## Add Update User API Route.
 
 
 ## Biblography
