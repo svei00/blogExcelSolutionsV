@@ -1568,6 +1568,41 @@
     };
     `
 ## Complete Update User Profile Page Functionality.
+1. Close all the backend pages if any open.
+2. Go to **/client/src/components/** then open the file **DashProfile.jsx**
+3. After the variable *imageFileUploadError* create a new pieces of state:
+   `const [formData, setFormData] = useState({});` We leave it empty because we'll fill with the changing data.
+4. Inside the function **getDownloadURL** add:
+   - With the spread operator `setFormData({ ...formData, profilePicture: downloadURL });`
+5. Select the imputs of username, email and password and add after **defaultValue** and **placeholder** for the password input the following: code: `onChange={handleChange}`
+6. Create the function **handleChange** before the return.
+   ` const handleChange = (e) => {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    console.log(formData); // For testing purposes`
+7. In the open **<form>** tag add the onSubmit code: `onSubmit={handleSubmit}`
+   - Open **/client/src/redux/user** folder, then the file: **userSlice.js**
+     * After the *signInFailure* add:
+          `updateStart: (state) => {
+          state.loading = true;
+          state.error = null;
+        },
+         updateSuccess: (state, action) => {
+          state.currentUser = action.payload;
+          state.loading = false;
+          state.error = null;
+        },
+        updateFailure: (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        },`
+      * Export them: `export const { signInStart, signInSuccess, signInFailure, updateSuccess, updateFailure } = userSlice.actions;`
+      * Import into **DashProfile.jsx** file: `import {updateStart, updateSuccess, updateError} from "../features/user/userSlice";`
+      * Import the **useDispatch** `import { useDispatch } from "react-redux";`
+      * After the *filePickerRef* initialize the useDispatch: `const dispatch = useDispatch();`
+   - And create an asyncronous function after *handleChange* function:
+     ``
 
 
 ## Biblography
