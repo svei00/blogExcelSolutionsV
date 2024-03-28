@@ -77,7 +77,7 @@ export default function DahsProfile() {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   // console.log(formData); // For testing purposes
@@ -86,6 +86,10 @@ export default function DahsProfile() {
     if (Object.keys(formData).length === 0) {
       return;
     }
+
+    console.log("Submitting form to:", `/api/user/update/${currentUser._id}`);
+    console.log("Form data:", formData);
+
     try {
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
