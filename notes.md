@@ -1602,7 +1602,72 @@
       * Import the **useDispatch** `import { useDispatch } from "react-redux";`
       * After the *filePickerRef* initialize the useDispatch: `const dispatch = useDispatch();`
    - And create an asyncronous function after *handleChange* function:
-     ``
+     `const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (Object.keys(formData).length === 0) {
+          return;
+        }
+
+        console.log("Submitting form to:", `/api/user/update/${currentUser._id}`);
+        console.log("Form data:", formData);
+
+        try {
+          dispatch(updateStart());
+          const res = await fetch(`/api/user/update/${currentUser._id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            dispatch(updateFailure(data.message));
+          } else {
+            dispatch(updateSuccess(data));
+            // Create message here!!!!
+          }
+        } catch (error) {
+          dispatch(updateFailure(error.message));
+        }
+      };`
+8. To prevent that image freezes at 100% percent add another state:
+   - After *imageFileUploadError* add `const [imageFileUploading, setImageFileUploading] = useState(false);`
+   - Then before *setImageFileUploadError* around line 50 set: `setImageFileUploading(true)`
+   - Also around line 70 after the *setImageFileUrl* set: `setImageFileUploading(false);`
+   - Finally around line 70 on the *getDownloadURL* set: `setImageFileUploading(false);`
+   - We need to add this line of code to protect us of any issue before the try-catch block:
+     ` if (imageFileUploading) {
+       return;
+    }`
+9. Let the user know that it was updated.
+  - After *setImageFileUploading* add another state `const [updateUserSuccess, setUpdateUserSuccess] = useState(null);`
+  - Then after update success around line of code 100 add: `setUpdateUserSuccess("User's profile updated successfully"); // You can do it dinamically later.`
+  - Create the **<Alert>** in the penultimate closing **</div>**:
+    ` {updateUserSuccess && (
+        <Alert color="success" className="mt-5">
+          {updateUserSuccess}
+        </Alert>
+      )}`
+10. Add another piece of state to manage when there's nothing to change.
+    - After *updateUserSuccess* create `const [updateUserError, setUpdateUserError] = useState(null);`
+    - After Object.keys around line of code 90 `updateUserError("No changes have been made");`
+    - After imageFileUploading around line of code 100 `setUpdateUserError("Please wait for the image to Upload");`
+    - After !res.ok and after the dispath add around line of code 115: `setUpdateUserError(data.message);`
+    - Finally after the *dispatch* of the **catch** block
+    - After the **<Alert>** of the Success add:
+      ` {updateUserError && (
+        <Alert color="failure" className="mt-5">
+          {updateUserError}
+        </Alert>
+      )}`
+11. Before Object.keys around line of code 90 add:
+    `setUpdateUserError(null);
+     setUpdateUserSuccess(null);`
+
+## Add Delete User API Route
+
+
 
 
 ## Biblography

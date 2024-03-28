@@ -23,6 +23,9 @@ export default function DahsProfile() {
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
+  const [updateUserError, setUpdateUserError] = useState(null);
   // console.log(imageFileUploadProgress, imageFileUploadError); Testing the load image purposes
   const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
@@ -45,6 +48,7 @@ export default function DahsProfile() {
 
   const uploadImage = async () => {
     // console.log("Uploading image..."); Testing Purposes.
+    setImageFileUploading(true);
     setImageFileUploadError(null);
     const storage = getStorage(app); // Since Firebase Version 9 we can use getStore directly
     const fileName = new Date().getTime() + imageFile.name;
@@ -66,11 +70,13 @@ export default function DahsProfile() {
         setImageFileUploadProgress(null);
         setImageFile(null);
         setImageFileUrl(null);
+        setImageFileUploading(false);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileUrl(downloadURL);
           setFormData({ ...formData, profilePicture: downloadURL });
+          setImageFileUploading(false);
         });
       }
     );
@@ -83,12 +89,20 @@ export default function DahsProfile() {
   // console.log(formData); // For testing purposes
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUpdateUserError(null);
+    setUpdateUserSuccess(null);
     if (Object.keys(formData).length === 0) {
+      updateUserError("No changes have been made");
       return;
     }
 
     console.log("Submitting form to:", `/api/user/update/${currentUser._id}`);
     console.log("Form data:", formData);
+
+    if (imageFileUploading) {
+      setUpdateUserError("Please wait for the image to Upload");
+      return;
+    }
 
     try {
       dispatch(updateStart());
@@ -102,12 +116,14 @@ export default function DahsProfile() {
       const data = await res.json();
       if (!res.ok) {
         dispatch(updateFailure(data.message));
+        setUpdateUserError(data.message);
       } else {
         dispatch(updateSuccess(data));
-        // Create message here!!!!
+        setUpdateUserSuccess("User's profile updated successfully"); // You can do it dinamically later.
       }
     } catch (error) {
       dispatch(updateFailure(error.message));
+      setUpdateUserError(error.message);
     }
   };
 
@@ -194,6 +210,16 @@ export default function DahsProfile() {
         <span className="cursor-pointer hover:text-blueEx">Delete Account</span>
         <span className="cursor-pointer  hover:text-greenEx">Sign Out</span>
       </div>
+      {updateUserSuccess && (
+        <Alert color="success" className="mt-5">
+          {updateUserSuccess}
+        </Alert>
+      )}
+      {updateUserError && (
+        <Alert color="failure" className="mt-5">
+          {updateUserError}
+        </Alert>
+      )}
     </div>
   );
 }
