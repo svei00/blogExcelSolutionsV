@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { TextInput, Button, Alert } from "flowbite-react";
+import { TextInput, Button, Alert, Modal } from "flowbite-react";
 import { useState, useRef, useEffect } from "react";
 import { app } from "../firebase";
 import {
@@ -26,6 +26,7 @@ export default function DahsProfile() {
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   // console.log(imageFileUploadProgress, imageFileUploadError); Testing the load image purposes
   const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
@@ -207,7 +208,12 @@ export default function DahsProfile() {
         </Button>
       </form>
       <div className="text-red-500 flex justify-between mt-5 font-semibold">
-        <span className="cursor-pointer hover:text-blueEx">Delete Account</span>
+        <span
+          onClick={() => setShowModal(true)}
+          className="cursor-pointer hover:text-blueEx"
+        >
+          Delete Account
+        </span>
         <span className="cursor-pointer  hover:text-greenEx">Sign Out</span>
       </div>
       {updateUserSuccess && (
@@ -220,6 +226,12 @@ export default function DahsProfile() {
           {updateUserError}
         </Alert>
       )}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      ></Modal>
     </div>
   );
 }

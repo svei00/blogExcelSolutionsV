@@ -1693,6 +1693,11 @@
   
 
 ## Complete Delete User Account Functionality.
+1. Go back to the Fronend secction to the folder **/client/src/components/** and open the file **DashProfile.jsx**
+2. Afther the piece of state *updateUserError* add: `const [showModal, setShowModal] = useState(false);`
+3. Go to the **Delete Account <span>** add: `onClick={() => setShowModal(true)}` 
+4. Now Set the **<Modal>** so after the second *Update <Alert>* add: `<Modal show={showModal} onClose={() => setShowModal(false)}></Modal>` so remember if not auto import, import it: `import { TextInput, Button, Alert, Modal } from "flowbite-react";`
+5.  5:21:11
 
 
 
