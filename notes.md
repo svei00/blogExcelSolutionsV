@@ -1666,6 +1666,33 @@
      setUpdateUserSuccess(null);`
 
 ## Add Delete User API Route
+1. Open the backend folder **/api/routes** then open the file **user.route.js**
+2. After the put route add the **delete** route: `router.delete("/delete/:userId", verifyToken, deleteUser);`
+3. Create the function *deleteUser* inside the controller, file **user.controller.js** from folder **/api/controllers/**
+4. Once you have created the function `export const deleteUser = async (req, res, next) => {}` import it in the **user.route.js** file.
+5. Come back to the **user.controller.js** file and add the code:
+   `export const deleteUser = async (req, res, next) => {
+      if (req.user.id !== req.params.userId) {
+        return next(
+          errorHandler(403, "You are not authorized to delete this user")
+        );
+      }
+      try {
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json("User has been deleted");
+      } catch (error) {
+        next(error);
+      }
+    };
+  `
+6. Make a test with ThunderClient.
+   - To make sure:
+     * Create a new user in the thunder client.
+     * Sign in and take the _id token.
+     * Delete the account. Remember to do not pass any data in the JSON content.
+  
+
+## Complete Delete User Account Functionality.
 
 
 
