@@ -1850,6 +1850,7 @@
     - `import { UseDispatch } from "react-redux";`
     - Initialize it: ` const dispatch = UseDispatch();`
     - Add the `onClick={handleSignout}` on **<Sidebar.Item>** 
+## Add Admin Functionality to the User
 
 
 ## Biblography
