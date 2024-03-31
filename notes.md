@@ -1770,7 +1770,86 @@
       )}`
 
 ## Add signout functionality
-
+1. Create the user api route, open backend folder **/api/routes/** then open file **user.route.js**
+   `router.post("/signout", signout);`
+2. Again on **/api/client/controllers** open file: **user.controller.js**
+   - Create the function and export:
+     `export const signout = (req, res, next) => {
+        try {
+          res
+            .clearCookie("access_token")
+            .status(200)
+            .json("User has been signed out");
+        } catch (error) {
+          next(error);
+        }
+      };
+      `
+3. Import the signout function: `import {test, updateUser, deleteUser, signout,} from "../controllers/user.controller.js";`  
+4. Go back to the **frontEnd** and in the **DashProfile.jsx** file add a handleSignout.
+   - Around line of code 240 add an onClick listener: `onClick={handleSignout}`
+5. Go to the **/client/src/redux/user** and open the **userSlice.js** file to add the signout Slice.
+   `signoutSuccess: (state) => {
+      state.currentUser = null;
+      state.error = null;
+      state.loading = false;
+    },`
+    - Export it:
+      `export const {
+        signInStart,
+        signInSuccess,
+        signInFailure,
+        updateStart,
+        updateSuccess,
+        updateFailure,
+        deleteUserStart,
+        deleteUserSuccess,
+        deleteUserFailure,
+        signoutSuccess,
+      } = userSlice.actions;`
+  - Import it into the **DashProfile.jsx** file.
+6.  const handleSignout = async () => {
+      try {
+        const res = await fetch("/api/user/signout", {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          console.log(data.message);
+        } else {
+          dispatch(signoutSuccess());
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+7. Go to the Header.jsx component and:
+   - Copy and paste the function, obously you can do the same way creating only one function and just import it, rehusing the code. You can paste before the return statement.
+     `  const handleSignout = async () => {
+          try {
+            const res = await fetch("/api/user/signout", {
+              method: "POST",
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              console.log(data.message);
+            } else {
+              dispatch(signoutSuccess());
+            }
+          } catch (error) {
+            console.log(error.message);
+          }
+        };
+      `
+     - Import the **signoutSuccess** from **redux**: `import { signoutSuccess } from "../redux/user/userSlice";`
+     - Import the **useDispatch** from **react-redux**: `import { useDispatch } from "react-redux";`
+     - Go to the **signout** <Dropdown.Item> and add the event listener `onClick={handleSignout}>` 
+8. Go to the DashSidebar.jsx file and do the same things as you did in the Header.jsx file.
+    - Add the function, and again, you can create an app or scripts folder and save all of the scripts and just import them to rehutilize the code.
+    - `import { signoutSuccess } from "../redux/user/userSlice";`
+    - `import { UseDispatch } from "react-redux";`
+    - Initialize it: ` const dispatch = UseDispatch();`
+    - Add the `onClick={handleSignout}` on **<Sidebar.Item>** 
 
 
 ## Biblography
