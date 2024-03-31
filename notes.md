@@ -1697,8 +1697,79 @@
 2. Afther the piece of state *updateUserError* add: `const [showModal, setShowModal] = useState(false);`
 3. Go to the **Delete Account <span>** add: `onClick={() => setShowModal(true)}` 
 4. Now Set the **<Modal>** so after the second *Update <Alert>* add: `<Modal show={showModal} onClose={() => setShowModal(false)}></Modal>` so remember if not auto import, import it: `import { TextInput, Button, Alert, Modal } from "flowbite-react";`
-5.  5:21:11
+5. Add a **<Modal.Header/>** tag inside the *<Modal>* tag to close it.
+6. Open folder **/client/src/redux/user/** then open the file **userSlice.js** add:
+   `
+   deleteUserStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    deleteUserSuccess: (state) => {
+      state.currentUser = null;
+      state.loading = false;
+      state.error = null;
+    },
+    deleteUserFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    }`
+    - Export them:
+      `export const {
+          signInStart,
+          signInSuccess,
+          signInFailure,
+          updateStart,
+          updateSuccess,
+          updateFailure,
+          deleteUserStart,
+          deleteUserSuccess,
+          deleteUserFailure,
+        } = userSlice.actions;`
+7. Import them to the **DashProfile.jsx** File
+8. Create a **HandleDeleteUser** function. YOu can do it before the return: 
+   ` const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess(data));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };`
+9.  Create a **<Modal.Body>** tag to add the functionality:
+   `<Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" /> // If not auto import, import it: `import { HiOutlineExclamationCircle } from "react-icons/hi";`
+            ** hi stands for hero icons
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-300">
+              Are you sure to delete your account?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteUser}>
+                Yes, I'm sure.
+              </Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>`
+10. On the line of code: `const { currentUser } = useSelector((state) => state.user);` add: `const { currentUser, error } = useSelector((state) => state.user);` and after *updateUserError* error add:
+    ` {error && (
+        <Alert color="failure" className="mt-5">
+          {error}
+        </Alert>
+      )}`
 
+## Add signout functionality
 
 
 
