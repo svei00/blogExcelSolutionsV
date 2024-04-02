@@ -21,9 +21,10 @@ import {
 } from "../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 export default function DahsProfile() {
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -242,9 +243,21 @@ export default function DahsProfile() {
           type="submit"
           className="bg-gradient-to-r from-blueEx to-greenEx"
           outline
+          disabled={loading || imageFileUploading}
         >
-          Update
+          {loading ? "Loading... " : "Update"}
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={"create-post"}>
+            <Button
+              type="button"
+              className=" w-full bg-gradient-to-r from-greenEx to-blueEx"
+              //outline
+            >
+              Create a Post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5 font-semibold">
         <span

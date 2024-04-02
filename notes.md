@@ -1870,7 +1870,27 @@
    - Finally around line 110 change **const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);** to **const token = jwt.sign({ id: newUser._id, isAdmin: newUser.isAdmin }, process.env.JWT_SECRET);**
 
 
-## Complete Create a Post Page UI
+## Complete Create a Post Page UI.
+1. Close all the open tabs to manage the files without issues.
+2. Go to the frontEnd folder **/app/src/componets** and open the file **DashProfile.jsx**
+3. Around line of code 250 after the Update button add:
+   `  {currentUser.isAdmin && (
+          <Link to={"create-post"}>
+            <Button
+              type="button"
+              className=" w-fullbg-gradient-to-r from-blueEx to-greenEx"
+              outline
+            >
+              Create a Post
+            </Button>
+          </Link>
+        )}`
+        Remember if Link don't autoimport, import it: `import { Link } from "react-router-dom";`
+4. Also we can add the load effect on the Update button but carefull if it doesn't work take off.
+   - Around line 25 change from `const { currentUser, error} = useSelector((state) => state.user);` to `const { currentUser, error, loading } = useSelector((state) => state.user);`
+   - At the end of the update button add after the outline: `disabled={loading || imageFileUploading}`
+   - Then inside the button change the *Update* to `{loading ? "Loading... " : "Update"}`
+  5:46:54
 
 
 ## Biblography
