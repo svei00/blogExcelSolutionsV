@@ -1859,8 +1859,18 @@
       default: false,
     },`
 4. Go to the **MongoDB** database and Sign-in
-   - Go to Databases
-   - Then Browse Collections
+   - Go to Database.
+   - Then Browse Collections.
+   - Then lookup for the user you want to change
+     * Set `isAdmin: true` 
+5. Set the isAdmin to the cookie.
+   - Go to the folder **/api/controllers/** open file **auth.controller.js**
+   - Around line 60 change **const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);** for **const token= jwt.sign({ id: validUser._id, isAdmin: validUser.isAdmin },process.env.JWT_SECRET);**
+   - Around line 80 change do the same with the Google Auth**const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);** for **const token=jwt.sign({ id: user._id, isAdmin: user.isAdmin },process.env.JWT_SECRET);**
+   - Finally around line 110 change **const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);** to **const token = jwt.sign({ id: newUser._id, isAdmin: newUser.isAdmin }, process.env.JWT_SECRET);**
+
+
+## Complete Create a Post Page UI
 
 
 ## Biblography
