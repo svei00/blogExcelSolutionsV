@@ -1851,6 +1851,16 @@
     - Initialize it: ` const dispatch = UseDispatch();`
     - Add the `onClick={handleSignout}` on **<Sidebar.Item>** 
 ## Add Admin Functionality to the User
+1. To avoid confutions close all the open tabs.
+2. Go to the folder **/app/models/** and open file **user.model.js**
+3. After the line of code of the picture add:
+   `  isAdmin: {
+      type: Boolean,
+      default: false,
+    },`
+4. Go to the **MongoDB** database and Sign-in
+   - Go to Databases
+   - Then Browse Collections
 
 
 ## Biblography
