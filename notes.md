@@ -1890,7 +1890,16 @@
    - Around line 25 change from `const { currentUser, error} = useSelector((state) => state.user);` to `const { currentUser, error, loading } = useSelector((state) => state.user);`
    - At the end of the update button add after the outline: `disabled={loading || imageFileUploading}`
    - Then inside the button change the *Update* to `{loading ? "Loading... " : "Update"}`
-  5:46:54
+ 5. Go to the folder **/client/src/pages** and create the page **CreatePost.jsx**
+ 6. With the RFC (React Functional Component):
+    `export default function CreatePost() {
+      return <div>CreatePost</div>;
+    }
+    `
+7. Go to the folder **/client/src/components/** and copy the file: **PrivateRoute.jsx** and paste in the same directory
+8. Change the name from **PrivateRoute.jsx** to **OnlyAdminPrivateRoute.jsx** and open it.
+9. Once open change from `export default function PrivateRoute() {` to `export default function OnlyAdminPrivateRoute() {` and `return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;` to `return currentUser.isAdmin ? <Outlet /> : <Navigate to="/sign-in" />;`
+10. 5:48:34
 
 
 ## Biblography
