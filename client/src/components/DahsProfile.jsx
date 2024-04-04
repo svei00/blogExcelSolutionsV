@@ -248,7 +248,7 @@ export default function DahsProfile() {
           {loading ? "Loading... " : "Update"}
         </Button>
         {currentUser.isAdmin && (
-          <Link to={"create-post"}>
+          <Link to={"/create-post"}>
             <Button
               type="button"
               className=" w-full bg-gradient-to-r from-greenEx to-blueEx"

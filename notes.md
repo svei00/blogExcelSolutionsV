@@ -1899,7 +1899,83 @@
 7. Go to the folder **/client/src/components/** and copy the file: **PrivateRoute.jsx** and paste in the same directory
 8. Change the name from **PrivateRoute.jsx** to **OnlyAdminPrivateRoute.jsx** and open it.
 9. Once open change from `export default function PrivateRoute() {` to `export default function OnlyAdminPrivateRoute() {` and `return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;` to `return currentUser.isAdmin ? <Outlet /> : <Navigate to="/sign-in" />;`
-10. 5:48:34
+10. Go to **/client/src/** folder and open **App.jsx**
+11. There you can copy, paste and then modify the *dashboard* route. So code should look like this:
+    `<Route element={<OnlyAdminPrivateRoute />}>
+          <Route path="/create-post" element={<CreatePost />} />
+      </Route>`
+      Remember if not auto import, import it: `import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";` and `import CreatePost from "./pages/CreatePost";`
+12. Install quill editor inside the fronend. Via NPM **npm install react-quill --save** or via yarn **yarn add react-quill**
+    - Import it to your **CreatePost** page. 
+      * `import ReactQuill from "react-quill";`
+      * `import ReactQuill from "react-quill";`
+    - You can Edit to perzonalize your editor.
+      * Go to **index.css** in forlder **/client/src/**
+        `body {
+          height: 100vh;
+        }
+        
+        .ql-editor {
+          font-size: 1.05rem;
+        }
+        `
+13. The functions should look like this:
+    `return (
+      <div className="p-3 max-w-3xl mx-auto min-h-screen">
+        <h1 className="text-center text-3xl my-7 font-semibold">Create a Post</h1>
+        <form className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row justify-between">
+            <TextInput
+              type="text"
+              placeholder="Title"
+              required
+              id="title"
+              className="flex-1"
+            />
+            <Select>
+              <option value="uncategorized">Select a category</option>
+              <option value="formulas">Formulas and Functions</option>
+              <option value="data-entry">Data Entry</option>
+              <option value="data-analysis">Data Analysis</option>
+              <option value="data-visualization">Data Visualization</option>
+              <option value="collaboration">Collaboration and Security</option>
+              <option value="automation">Automation</option>
+              <option value="add-ins">Add-in and Extensions</option>
+              <option value="printing">Printing and Sharing</option>
+              <option value="accessibility">Accessibility</option>
+              <option value="macros">Macros</option>
+            </Select>
+          </div>
+          <div className="flex gap-4 items-center justify-between border-2 border-blueEx p-3">
+            <FileInput type="file" accept="image/*" />
+            <Button
+              type="button"
+              className="bg-gradient-to-r from-greenEx to-blueEx "
+              outline
+              size="sm"
+            >
+              Upload Image
+            </Button>
+          </div>
+          <ReactQuill
+            theme="snow"
+            placeholder="Create a story..."
+            className="h-72 mb-12"
+          />
+          <Button
+            className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
+            required
+          >
+            Publish!!
+          </Button>
+        </form>
+      </div>
+    );`
+    - Remember to import flow-byte functions if not autoimport.
+      * import { Button, FileInput, Select, TextInput } from "flowbite-react";
+
+
+## Add Create a Post API Route.
 
 
 ## Biblography
