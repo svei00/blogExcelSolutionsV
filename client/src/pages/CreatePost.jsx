@@ -1,6 +1,7 @@
 import { Button, FileInput, Select, TextInput } from "flowbite-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import CustomReactQuill from "../components/CustomReactQuill";
 
 export default function CreatePost() {
   return (
@@ -51,6 +52,7 @@ export default function CreatePost() {
         >
           Publish!!
         </Button>
+        <CustomReactQuill />
       </form>
     </div>
   );
