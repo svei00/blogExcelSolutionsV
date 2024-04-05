@@ -1976,6 +1976,16 @@
 
 
 ## Add Create a Post API Route.
+1. Close all the open tabs for better view.
+2. Go to backend and open folder **/api/routes** and crate file **post.route.js**
+3. import express: `import express from "express";`
+   - create the router: `const router = express.Router();`
+4. We're going to rehutilize the code from *verifyUser.js* so import it:
+   - So use: `import { verifyToken } from "../utils/verifyToken.js";`
+   - Create the route: `router.post("/create", verifyToken, create);`
+5. Create the function **create** on **/api/controllers/** and create the file **post.controller.js**
+   - Create an asyncronous function (since we need to wait for the server response):
+     ``
 
 
 ## Biblography
