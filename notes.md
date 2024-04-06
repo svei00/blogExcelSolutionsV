@@ -1985,7 +1985,9 @@
    - Create the route: `router.post("/create", verifyToken, create);`
 5. Create the function **create** on **/api/controllers/** and create the file **post.controller.js**
    - Create an asyncronous function (since we need to wait for the server response):
-     ``
+     `export const create = async (req, res, next) => {};`
+
+     6:03:37
 
 
 ## Biblography
