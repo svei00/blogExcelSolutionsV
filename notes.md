@@ -1986,8 +1986,13 @@
 5. Create the function **create** on **/api/controllers/** and create the file **post.controller.js**
    - Create an asyncronous function (since we need to wait for the server response):
      `export const create = async (req, res, next) => {};`
+   - Import the function `import { create } from "../controllers/post.controller.js";` into **post.route.js** file.
+   - Now export the router `export default router;`
+   - Go to the **index.js** file an import the route: `import postRouters from "./routes/post.route.js";`
+   - Add it after *authRoutes* around line 30: `app.use("/api/post", postRouters);`
+   - Come back to the file *post.controller.js* and verify if the user as admin privilegies.
 
-     6:03:37
+     6:04:05
 
 
 ## Biblography
