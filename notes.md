@@ -1991,6 +1991,78 @@
    - Go to the **index.js** file an import the route: `import postRouters from "./routes/post.route.js";`
    - Add it after *authRoutes* around line 30: `app.use("/api/post", postRouters);`
    - Come back to the file *post.controller.js* and verify if the user as admin privilegies.
+     `import {errorHandler} from '../utils/errorHandler.js'
+
+        export const create = async (req, res, next) => {
+          if (!req.body.isAdmin) {
+            return next(errorHandler(403, "You are not allowed to create a post"));
+          }
+          if (!req.body.title || !req.body.content) {
+            return next(errorHandler(400, "Please fill all the fields"));
+          }
+        };
+    `Remember if not auto import do it manaually.
+  - After the if add the **slug**:
+    `const slug = req.body.title
+    .split(" ")
+    .join("-")
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9-]/g, "-");
+    `
+  - Create the post model.
+    * Go to the folder **/api/models** and create file **user.model.js**
+    * Code should look like this: 
+      `import mongoose from "mongoose";
+
+        const postSchema = new mongoose.Schema(
+          {
+            userId: {
+              type: String,
+              required: true,
+            },
+            content: {
+              type: String,
+              required: true,
+            },
+            title: {
+              type: String,
+              required: true,
+              unique: true,
+            },
+            image: {
+              type: String,
+              default:
+                "https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2021/09/how-to-write-a-blog-post.png",
+            },
+            category: {
+              type: String,
+              default: "uncategorized",
+            },
+            slug: {
+              type: String,
+              required: true,
+              unique: true,
+            },
+            likes: [{
+              userId: {
+                type: String,
+                required: true,
+              },
+              likedAt: {
+                type: Date,
+                default: Date.now,
+              }
+            }],
+          },
+          { timestamps: true }
+        );
+
+        const Post = mongoose.model("Post", postSchema);
+
+        export default Post;
+`
+    
+  - Create the **post** instruction
 
      6:04:05
 
