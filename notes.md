@@ -2096,7 +2096,43 @@
     * Use the signIn to verify everythings works well and sighin
   
   ## Complete Upload Post Image Functionality.
+  1. Close all the tabs that are open for better readibility. 
+  2. Go to **/client/src/pages** and open file **CreatePost.jsx**
+  3. Around line of code *5* create a state to manage the image file: `const [file, setFile] = useState(null);`
+  4. Around line of code *35* add an onChange event in the **FileInput** tag: `onChange={(e) => setFile(e.target.files[0])}`
+  5. Around line of code *40* add an onClick event listener to call the function **handleUploadImage**: `onClick={handleUploadImage}`
+6. Create the function before the return:
+   `const handleUploadImage = async () => {
+    try {
+      if (!file) {
+        setImageUploadError("Please Select an Image");
+        return;
+      }
+      setImageUploadError(null);
+      const storage = getStorage(app); if not auto import **import { getStorage } from "firebase/storage"; and import { app } from "../firebase";**
+      const fileName = new Date().getTime() + "-" + file.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setImageLoadProgress(progress.toFixed(0)); // We round to zero with toFixed(0)
+        },
+        (error) => {
+          setImageUploadError("Image Upload Failed");
+          setImageLoadProgress(null);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setImageLoadProgress(null);
+            setImageUploadError(null);
+            setFormData({ ...formData, image: downloadURL });
+          });
+        }
+      );`
 
+      6:20:22
 
 
 ## Biblography
