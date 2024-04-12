@@ -1,14 +1,21 @@
-import { Button, FileInput, Select, TextInput } from "flowbite-react";
+import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import CustomReactQuill from "../components/CustomReactQuill";
 import { useState } from "react";
-import { getStorage } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { app } from "../firebase";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 export default function CreatePost() {
   const [file, setFile] = useState(null);
-  const [imageUploadProgress, setImageLoadProgress] = useState(null);
+  const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
 
@@ -27,21 +34,23 @@ export default function CreatePost() {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setImageLoadProgress(progress.toFixed(0));
+          setImageUploadProgress(progress.toFixed(0));
         },
         (error) => {
           setImageUploadError("Image Upload Failed");
-          setImageLoadProgress(null);
+          setImageUploadProgress(null);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImageLoadProgress(null);
+            setImageUploadProgress(null);
             setImageUploadError(null);
             setFormData({ ...formData, image: downloadURL });
           });
         }
       );
     } catch (error) {
+      setImageUploadError("Image Upload Failed");
+      setImageUploadProgress(null);
       console.log(error); // Provisional code
     }
   };
@@ -84,10 +93,29 @@ export default function CreatePost() {
             outline
             size="sm"
             onClick={handleUploadImage}
+            disabled={imageUploadProgress}
           >
-            Upload Image
+            {imageUploadProgress ? (
+              <div className="w-16 h-16">
+                <CircularProgressbar
+                  value={imageUploadProgress}
+                  text={`${imageUploadProgress || 0} %`}
+                />
+              </div>
+            ) : (
+              "Upload Image"
+            )}
           </Button>
         </div>
+        {imageUploadError && <Alert color="failure">{imageUploadError}</Alert>}
+        {formData.image && (
+          <img
+            src={formData.image}
+            alt="Uploaded Image"
+            className="w-full h-72 object-cover"
+          />
+        )}
+
         <ReactQuill
           theme="snow"
           placeholder="Create a story..."

@@ -2096,11 +2096,11 @@
     * Use the signIn to verify everythings works well and sighin
   
   ## Complete Upload Post Image Functionality.
-  1. Close all the tabs that are open for better readibility. 
-  2. Go to **/client/src/pages** and open file **CreatePost.jsx**
-  3. Around line of code *5* create a state to manage the image file: `const [file, setFile] = useState(null);`
-  4. Around line of code *35* add an onChange event in the **FileInput** tag: `onChange={(e) => setFile(e.target.files[0])}`
-  5. Around line of code *40* add an onClick event listener to call the function **handleUploadImage**: `onClick={handleUploadImage}`
+1. Close all the tabs that are open for better readibility. 
+2. Go to **/client/src/pages** and open file **CreatePost.jsx**
+3. Around line of code *5* create a state to manage the image file: `const [file, setFile] = useState(null);`
+4. Around line of code *35* add an onChange event in the **FileInput** tag: `onChange={(e) => setFile(e.target.files[0])}`
+5. Around line of code *40* add an onClick event listener to call the function **handleUploadImage**: `onClick={handleUploadImage}`
 6. Create the function before the return:
    `const handleUploadImage = async () => {
     try {
@@ -2130,9 +2130,60 @@
             setFormData({ ...formData, image: downloadURL });
           });
         }
+          } catch (error) {
+            setImageUploadError("Image Upload Failed");
+            setImageLoadProgress(null);
+            console.log(error); // Provisional code
+          }
+        };
       );`
+7. Adding the progress bar.
+  - Import the circular progress bar:
+    `import { CircularProgressbar } from "react-circular-progressbar";  
+     import "react-circular-progressbar/dist/styles.css";`
+  - Change the **Upload Image** Button from:
+    `<Button
+    type="button"
+            className="bg-gradient-to-r from-greenEx to-blueEx "
+            outline
+            size="sm"
+            onClick={handleUploadImage}
+    >
+           Upload Image
+          </Button>`
+          to:
+          `<Button
+            type="button"
+            className="bg-gradient-to-r from-greenEx to-blueEx "
+            outline
+            size="sm"
+            onClick={handleUploadImage}
+            disabled={imageUploadProgress}
+          >
+            {imageUploadProgress ? (
+              <div className="w-16 h-16">
+                <CircularProgressbar
+                  value={imageUploadProgress}
+                  text={`${imageUploadProgress || 0} %`}
+                />
+              </div>
+            ) : (
+              "Upload Image"
+            )}
+          </Button>`
+8. After the div of the Button add the Alert in case something went wrong:
+   `{imageUploadError && <Alert color="failure">{imageUploadError}</Alert>}`
+9. Getting the image. After the alert code:
+   `{formData.image && (
+          <img
+            src={formData.image}
+            alt="Uploaded Image"
+            className="w-full h-72 object-cover"
+          />
+        )}`
 
-      6:20:22
+## Complete Create Post Functionality
+
 
 
 ## Biblography
