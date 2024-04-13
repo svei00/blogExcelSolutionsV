@@ -66,8 +66,16 @@ export default function CreatePost() {
             required
             id="title"
             className="flex-1"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
           />
-          <Select>
+          <TextInput type="text" placeholder="Author" required />
+          <Select
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >
             <option value="uncategorized">Select a category</option>
             <option value="formulas">Formulas and Functions</option>
             <option value="data-entry">Data Entry</option>

@@ -2183,6 +2183,18 @@
         )}`
 
 ## Complete Create Post Functionality
+1. On the file **CreatePost** we need to add three event listener.
+   - Add an onChage event listener in the first Input which is **Title** around line of code 60:
+     `onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }`
+   - Let's do the same with the **<Select>** around line of code 70 and write inse the tag:
+     ` <Select
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >`
+   
 
 
 
