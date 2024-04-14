@@ -2205,10 +2205,39 @@
 4. Create a piece of state after the **formData** around line 20
    - `const [publishError, setPublishError] = useState(null);`
 5. Create the handleSubmit function before the retutn:
-   ``
+   `const handleSubmit = async (e) => {
+    e.preventDefault(); // To prevent reflesing the page
+    try {
+      const res = await fetch("/api/post/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPublishError(data.message);
+        return;
+      }
+
+      if (res.ok) {
+        setPublishError(null);
+      }
+    } catch (error) {
+      setPublishError("Something went wrong!!");
+    }
+  };`
 6. Creae an **<Alert>** to show an alert if something is wrong. After the last **<Button>** tag add:
    ` {publishError && <Alert className="mt-5"color="failure">{publishError}</Alert>}`
-   
+7. Navigate the user to the post page, so add **useNavigete** before the export around line of code 10:
+   - `import { useNavigate } from "react-router-dom";`
+   - Initialize it around line of code 20: `const navigate = useNavigate();`
+   - Around line of code 80 add the navigate route: `navigate(`/post/${data.slug}`);`
+   - Try it, you should see the page with the ending: */post/your-post* in the slug form.
+
+
+## Add Posts Section to the Dashboard.
 
 
 
