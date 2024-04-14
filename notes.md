@@ -323,7 +323,7 @@
                email, 
                password // After JS6 We don't have to write password: password 
                });
-          // res.status(201).json({ user: user._id });
+          // res.status(201).json({ user: user.id });
           } catch (error) {
           res.status(500).json({ message: error.message });
           }
@@ -2194,6 +2194,20 @@
               setFormData({ ...formData, category: e.target.value })
             }
           >`
+   - Do the same with the **<ReactQuill>** component.
+     `onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}`
+2. Console.log the functions to see if it works. After the *useState* formData aroun line of code 20:
+   `console.log(formData)`
+3. Around line 60 add in the **<form>** tag an onSubmit event:
+   `onSubmit={handleSubmit}`
+4. Create a piece of state after the **formData** around line 20
+   - `const [publishError, setPublishError] = useState(null);`
+5. Create the handleSubmit function before the retutn:
+   ``
+6. Creae an **<Alert>** to show an alert if something is wrong. After the last **<Button>** tag add:
+   ` {publishError && <Alert className="mt-5"color="failure">{publishError}</Alert>}`
    
 
 

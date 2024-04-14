@@ -18,6 +18,8 @@ export default function CreatePost() {
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [publishError, setPublishError] = useState(null);
+  // console.log(formData); Testing purposes.
 
   const handleUploadImage = async () => {
     try {
@@ -55,10 +57,34 @@ export default function CreatePost() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // To prevent reflesing the page
+    try {
+      const res = await fetch("/api/post/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPublishError(data.message);
+        return;
+      }
+
+      if (res.ok) {
+        setPublishError(null);
+      }
+    } catch (error) {
+      setPublishError("Something went wrong!!");
+    }
+  };
+
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
       <h1 className="text-center text-3xl my-7 font-semibold">Create a Post</h1>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
             type="text"
@@ -70,7 +96,7 @@ export default function CreatePost() {
               setFormData({ ...formData, title: e.target.value })
             }
           />
-          <TextInput type="text" placeholder="Author" required />
+          {/* <TextInput type="text" placeholder="Author" required /> */}
           <Select
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
@@ -128,13 +154,23 @@ export default function CreatePost() {
           theme="snow"
           placeholder="Create a story..."
           className="h-72 mb-12"
+          required
+          onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}
         />
         <Button
+          type="submit"
           className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
           required
         >
           Publish!!
         </Button>
+        {publishError && (
+          <Alert className="mt-5" color="failure">
+            {publishError}
+          </Alert>
+        )}
         <CustomReactQuill />
       </form>
     </div>
