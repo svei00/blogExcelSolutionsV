@@ -2238,7 +2238,36 @@
 
 
 ## Add Posts Section to the Dashboard.
+1. First thing first. Close all the tabs that are open.
+2. Open **DashSidebar.jsx** File from **/client/src/components**
+3. After the *Profile* <Link> add:
+   - Import the useSelector: `import { useSelector } from "react-redux";`
+   - then add the current user befire the useEffect aroun line of code 10:  ``
+   ` {currentUser.isAdmin && (
+            <Link to="/dashboard?tab=post">
+              <Sidebar.Item
+                active={tab === "posts"}
+                icon={HiDocumentText}
+                as="div"
+              >
+                Posts
+              </Sidebar.Item>
+            </Link>
+          )}`
+    * Remember if not auto import the HiDocumentText do it: `import { HiArrowSmRight, HiDocumentText, HiUser } from "react-icons/hi";`
+4. Around line of code 50 make the current user Dynamic, so change: `label={"Change Later"}` to `label={currentUser.isAdmin ? "Admin" : "User"}`
+5. Also modify around line of code 40 the **<Sidebar.ItemGroup> from `<Sidebar.ItemGroup>` to `<Sidebar.ItemGroup className="flex flex-col gap-1">`
+6. Create in the same folder, component the file **DashPosts.jsx**
+   - Create the React Function Component (RFC):
+     `export default function DashPosts() {
+    return <div>DashPosts</div>;
+  }
+  `
+7. In the **Dashboard.jsx** file from **/client/src/pages** around line of code 25 add:
+   - ` {/* Posts */}
+      {tab === "posts" && <DashPosts />}` remember if not auto import  import it: `import DashPosts from "../components/DashPosts";`
 
+## Create Get Posts API Route.
 
 
 ## Biblography
