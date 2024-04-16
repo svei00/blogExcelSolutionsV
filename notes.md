@@ -2268,6 +2268,11 @@
       {tab === "posts" && <DashPosts />}` remember if not auto import  import it: `import DashPosts from "../components/DashPosts";`
 
 ## Create Get Posts API Route.
+1. Go to the backend section **/api/routes/** and open **post.route.js** file and code:
+  - `router.get("/getposts", getposts); ` No need to verifyToken since we need al the users can check the posts.
+2. Now go to the **/api/controllers** and open the file **post.controller.js** now code the *getpost* async function:
+
+6:44:38
 
 
 ## Biblography

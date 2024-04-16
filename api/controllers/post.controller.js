@@ -26,3 +26,29 @@ export const create = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getposts = async (req, res, next) => {
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9; // The see the page in tiles 3 x 3
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
+    const posts = await Post.find({
+      ...(req.query.userId && { userId: req.query.userId }),
+      ...(req.query.category && { category: req.query.category }),
+      ...(req.query.slug && { category: req.query.slug }),
+      ...(req.query.postId && { _id: req.query.postId }),
+      ...(req.query.searchItem && {
+        $or: [
+          // It allow us to use multiple criteria
+          { title: { $regex: req.query.searchTerm, $options: "i" } }, // "i" stands for that upper case or lower case text doesn't matter
+          { content: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .sort({ updateAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+  } catch (error) {
+    next(error);
+  }
+};
