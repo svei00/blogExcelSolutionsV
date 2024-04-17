@@ -2325,7 +2325,16 @@
    - Also you can limit it by running like this: `http://localhost:3000/api/post/getposts?limit=1`
 
 ## Show user Posts Inside Dashboard.
+1. Close all the tabs you don't need and just leave open **Dasgbiar.jsx, DashPost.jsx and DashSideber.jsx**
+2. On **DashPost.jsx** File:   
+   - Import:
+     `import { useEffect } from "react";
+      import {useSelector} from 'react-redux'`
+  - Create the function.
+    Remember you cannot use async functions with useEffect so the thing we do is a work around:
 
+
+6:50:08
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
