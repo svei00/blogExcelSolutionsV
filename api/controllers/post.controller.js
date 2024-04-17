@@ -35,9 +35,9 @@ export const getposts = async (req, res, next) => {
     const posts = await Post.find({
       ...(req.query.userId && { userId: req.query.userId }),
       ...(req.query.category && { category: req.query.category }),
-      ...(req.query.slug && { category: req.query.slug }),
+      ...(req.query.slug && { slug: req.query.slug }),
       ...(req.query.postId && { _id: req.query.postId }),
-      ...(req.query.searchItem && {
+      ...(req.query.searchTerm && {
         $or: [
           // It allow us to use multiple criteria
           { title: { $regex: req.query.searchTerm, $options: "i" } }, // "i" stands for that upper case or lower case text doesn't matter
@@ -48,6 +48,26 @@ export const getposts = async (req, res, next) => {
       .sort({ updateAt: sortDirection })
       .skip(startIndex)
       .limit(limit);
+
+    const totalPosts = await Post.countDocuments();
+
+    const now = new Date();
+
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+
+    const lastMonthPosts = await Post.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    res.status(200).json({
+      posts,
+      totalPosts,
+      lastMonthPosts,
+    });
   } catch (error) {
     next(error);
   }

@@ -2271,8 +2271,60 @@
 1. Go to the backend section **/api/routes/** and open **post.route.js** file and code:
   - `router.get("/getposts", getposts); ` No need to verifyToken since we need al the users can check the posts.
 2. Now go to the **/api/controllers** and open the file **post.controller.js** now code the *getpost* async function:
+   - Code should look like this:
+     `export const getposts = async (req, res, next) => {
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9; // The see the page in tiles 3 x 3
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
+    const posts = await Post.find({
+      ...(req.query.userId && { userId: req.query.userId }),
+      ...(req.query.category && { category: req.query.category }),
+      ...(req.query.slug && { category: req.query.slug }),
+      ...(req.query.postId && { _id: req.query.postId }),
+      ...(req.query.searchItem && {
+        $or: [
+          // It allow us to use multiple criteria
+          { title: { $regex: req.query.searchTerm, $options: "i" } }, // "i" stands for that upper case or lower case text doesn't matter
+          { content: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .sort({ updateAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
 
-6:44:38
+    const totalPosts = await Post.countDocuments();
+
+    const now = Date();
+
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+
+    const lastMonthPosts = await Post.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    res.status(200).json({
+      posts,
+      totalPosts,
+      lastMonthPosts,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+`
+   - import it: `import { getposts } from "../controllers/post.controller.js";` in to the **post.route.js** file.
+3. Go to the Thunderclient to test the function. 
+   - Create a Get funtion: `http://localhost:3000/api/post/getposts`
+   - Save it and run it.  
+   - Also you can limit it by running like this: `http://localhost:3000/api/post/getposts?limit=1`
+
+## Show user Posts Inside Dashboard.
 
 
 ## Biblography
