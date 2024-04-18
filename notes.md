@@ -2334,7 +2334,7 @@
     Remember you cannot use async functions with useEffect so the thing we do is a work around:
 
 
-6:50:08
+6:52:00
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
