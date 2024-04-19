@@ -2189,11 +2189,11 @@
               setFormData({ ...formData, title: e.target.value })
             }`
    - Let's do the same with the **<Select>** around line of code 70 and write inse the tag:
-     ` <Select
+     *<Select
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
-          >`
+          >*
    - Do the same with the **<ReactQuill>** component.
      `onChange={(value) => {
             setFormData({ ...formData, content: value });
@@ -2332,7 +2332,30 @@
       import {useSelector} from 'react-redux'`
   - Create the function.
     Remember you cannot use async functions with useEffect so the thing we do is a work around:
-
+    ` useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
+        const data = await res.json();
+        if (res.ok) {
+          setUserPosts(data.posts);
+        }
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (currentUser.isAdmin) fetchPosts();
+  }, [currentUser._id]);`
+3. Seacth in Google for scrollbar tailwind and hit the npm package [Tailwind Scrollbar](https://www.npmjs.com/package/tailwind-scrollbar)
+ - Install via **NPM** npm install --save-dev tailwind-scrollbar or via **yarn** yarn add -D tailwind-scrollbar
+   **Remember to install in the client side**
+ - Go to **/client** and open the tailwind file **tailwind.config.js** and edit:
+   * On pluging after the flowbite add: `require('tailwind-scrollbar'),` code should look like this:
+     `plugins: [require("flowbite/plugin"), require("tailwind-scrollbar")],` 
+   * Remember when you do changes like this you should restart the app on the client side.
+4. Go back to the **/client/src/components** and continue working on **DashPost.jsx** file:
+   - 
 
 6:52:00
 
