@@ -54,6 +54,18 @@ export default function DashPosts() {
                       />
                     </Link>
                   </Table.Cell>
+                  <Table.Cell>
+                    <Link to={`/post/${post.slug}`}>{post.title}</Link>
+                  </Table.Cell>
+                  <Table.Cell>{post.category}</Table.Cell>
+                  <Table.Cell>
+                    <span>Delete</span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Link className="greenEx" to={`/update-post/${post._id}`}>
+                      <span>Edit</span>
+                    </Link>
+                  </Table.Cell>
                 </Table.Row>
               </Table.Body>
             ))}
