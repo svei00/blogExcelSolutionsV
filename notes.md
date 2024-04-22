@@ -2449,9 +2449,44 @@ export default function DashPosts() {
 }
 `
 
-## Add Show more Functionality to the Posts Results of the Dashboard
+## Add Show more Functionality to the Posts Results of the Dashboard.
+1. Add a **showMore** state around line of code 10 after *userPost* state
+   `const [ showMore, setShowMore ] = useState(true);`
+2. Around line of code 20 insde the try statement after the *setUserPost* add the code:
+   `if (data.posts.length <Table 9) {
+            setShowMore(false);
+          }`
+3. After the closing **</Table>** tag add:
+   `  {showMore && (
+            <button
+              onClick={handleShowMore}
+              className="w-full text-blueEx font-semibold self-center text-sm py-7 hover:text-greenEx"
+            >
+              Show More
+            </button>`
+4. Now before the return add the function **handleShowMore**
+   `const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const res = await fetch(
+        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error); // No need to add error handler
+    }
+  };`
 
-6:52:00
+## Add Delete Post Functionality to the Dashboard
+
+
+
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
