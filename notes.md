@@ -2483,7 +2483,26 @@ export default function DashPosts() {
     }
   };`
 
-## Add Delete Post Functionality to the Dashboard
+## Add Delete Post Functionality to the Dashboard.
+1. Open **/api/routers/** and open file **post.route.js**
+   - Add: `router.delete("/deletepost/:postId/:userId", verifyToken, deletepost);`
+2. Now go to **/api/controllers** then open the file **post.controller.js** an create the function deletepost.
+   - Write the code that should look like:
+     `export const deletepost = async (req, res, next) => {
+        if (!req.user.isAdmin || req.user.id !== req.params.id) {
+          return next(errorHandler(403, "You are not allowed to delete this post."));
+        }
+        try {
+          await Post.findByIdAndDelete(req.params.postId);
+          res.status(200).json("The post has been deleted!!");
+        } catch (error) {
+          next(error);
+        }
+      };
+      `
+3. Now go to the **DashPost.jsx** File around line of code 10 add a piece of state to handle *Modals*
+
+7:10:50
 
 
 
