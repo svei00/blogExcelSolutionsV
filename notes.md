@@ -2500,9 +2500,65 @@ export default function DashPosts() {
         }
       };
       `
-3. Now go to the **DashPost.jsx** File around line of code 10 add a piece of state to handle *Modals*
+3. Now go to the **DashPost.jsx** File around line of code 10 add a piece of state to handle *Modal*
+   - We can use the **<Modal>** we made on file **DashProfile.jsx** or create a component to handle it.
+   - For now copy and paste the modal around line of code 120 after the *<p>* element *You have not post yet* inside the same div:
+     `<Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-300">
+              Are you sure to delete your account?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteUser}>
+                Yes, I'm sure.
+              </Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>`
+      - Remember to import the **<Modal>** `import { Modal, Button } from "flowbite-react";` and `import { HiOutlineExclamationCircle } from "react-icons/hi";`
+      - Around line of code 130 change the h3 element from: **Are you sure to delete your account?** to **Are you sure to delete this post?**
+      - Around the same line of code change the handle event from **onClick={handleDeleteUser}>** to **onClick={handleDeletePost}>**
+      - Around line of code 90 add on the span of the delete button the **onClick**: ` onClick={() => {
+                        setShowModal(true);
+                        setPostIdToDelete(post._id);
+                      }}`
+      - Around line of code 10 add the piece of state: `const [postIdToDelete, setPostIdToDelete] = useState(null);`
+      - Before the return add the **handleDeletePost** Function.
+        `const handleDeletePost = async () => {
+    setShowModal(false);
+    try {
+      const res = await fetch(
+        `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        console.log(data.message);
+      } else {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };`
 
-7:10:50
+## Add Update Post Functionality.
 
 
 
