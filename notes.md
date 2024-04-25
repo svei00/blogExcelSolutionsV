@@ -2559,9 +2559,18 @@ export default function DashPosts() {
   };`
 
 ## Add Update Post Functionality.
+1. Go to **/client/src/pages** and create a new file **UpdatePost.jsx**
+2. Go to **/client/src** and open **App.jsx** file. Then add the *private* route for UpdatePost:
+  - Code should lool like this:
+    `<Route element={<OnlyAdminPrivateRoute />}>
+          <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/update-post/:postId" element={<UpdatePost />} />
+        </Route>`
+  - If not auto import, do it: `import UpdatePost from "./pages/UpdatePost";`
+3. Open the page **CreatePost.jsx** and copy the code and paste into **UpdatePost.jsx**
 
 
-
+7:21:33
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
