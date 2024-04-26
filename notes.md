@@ -2805,8 +2805,12 @@ export default function UpdatePost() {
   );
 }
 `
-## Create Get Users API Route.
+** Remember to import the function: import { updatepost } from "../controllers/post.controller.js";
 
+## Create Get Users API Route.
+1. Go to the folder **/api/routes/** and open the file **user.route.js**
+2. Create a new route after the router.post around line of code 10: `router.put("/updatepost/:postId/:userId", verifyToken, updatepost);`
+3. Go to the folder **/api/controllers** and open file **user.controller.js** and create the function:
 
 
 ## Biblography
