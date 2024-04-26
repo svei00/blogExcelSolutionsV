@@ -84,3 +84,27 @@ export const deletepost = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updatepost = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, "You are not allowed to update this post."));
+  }
+  try {
+    const updatepost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        // $set: req.body, this is not secure thats whay we use like this:
+        $set: {
+          title: req.body.title,
+          content: req.body.content,
+          category: req.body.category,
+          image: req.body.image,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(updatepost);
+  } catch (error) {
+    next(error);
+  }
+};
