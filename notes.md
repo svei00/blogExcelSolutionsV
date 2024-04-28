@@ -2811,6 +2811,7 @@ export default function UpdatePost() {
 1. Go to the folder **/api/routes/** and open the file **user.route.js**
 2. Create a new route after the router.post around line of code 10: `router.put("/updatepost/:postId/:userId", verifyToken, updatepost);`
 3. Go to the folder **/api/controllers** and open file **user.controller.js** and create the function:
+   
 
 
 ## Biblography
