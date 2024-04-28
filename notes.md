@@ -2811,7 +2811,57 @@ export default function UpdatePost() {
 1. Go to the folder **/api/routes/** and open the file **user.route.js**
 2. Create a new route after the router.post around line of code 10: `router.put("/updatepost/:postId/:userId", verifyToken, updatepost);`
 3. Go to the folder **/api/controllers** and open file **user.controller.js** and create the function:
-   
+   `export const getUsers = async (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return next(errorHandler(403, "You are not allowed to See all users."));
+  }
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+
+    const users = await User.find()
+      .sort({ createAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    // No showing the password
+    const usersWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
+    });
+
+    const totalUsers = await User.countDocuments();
+
+    const now = new Date();
+
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+
+    const lastMonthUsers = await User.countDocuments({
+      createAt: {
+        $gte: oneMonthAgo,
+      },
+    });
+
+    res.status(200).json({
+      users: usersWithoutPassword,
+      totalUsers,
+      lastMonthUsers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};`
+4. Test it with ThunderClient:
+   - Create a copy of a old one, for exaple the getPosts.
+   - Writhe this request: `http://localhost:3000/api/user/getusers`
+   - To limit the user you can use: `http://localhost:3000/api/user/getusers?limit=times`
+  
+## Show Users to the Admin Dashboard.
+
 
 
 ## Biblography
