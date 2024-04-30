@@ -2861,6 +2861,8 @@ export default function UpdatePost() {
    - To limit the user you can use: `http://localhost:3000/api/user/getusers?limit=times`
   
 ## Show Users to the Admin Dashboard.
+1. Close all the open tabs for better unedrstanding.
+2. Go tp 
 
 
 
