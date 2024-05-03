@@ -2868,9 +2868,10 @@ export default function UpdatePost() {
      `{/* Users */}
       {tab === "users" && <DashUsers />}`
       ** Remember. If not auto import, Import it: `import DashUsers from "../components/DashUsers";` 
-   - 
+   - Go to **DashSideBar.jsx** from **/client/src/componets** and copy and paste the code from showing the code of side bar around line of code 55 after it, it should look like:
+     ``
 
-
+7 36 33
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
