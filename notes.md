@@ -2862,7 +2862,13 @@ export default function UpdatePost() {
   
 ## Show Users to the Admin Dashboard.
 1. Close all the open tabs for better unedrstanding.
-2. Go tp 
+2. Go to **/client/src/componets** and create file: **DashUsers.jsx**
+3. Now copy the code from **DashPost.jsx** since the code here should look the same since we fill a table. 
+   - First add the page to **Dashboard.jsx** which is in **/client/src/pages** around line of code 30 after the DashPost page:
+     `{/* Users */}
+      {tab === "users" && <DashUsers />}`
+      ** Remember. If not auto import, Import it: `import DashUsers from "../components/DashUsers";` 
+   - 
 
 
 
