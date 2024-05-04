@@ -2871,7 +2871,7 @@ export default function UpdatePost() {
    - Go to **DashSideBar.jsx** from **/client/src/componets** and copy and paste the code from showing the code of side bar around line of code 55 after it, it should look like:
      ``
 
-7 36 33
+7 36 59
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
