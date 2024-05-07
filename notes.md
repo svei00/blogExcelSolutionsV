@@ -3034,8 +3034,17 @@ export default function DashUsers() {
     }
   };`
 
-
 ## Complete post page functionality
+1. Close all open tabs to avoid confutions.
+2. Go to FrontEnd page **/client/src/pages** and create the file **PostPage.jsx**
+   - Use RFC snippet (React Functional Component).
+     `export default function PostPage() {
+  return <div>PostPage</div>;
+}
+`
+3. Go to folder **/client/src** and open file **App.jsx** add the page without any protections since it will be public so around line of code 30 after the projects path add: `<Route path="/posts/:postSlug" element={<PostPage />} />` remember if not auto import do it: `import PostPage from "./pages/PostPage";`
+
+7:52:38 
 
 
 ## Biblography
