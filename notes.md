@@ -3046,8 +3046,13 @@ export default function DashUsers() {
 4. Go back to the **PostPage.jsx** file and:
    - Import `import { useParams } from "react-router-dom";`
    - Add before the regurn of the function: `const { postSlug } = useParams();`
+   - Create the useEffect:
+     `  useEffect(() => {
+    console.log(postSlug);
+  }, [postSlug]);`
+      ** If not auto import do it: `import { useEffect } from "react";`
 
-7:53:03 
+7:53:36
 
 
 ## Biblography
