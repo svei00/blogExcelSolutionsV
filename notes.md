@@ -3043,16 +3043,24 @@ export default function DashUsers() {
 }
 `
 3. Go to folder **/client/src** and open file **App.jsx** add the page without any protections since it will be public so around line of code 30 after the projects path add: `<Route path="/posts/:postSlug" element={<PostPage />} />` remember if not auto import do it: `import PostPage from "./pages/PostPage";`
-4. Go back to the **PostPage.jsx** file and:
+4. Go to **/api/controllers** folder and open **post.controller.js** file.
+   - Around Change the line of code ********HERE
+5. Go back to the **PostPage.jsx** file and:
    - Import `import { useParams } from "react-router-dom";`
-   - Add before the regurn of the function: `const { postSlug } = useParams();`
+   - Add before the regurn of the functions: 
+     `const { postSlug } = useParams();
+      const { loading, setLoading } = useState(true);
+      const { error, setError } = useState(false);
+      const { post, setPost } = useState(null);`
+      ** Remember to import **useState** if it won't do automatically: `import { useEffect, useState } from "react";`
    - Create the useEffect:
      `  useEffect(() => {
     console.log(postSlug);
   }, [postSlug]);`
       ** If not auto import do it: `import { useEffect } from "react";`
 
-7:53:36
+
+7:58:25
 
 
 ## Biblography
