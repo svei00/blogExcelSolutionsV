@@ -1,12 +1,13 @@
+import { Spinner } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function PostPage() {
   const { postSlug } = useParams();
-  const { loading, setLoading } = useState(true);
-  const { error, setError } = useState(false);
-  const { post, setPost } = useState(null);
-  console.log(post); // To see the result of the query
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [post, setPost] = useState(null);
+  // console.log(post); // To see the result of the query
 
   useEffect(() => {
     // console.log(postSlug); // Testing purposes
@@ -34,7 +35,15 @@ export default function PostPage() {
     fetchPost();
   }, [postSlug]);
 
-  if (loading) return <div>Loading...</div>;
-
-  return <div>PostPage</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner size="xl" />
+      </div>
+    );
+  return (
+    <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
+      <h1>{post && post.title}</h1>
+    </main>
+  );
 }
