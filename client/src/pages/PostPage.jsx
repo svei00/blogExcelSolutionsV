@@ -43,7 +43,7 @@ export default function PostPage() {
     );
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
-      <h1>{post && post.title}</h1>
+      <h1>{post && post.title}Can you read me?</h1>
     </main>
   );
 }
