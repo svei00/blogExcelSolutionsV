@@ -16,14 +16,13 @@ export default function PostPage() {
         setLoading(true);
         const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
         const data = await res.json();
-
         if (!res.ok) {
           setError(true);
           setLoading(false);
           return;
         }
         if (res.ok) {
-          setPost(data.post[0]);
+          setPost(data.posts[0]);
           setLoading(false);
           setError(false);
         }
@@ -43,7 +42,7 @@ export default function PostPage() {
     );
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
-      <h1>{post && post.title}Can you read me?</h1>
+      <h1>{post && post.title}</h1>
     </main>
   );
 }
