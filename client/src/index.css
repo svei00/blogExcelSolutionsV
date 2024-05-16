@@ -29,7 +29,7 @@ body {
   }
   
   .post-content a {
-    color: rgb(73, 149, 199);
+    color: rgb(73, 149, 199); /* Change to blueEx */
     text-decoration: none;
   }
   
@@ -38,7 +38,7 @@ body {
   }
   
   .dark .post-content a {
-    color: red;
+    color: red; /* Change to greenEx */
   }
 
   .navbar-link.active {

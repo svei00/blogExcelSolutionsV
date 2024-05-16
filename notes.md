@@ -3055,12 +3055,105 @@ export default function DashUsers() {
       ** Remember to import **useState** if it won't do automatically: `import { useEffect, useState } from "react";`
    - Create the useEffect:
      `  useEffect(() => {
-    console.log(postSlug);
-  }, [postSlug]);`
+    // console.log(postSlug); // Testing purposes
+    const fetchPost = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
+        const data = await res.json();
+        if (!res.ok) {
+          setError(true);
+          setLoading(false);
+          return;
+        }
+        if (res.ok) {
+          setPost(data.posts[0]);
+          setLoading(false);
+          setError(false);
+        }
+      } catch (error) {
+        setError(true);
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [postSlug]);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner size="xl" />
+      </div>
+    );
+  return (
+    <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
+      <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
+        {post && post.title}
+      </h1>
+      <Link
+        to={`/search/?category=${post && post.category}`}
+        className="self-center mt-5"
+      >
+        <Button color="gray" pill size="xs">
+          {post && post.category}
+        </Button>
+      </Link>
+      <img
+        src={post && post.image}
+        alt={post && post.title}
+        className="mt-10 p-3 max-h-[600px] w-full object-cover"
+      />
+      <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
+        <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
+        <span>
+          {post && "about " + (post.content.length / 1000).toFixed(0)} minutes
+          to read
+        </span>
+      </div>
+      <div
+        className="p-3 max-w-2xl mx-auto w-full post-content"
+        dangerouslySetInnerHTML={{ __html: post && post.content }}
+      ></div>
+    </main>
+  );
+}
+`
       ** If not auto import do it: `import { useEffect } from "react";`
 
+6. Go to **/client/src/pages** and open the file **index.css**
+   - Add the following CSS Code:
+     `.post-content p {
+    margin-bottom: 0.5rem;
+  }
+  
+  .post-content h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: sans-serif;
+    margin: 1.5rem 0;
+  }
+  
+  .post-content h2 {
+    font-size: 1.4rem;
+    font-family: sans-serif;
+    margin: 1.5rem 0;
+  }
+  
+  .post-content a {
+    color: rgb(73, 149, 199); /* Change to blueEx */
+    text-decoration: none;
+  }
+  
+  .post-content a:hover {
+    text-decoration: underline;
+  }
+  
+  .dark .post-content a {
+    color: red; /* Change to greenEx */
+  }
+`
 
-8:02:54
+## Add Call to Action to the Post Page.
 
 
 ## Biblography
