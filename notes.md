@@ -3153,7 +3153,21 @@ export default function DashUsers() {
   }
 `
 ## Add Call to Action to the Post Page.
+1. Go to **/client/src/components** folder an create file **CallToAction.jsx**
+2. Then create a RFC (React Funtional Component).
+3. Add the *Call to Action Component* to **PostPage.jsx**
+   - Add a new <div> tag after the last one:
+     `
+      <div className="max-w-4xl mx-auto w-full">
+        <CallToAction />
+      </div>
+     `
+     ** Remeber if not auto import do it: `import CallToAction from "../components/CallToAction";`
+4. Go back to the **CallToAction** function and:
 
+
+
+8:17:14
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
