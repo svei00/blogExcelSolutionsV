@@ -2,13 +2,15 @@ import { Button } from "flowbite-react";
 
 export default function CallToAction() {
   return (
-    <div className="flex flex-col sm:flex-row p-3 border border-greenEx justify-center items-center rounded-tl-3xl text-center">
-      <div className="flex-1">
-        <h2>Want to learn more about Excel?</h2>
-        <p>Checkout these resources with 100% practical exercises</p>
+    <div className="flex flex-col sm:flex-row p-3 border border-greenEx justify-center items-center rounded-tl-3xl rounded-br-3xl text-center">
+      <div className="flex-1 justify-center flex flex-col">
+        <h2 className="text-2xl">Want to learn more about Excel?</h2>
+        <p className="text-gray-500 my-2">
+          Checkout these resources with 100% practical exercises
+        </p>
         <Button className="bg-gradient-to-r from-blueEx to-greenEx rounded-tl-xl rounded-bl-none">
           <a
-            href="portfolio.excelsolutionsv.com"
+            href="https://portfolio.excelsolutionsv.com/"
             target="_blank"
             rel="noopener noreferrer"
           >
