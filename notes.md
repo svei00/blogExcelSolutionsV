@@ -3195,7 +3195,17 @@ export default function CallToAction() {
 }`
 
 
-## Add comment section to the post page
+## Add comment section to the post page.
+1. Go to **/client/src/components** and create the file: **CommentSection.jsx**
+   - Then run the RFC snipped (React Functional Component)
+2. Then add to the **PostPage.jsx** Fille after the <Div> of the *<CallToAction>* function:
+   `<CommentSection postId={post._id} />`
+    ** We gather the id because we need to select a post to edit it.
+
+
+    8:23:29 
+
+
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
