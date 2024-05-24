@@ -3201,9 +3201,27 @@ export default function CallToAction() {
 2. Then add to the **PostPage.jsx** Fille after the <Div> of the *<CallToAction>* function:
    `<CommentSection postId={post._id} />`
     ** We gather the id because we need to select a post to edit it.
+3. Add a new component to always being to the top of the page:
+   - So go to **/client/src/components** and create the file: **ScrollToTop.jsx**
+   - Code:
+     `import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
+const ScrollToTop = () => {
+    const { pathname } = useLocation();
+    useEffect{() =>{
+        window.scrollTo(0, 0)
+    }, [pathname]} // eslint-disable-line react-hooks/exhaustive-deps
+    return null;
+}
 
-    8:26:47 
+export default ScrollToTop;`
+   - The go to the folder **/client/src** and open file **App.jsx**
+      * Write on the top the **ScrollToTop** component before the *<BrowserRouter>* tag
+        `<ScrollToTop />`
+        ** Remember if not auto import: `import ScrollToTop from "./components/ScrollToTop";`
+
+    8:33:26 
 
 
 
