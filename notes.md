@@ -3220,8 +3220,33 @@ export default ScrollToTop;`
       * Write on the top the **ScrollToTop** component before the *<BrowserRouter>* tag
         `<ScrollToTop />`
         ** Remember if not auto import: `import ScrollToTop from "./components/ScrollToTop";`
+4. Create a Button compoment so that way you don't have to repeat and repeat and repeat the same code everysingle time.
+   - Go to **/client/src/components** folder and create file: **Buttons.jsx**
+   - Code:
+     `import { Button } from "flowbite-react";
+import PropTypes from "prop-types";
 
-    8:33:26 
+const ButtonOutline = ({ title }) => {
+  return (
+    <Button className="bg-gradient-to-r from-blueEx to-greenEx" outline>
+      {title}
+    </Button>
+  );
+};
+
+ButtonOutline.propTypes = {
+  title: PropTypes.string.isRequired,
+  // onClick: PropTypes.func,
+  // width: PropTypes.string,
+  // loading: PropTypes.bool,
+  // padding: PropTypes.string,
+  // noIcon: PropTypes.bool
+};
+
+export default ButtonOutline;
+` 
+   - To use the Button simply use:
+     `<ButtonOutline title="Submit" />` for example.
 
 
 

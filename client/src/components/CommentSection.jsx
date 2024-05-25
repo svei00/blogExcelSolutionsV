@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Textarea } from "flowbite-react";
-import { ButtonEx1 } from "../components/Buttons";
+import ButtonOutline from "../components/Buttons";
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
+  const [comment, setComment] = useState("");
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
@@ -33,15 +34,17 @@ export default function CommentSection({ postId }) {
         </div>
       )}
       {currentUser && (
-        <form>
+        <form className="border border-blueEx rounded-md p-3">
           <Textarea
             placeholder="Write a comment..."
             rows="3"
             maxLength="1000"
+            onChange={(e) => setComment(e.target.value)}
+            value={comment}
           />
-          <div className="">
-            <p>1,000 characters left</p>
-            <ButtonEx1></ButtonEx1>
+          <div className="flex justify-between items-center mt-5">
+            <p className="text-gray-500 text-xs">1,000 characters left</p>
+            <ButtonOutline title="Submit" type="submit" />
           </div>
         </form>
       )}
