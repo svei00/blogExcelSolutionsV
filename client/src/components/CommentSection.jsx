@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { TextArea } from "flowbite-react";
+import { Textarea } from "flowbite-react";
+import { ButtonEx1 } from "../components/Buttons";
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -33,13 +34,14 @@ export default function CommentSection({ postId }) {
       )}
       {currentUser && (
         <form>
-          <TextArea
+          <Textarea
             placeholder="Write a comment..."
             rows="3"
             maxLength="1000"
           />
           <div className="">
             <p>1,000 characters left</p>
+            <ButtonEx1></ButtonEx1>
           </div>
         </form>
       )}
