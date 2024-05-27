@@ -3249,6 +3249,7 @@ export default ButtonOutline;
      `<ButtonOutline title="Submit" />` for example.
 
 
+8:35.22
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"

@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Textarea } from "flowbite-react";
 import ButtonOutline from "../components/Buttons";
+import { useState } from "react";
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -43,7 +44,9 @@ export default function CommentSection({ postId }) {
             value={comment}
           />
           <div className="flex justify-between items-center mt-5">
-            <p className="text-gray-500 text-xs">1,000 characters left</p>
+            <p className="text-gray-500 text-xs">
+              {(1000 - comment.length).toLocaleString()} characters left
+            </p>
             <ButtonOutline title="Submit" type="submit" />
           </div>
         </form>
