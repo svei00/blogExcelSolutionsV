@@ -3201,7 +3201,43 @@ export default function CallToAction() {
 2. Then add to the **PostPage.jsx** Fille after the <Div> of the *<CallToAction>* function:
    `<CommentSection postId={post._id} />`
     ** We gather the id because we need to select a post to edit it.
-3. Add a new component to always being to the top of the page:
+3. Go to **/api/models** and create the file: **comment.model.js**:
+   `import mongoose from "mongoose";
+
+const commentSchema = new mongoose.Schema({
+  conent: {
+    type: String,
+    required: true,
+  },
+  postId: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+  likes: {
+    type: Array,
+    default: []
+  },
+  numberOfLikes: {
+      type:Number,
+      dafault:0
+  },
+  {timestamps: true}
+});
+
+const Comment = mongoose.model("Comment", commentSchema);
+
+export default Comment;`
+
+4. Go to **/api/routes** and create the file: **comment.routes.js**:
+   ``
+5. Go to **/api/controllers** and create the file: **comment.controller.js**:
+   ``
+
+6. Add a new component to always being to the top of the page:
    - So go to **/client/src/components** and create the file: **ScrollToTop.jsx**
    - Code:
      `import { useEffect } from "react";
@@ -3220,7 +3256,7 @@ export default ScrollToTop;`
       * Write on the top the **ScrollToTop** component before the *<BrowserRouter>* tag
         `<ScrollToTop />`
         ** Remember if not auto import: `import ScrollToTop from "./components/ScrollToTop";`
-4. Create a Button compoment so that way you don't have to repeat and repeat and repeat the same code everysingle time.
+7. Create a Button compoment so that way you don't have to repeat and repeat and repeat the same code everysingle time.
    - Go to **/client/src/components** folder and create file: **Buttons.jsx**
    - Code:
      `import { Button } from "flowbite-react";
@@ -3249,7 +3285,7 @@ export default ButtonOutline;
      `<ButtonOutline title="Submit" />` for example.
 
 
-8:35.22
+8:38.16
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
