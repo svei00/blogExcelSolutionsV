@@ -3237,7 +3237,10 @@ export default Comment;`
 5. Go to **/api/controllers** and create the file: **comment.controller.js**:
    ``
 
-6. Add a new component to always being to the top of the page:
+6. Go to the folder: **/api** and open file: **index.js**:
+   - Around line of code 10: `import commentRoutes from "./routes/comment.route.js";`
+
+7. Add a new component to always being to the top of the page:
    - So go to **/client/src/components** and create the file: **ScrollToTop.jsx**
    - Code:
      `import { useEffect } from "react";
@@ -3256,15 +3259,19 @@ export default ScrollToTop;`
       * Write on the top the **ScrollToTop** component before the *<BrowserRouter>* tag
         `<ScrollToTop />`
         ** Remember if not auto import: `import ScrollToTop from "./components/ScrollToTop";`
-7. Create a Button compoment so that way you don't have to repeat and repeat and repeat the same code everysingle time.
+8. Create a Button compoment so that way you don't have to repeat and repeat and repeat the same code everysingle time.
    - Go to **/client/src/components** folder and create file: **Buttons.jsx**
    - Code:
      `import { Button } from "flowbite-react";
 import PropTypes from "prop-types";
 
-const ButtonOutline = ({ title }) => {
+const ButtonOutline = ({ title, type }) => {
   return (
-    <Button className="bg-gradient-to-r from-blueEx to-greenEx" outline>
+    <Button
+      type={type}
+      className="bg-gradient-to-r from-blueEx to-greenEx"
+      outline
+    >
       {title}
     </Button>
   );
@@ -3272,6 +3279,7 @@ const ButtonOutline = ({ title }) => {
 
 ButtonOutline.propTypes = {
   title: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(["button", "submit", "reset"]),
   // onClick: PropTypes.func,
   // width: PropTypes.string,
   // loading: PropTypes.bool,

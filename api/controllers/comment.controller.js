@@ -1,4 +1,20 @@
+import Comment from "../models/comment.model.js";
+
 export const createComment = async (req, res, next) => {
   try {
-  } catch (error) {}
+    const { content, postId, userId } = req.body;
+
+    if (userId !== req.user.id) {
+      return next(errorHandler(403, "You're not allowed to create comments"));
+    }
+
+    const newComment = new Comment({
+      content,
+      postId,
+      userId,
+    });
+    await newComment.save();
+  } catch (error) {
+    next(error);
+  }
 };

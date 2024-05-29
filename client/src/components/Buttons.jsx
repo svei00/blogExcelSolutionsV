@@ -1,9 +1,13 @@
 import { Button } from "flowbite-react";
 import PropTypes from "prop-types";
 
-const ButtonOutline = ({ title }) => {
+const ButtonOutline = ({ title, type }) => {
   return (
-    <Button className="bg-gradient-to-r from-blueEx to-greenEx" outline>
+    <Button
+      type={type}
+      className="bg-gradient-to-r from-blueEx to-greenEx"
+      outline
+    >
       {title}
     </Button>
   );
@@ -11,6 +15,7 @@ const ButtonOutline = ({ title }) => {
 
 ButtonOutline.propTypes = {
   title: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(["button", "submit", "reset"]),
   // onClick: PropTypes.func,
   // width: PropTypes.string,
   // loading: PropTypes.bool,

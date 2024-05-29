@@ -7,7 +7,29 @@ import { useState } from "react";
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
-  const handleSubmit = async (e) => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Remember to avoid refreshing the page.
+    if (comment.length > 1000) {
+      return;
+    }
+
+    const res = await fetch("/api/comment/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: comment,
+        postId,
+        userId: currentUser.id,
+      }),
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      setComment("");
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
