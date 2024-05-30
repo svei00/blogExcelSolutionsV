@@ -7,6 +7,7 @@ import { useState } from "react";
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // Remember to avoid refreshing the page.
     if (comment.length > 1000) {
@@ -21,7 +22,7 @@ export default function CommentSection({ postId }) {
       body: JSON.stringify({
         content: comment,
         postId,
-        userId: currentUser.id,
+        userId: currentUser._id,
       }),
     });
     const data = await res.json();
