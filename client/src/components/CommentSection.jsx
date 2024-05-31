@@ -2,12 +2,14 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Alert, Textarea } from "flowbite-react";
 import ButtonOutline from "../components/Buttons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [commentError, setCommentError] = useState(null);
+  const [comments, setComments] = useState([]);
+  console.log(comments); // For testing purposes
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Remember to avoid refreshing the page.
@@ -37,6 +39,21 @@ export default function CommentSection({ postId }) {
       setCommentError(error.message);
     }
   };
+
+  useEffect(() => {
+    const getComments = async () => {
+      try {
+        const res = await fetch(`/api/comment/getPostComments/${postId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setComments(data);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getComments();
+  }, [postId]);
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
@@ -88,6 +105,16 @@ export default function CommentSection({ postId }) {
             </Alert>
           )}
         </form>
+      )}
+      {comments.length === 0 ? (
+        <p className="text-sm my-5">No comments yet!</p>
+      ) : (
+        <div className="text-sm my-5 flex items-center gap-1">
+          <p>Comments: </p>
+          <div className="border border-greenEx py-1 px-2 rounded-sm">
+            <p>{comments.length}</p>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -3417,8 +3417,44 @@ export default ButtonOutline;
    - To use the Button simply use:
      `<ButtonOutline title="Submit" />` for example.
 
+## Show the Comments of a Post.
+1. For easy understanding close all the tabs you won't need.
+2. Go to the folder **/api/routes** and open the file comment.route.js
+3. Around line of code 10 write: `router.get("/getPostComments/:postId", getPostComment);`
+4. Now create the function so go to **/api/controllers** folder and at the end of the file **comment.controller.js** create te function:
+`export const getPostComments = async (req, res, next) => {
+  try {
+    const comments = await Comment.find({ postId: req.params.postId }).sort({
+      createAt: -1, // To order newst ones
+    });
+  } catch (error) {
+    next(error);
+  }
+};`
+* Don't forget to import it into **cinnebt.route.js** file: `import {createComment, getPostComments,} from "../controllers/comment.controller.js";
+* 5. Close the backend files and go to **/client/src/comments** and open **commentSection.jsx**
+  - Around line of code 10 type: 
+    `const [comments, setComments] = useState([]);
+     console.log(comments); // For testing purposes
+    `
+  - Around line of code 40 type:
+    `useEffect(() => {
+    const getComments = async () => {
+      try {
+        const res = await fetch(`/api/comment/getPostComments/${postId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setComments(data);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getComments();
+  }, [postId]);`
 
-## Show the comments of a post
+
+8:54:40
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
