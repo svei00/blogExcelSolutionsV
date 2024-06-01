@@ -3432,7 +3432,30 @@ export default ButtonOutline;
   }
 };`
 * Don't forget to import it into **cinnebt.route.js** file: `import {createComment, getPostComments,} from "../controllers/comment.controller.js";
-* 5. Close the backend files and go to **/client/src/comments** and open **commentSection.jsx**
+4. Create an api roite for getUser, go to folder **/api/routes** and open file **user.route.js**
+   - Around line of code 20 add: `router.get(":userId", getUser); // get user by id`
+5. Create the function so go to **/api/controllers** and open the file **userControllers.js**
+   - At the end of the file, around line of code 130 add the function:
+     `export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    const { password, ...rest } = user._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
+`
+   - Remember to import the function into **user.route.js** file: `import { getUser } from "../controllers/user.controller.js";`
+6. Go to folder **/client/src/componets** and creta the file **Comment.jsx**
+   - Create a RFC (React Functional Component).
+   - Import that component into **commentSection.jsx**: `import { Comment } from "../components/Comment";`
+7. Close the backend files and go to **/client/src/comments** and open **commentSection.jsx**
   - Around line of code 10 type: 
     `const [comments, setComments] = useState([]);
      console.log(comments); // For testing purposes
@@ -3452,6 +3475,8 @@ export default ButtonOutline;
     };
     getComments();
   }, [postId]);`
+  - Around line of code 100 after the closging tag of form type:
+    ``
 
 
 8:54:40
