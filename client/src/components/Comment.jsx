@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Comment({ comment }) {
   const [user, setUser] = useState({});
@@ -6,7 +6,7 @@ export default function Comment({ comment }) {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await fetch(`api/users/${comment.userId}`);
+        const res = await fetch(`/api/user/${comment.userId}`);
         const data = await res.json();
         if (res.ok) {
           setUser(data);
@@ -18,5 +18,20 @@ export default function Comment({ comment }) {
     getUser();
   }, [comment]);
 
-  return <div>Comment</div>;
+  return (
+    <div>
+      <div className="">
+        <img
+          className="w-10 h-10 rounded-full bg-gray-200"
+          src={user.profilePicture}
+          alt={user.username}
+        />
+      </div>
+      <div className="">
+        <div className="">
+          <span>{user ? `@${user.username}` : "Anonymous User"}</span>
+        </div>
+      </div>
+    </div>
+  );
 }

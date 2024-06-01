@@ -3433,7 +3433,7 @@ export default ButtonOutline;
 };`
 * Don't forget to import it into **cinnebt.route.js** file: `import {createComment, getPostComments,} from "../controllers/comment.controller.js";
 4. Create an api roite for getUser, go to folder **/api/routes** and open file **user.route.js**
-   - Around line of code 20 add: `router.get(":userId", getUser); // get user by id`
+   - Around line of code 20 add: `router.get("/:userId", getUser); // get user by id`
 5. Create the function so go to **/api/controllers** and open the file **userControllers.js**
    - At the end of the file, around line of code 130 add the function:
      `export const getUser = async (req, res, next) => {
