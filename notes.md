@@ -3543,6 +3543,12 @@ export default function Comment({ comment }) {
       )}`
 
 ## Add Like Functionality to the Comment Component.
+1. Open the folder **/api/routes** and open file: **comment.route.js**
+   - Add the route around line of code 10: `router.put("/likeComment/:commentId", verifyToken, likeComment);`
+2. Create the controller so open folder **/api/controllers** and the file: **comment.controller.js**
+   - At the end of the file around line of code 35:
+     ``
+   - Remember to import the function into **comment.route.js** file: ``
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
