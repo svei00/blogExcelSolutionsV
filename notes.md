@@ -3452,10 +3452,60 @@ export default ButtonOutline;
 };
 `
    - Remember to import the function into **user.route.js** file: `import { getUser } from "../controllers/user.controller.js";`
-6. Go to folder **/client/src/componets** and creta the file **Comment.jsx**
+6. Instal package on the client side **/client** called **luxon**
+   - NPM: `npm i luxon`
+   - YARN: `yarn add luxon`
+   - import it into **Comment.jsx** file: `import { DateTime } from "luxon";`
+7. Go to folder **/client/src/componets** and creta the file **Comment.jsx**
    - Create a RFC (React Functional Component).
    - Import that component into **commentSection.jsx**: `import { Comment } from "../components/Comment";`
-7. Close the backend files and go to **/client/src/comments** and open **commentSection.jsx**
+   - Write:
+     `import { useEffect, useState } from "react";
+import { DateTime } from "luxon";
+
+export default function Comment({ comment }) {
+  const [user, setUser] = useState({});
+  console.log(user); // For testing purposes
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const res = await fetch(`/api/user/${comment.userId}`);
+        const data = await res.json();
+        if (res.ok) {
+          setUser(data);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getUser();
+  }, [comment]);
+
+  return (
+    <div className="flex p-4 border-b dark:border-greenEx text-sm">
+      <div className="flex-shrink-0 mr-3">
+        <img
+          className="w-10 h-10 rounded-full bg-gray-200"
+          src={user.profilePicture}
+          alt={user.username}
+        />
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center mb-1">
+          <span className="font-bold mr-1 text-xs">
+            {user ? `@${user.username}` : "Anonymous User"}
+          </span>
+          <span text-gray-500 text-xs>
+            {DateTime.fromISO(comment.createdAt).toRelative()}
+          </span>
+        </div>
+        <p className="text-gray-500 pb-2 text-justify">{comment.content}</p>
+      </div>
+    </div>
+  );
+}
+` 
+8. Close the backend files and go to **/client/src/comments** and open **commentSection.jsx**
   - Around line of code 10 type: 
     `const [comments, setComments] = useState([]);
      console.log(comments); // For testing purposes
@@ -3475,11 +3525,24 @@ export default ButtonOutline;
     };
     getComments();
   }, [postId]);`
-  - Around line of code 100 after the closging tag of form type:
-    ``
+  - Around line of code 100 after the closging tag of *<form>* type:
+    ` {comments.length === 0 ? (
+        <p className="text-sm my-5">No comments yet!</p>
+      ) : (
+        <>
+          <div className="text-sm my-5 flex items-center gap-1">
+            <p>Comments: </p>
+            <div className="border border-greenEx py-1 px-2 rounded-sm">
+              <p>{comments.length}</p>
+            </div>
+          </div>
+          {comments.map((comment) => (
+            <Comment key={comment._id} comment={comment} />
+          ))}
+        </>
+      )}`
 
-
-8:54:40
+## Add Like Functionality to the Comment Component.
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
