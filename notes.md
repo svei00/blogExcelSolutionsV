@@ -3547,8 +3547,44 @@ export default function Comment({ comment }) {
    - Add the route around line of code 10: `router.put("/likeComment/:commentId", verifyToken, likeComment);`
 2. Create the controller so open folder **/api/controllers** and the file: **comment.controller.js**
    - At the end of the file around line of code 35:
+     `export const likeComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+    const userIndex = comment.likes.indexOf(req.user.id);
+    if (userIndex === -1) {
+      comment.numberOfLikes += 1;
+      comment.likes.push(req.user.id);
+    } else {
+      comment.numberOfLikes -= 1;
+      comment.likes.splice(userIndex, 1); // userIndex remove the array, that why the number 1.
+    }
+    await comment.save();
+    res.status(200).json(comment);
+  } catch (error) {
+    next(error);
+  }
+};
+`
+   - Remember to import the function into **comment.route.js** file: `import { likeComment } from "../controllers/comment.controller.js";`
+3. Go to the front end section **/client/src/components** and open the file **CommentSection.jsx**.
+   - Before the *return* around line of code create the function **handleLike**:
+   - Add the import: `import { Link, useNavigate } from "react-router-dom";`
+   - Then around line of code 15 add : `const navigate = useNavigate();` 
      ``
-   - Remember to import the function into **comment.route.js** file: ``
+   - On **Comment.jsx** add: `import { useSelector } from "react-redux";`
+   - Around line of code 125 into the **<Comment />** tag add: `onLike={handleLike}`
+   - On **/client/src/compoments** open the file: **Comment.jsx** and add:
+   - Change: `export default function Comment({ comment })` for: `export default function Comment({ comment, onLike })`
+4. On the file **Comment.jsx** around line 40 write:
+   - Import: `import { FaThumbsUp } from "react-icons/fa";`
+   - ``
+
+## Add Edit Functionality to the Comment Component.
+
+
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
