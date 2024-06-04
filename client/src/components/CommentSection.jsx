@@ -70,7 +70,7 @@ export default function CommentSection({ postId }) {
       if (res.ok) {
         const data = await res.json();
         setComments(
-          comment.map((comment) =>
+          comments.map((comment) =>
             comment._id === commentId
               ? {
                   ...comment,
