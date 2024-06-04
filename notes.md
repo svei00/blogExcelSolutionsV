@@ -3573,17 +3573,94 @@ export default function Comment({ comment }) {
    - Before the *return* around line of code create the function **handleLike**:
    - Add the import: `import { Link, useNavigate } from "react-router-dom";`
    - Then around line of code 15 add : `const navigate = useNavigate();` 
-     ``
+     `const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        navigate("/sign-in");
+        return;
+      }
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: "PUT",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setComments(
+          comments.map((comment) =>
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: data.likes,
+                  numberOfLikes: data.likes.length,
+                }
+              : comment
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };`
    - On **Comment.jsx** add: `import { useSelector } from "react-redux";`
    - Around line of code 125 into the **<Comment />** tag add: `onLike={handleLike}`
    - On **/client/src/compoments** open the file: **Comment.jsx** and add:
    - Change: `export default function Comment({ comment })` for: `export default function Comment({ comment, onLike })`
 4. On the file **Comment.jsx** around line 40 write:
    - Import: `import { FaThumbsUp } from "react-icons/fa";`
-   - ``
+   - `<div className="flex items-center pt-2 text-xs border-t dark:border-gray-700 max-w-fit gap-2">
+          <button
+            type="button"
+            onClick={() => onLike(comment._id)}
+            className={`text-gray-400 hover:text-blue-500 ${
+              currentUser &&
+              comment.likes.includes(currentUser._id) &&
+              "!text-blue-500"
+            }`}
+          >
+            <FaThumbsUp className="text-sm" />
+          </button>
+          <p className="text-gray-400">
+            {comment.numberOfLikes > 0 &&
+              comment.numberOfLikes +
+                " " +
+                (comment.numberOfLikes === 1 ? "like" : "likes")}
+          </p>
+        </div>
+      </div>
+    </div>`
 
 ## Add Edit Functionality to the Comment Component.
+1. Go to **/api/routes/** folder and open file: **comment.route.js** and add an the end around line of code 15: `router.put("/editComment/:commentId", verifyToken, editComment);`
+- Remember to import it on the top: `import { likeComment, editComment } from "../controllers/comment.controller.js";`
+2 Open **/api/controllers/** and open file **comment.controller.js** at the en of the file, aronn line of code 60 code:
+  `export const editComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+    if (comment.userId !== req.user.id && !req.user.isAdmin) {
+      return next(errorHandler(403, "You're not allowed to edit this comment"));
+    }
 
+    const editComment = await Comment.findByIdAndUpdate(
+      req.params.commentId,
+      {
+        content: req.body.content,
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(editComment);
+  } catch (error) {
+    next(error);
+  }
+};
+`
+3. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
+   - ``
+
+9:28:48
 
 
 ## Biblography
