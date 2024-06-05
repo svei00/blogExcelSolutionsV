@@ -3657,8 +3657,16 @@ export default function Comment({ comment }) {
   }
 };
 `
-3. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
+3. Create the **handleEdit** function bedore the return:
+   - Around line of code 10 create a piece of state: `const [isEditing, setIsEditing] = useState(false);`
+   - Around line of code 10 create another piece of state: `const [editContent, setEditContent] = useState(comment.content);`
+   - Create the function aarond line of code 20
+     ``
+   - Around line of code 50 after the time or hours ago tag create the logic for isEditing:
+     `` 
+4. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
    - ``
+  
 
 9:28:48
 

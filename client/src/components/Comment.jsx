@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import { Textarea } from "flowbite-react";
 
 export default function Comment({ comment, onLike }) {
   const [user, setUser] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
   const { currentUser } = useSelector((state) => state.user);
   console.log(user); // For testing purposes
   useEffect(() => {
@@ -21,6 +24,10 @@ export default function Comment({ comment, onLike }) {
     };
     getUser();
   }, [comment]);
+
+  handleEdit = () => {
+    setIsEditing(true);
+  };
 
   return (
     <div className="flex p-4 border-b dark:border-greenEx text-sm">
@@ -40,7 +47,17 @@ export default function Comment({ comment, onLike }) {
             {DateTime.fromISO(comment.createdAt).toRelative()}
           </span>
         </div>
-        <p className="text-gray-500 pb-2 text-justify">{comment.content}</p>
+        {isEditing ? (
+          <Textarea 
+            className="w-full p-2 border border-gray-700 rounded-md resize-none focus:outline-none focus:bg-gray-100"
+            rows="3"
+            value={}
+            onChange={(e) => setComment(e.target.value)}
+
+          />  
+        ) : (
+          <>
+           <p className="text-gray-500 pb-2 text-justify">{comment.content}</p>
         <div className="flex items-center pt-2 text-xs border-t dark:border-gray-700 max-w-fit gap-2">
           <button
             type="button"
@@ -64,6 +81,7 @@ export default function Comment({ comment, onLike }) {
               <>
                 <button
                   type="button"
+                  onClick={handleEdit}
                   className="text-gray-400 hover:text-greenEx font-semibold"
                 >
                   Edit
@@ -78,6 +96,9 @@ export default function Comment({ comment, onLike }) {
               </>
             )}
         </div>
+        )        
+        )}
+        </>
       </div>
     </div>
   );
