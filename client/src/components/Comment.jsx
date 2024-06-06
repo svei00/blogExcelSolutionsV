@@ -3,11 +3,12 @@ import { DateTime } from "luxon";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Textarea } from "flowbite-react";
+import ButtonInline from "./Buttons";
 
 export default function Comment({ comment, onLike }) {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.content);
+  const [editedContent, setEditedContent] = useState(comment.content);
   const { currentUser } = useSelector((state) => state.user);
   console.log(user); // For testing purposes
   useEffect(() => {
@@ -25,10 +26,10 @@ export default function Comment({ comment, onLike }) {
     getUser();
   }, [comment]);
 
-  handleEdit = () => {
+  const handleEdit = () => {
     setIsEditing(true);
+    setEditedContent(comment.content);
   };
-
   return (
     <div className="flex p-4 border-b dark:border-greenEx text-sm">
       <div className="flex-shrink-0 mr-3">
@@ -48,57 +49,59 @@ export default function Comment({ comment, onLike }) {
           </span>
         </div>
         {isEditing ? (
-          <Textarea 
-            className="w-full p-2 border border-gray-700 rounded-md resize-none focus:outline-none focus:bg-gray-100"
-            rows="3"
-            value={}
-            onChange={(e) => setComment(e.target.value)}
-
-          />  
+          <>
+            <Textarea
+              className="mb2"
+              value={editedContent}
+              onChange={(e) => setEditContent(e.target.value)}
+            />
+            <div className="">
+              <ButtonInline title="Edit" type="button" />
+            </div>
+          </>
         ) : (
           <>
-           <p className="text-gray-500 pb-2 text-justify">{comment.content}</p>
-        <div className="flex items-center pt-2 text-xs border-t dark:border-gray-700 max-w-fit gap-2">
-          <button
-            type="button"
-            onClick={() => onLike(comment._id)}
-            className={`text-gray-400 hover:text-blue-500 ${
-              currentUser &&
-              comment.likes.includes(currentUser._id) &&
-              "!text-blue-500"
-            }`}
-          >
-            <FaThumbsUp className="text-sm" />
-          </button>
-          <p className="text-gray-400">
-            {comment.numberOfLikes > 0 &&
-              comment.numberOfLikes +
-                " " +
-                (comment.numberOfLikes === 1 ? "like" : "likes")}
-          </p>
-          {currentUser &&
-            (currentUser._id === comment.userId || currentUser.isAdmin) && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleEdit}
-                  className="text-gray-400 hover:text-greenEx font-semibold"
-                >
-                  Edit
-                </button>
+            <p className="text-gray-500 pb-2 text-justify">{comment.content}</p>
+            <div className="flex items-center pt-2 text-xs border-t dark:border-gray-700 max-w-fit gap-2">
+              <button
+                type="button"
+                onClick={() => onLike(comment._id)}
+                className={`text-gray-400 hover:text-blue-500 ${
+                  currentUser &&
+                  comment.likes.includes(currentUser._id) &&
+                  "!text-blue-500"
+                }`}
+              >
+                <FaThumbsUp className="text-sm" />
+              </button>
+              <p className="text-gray-400">
+                {comment.numberOfLikes > 0 &&
+                  comment.numberOfLikes +
+                    " " +
+                    (comment.numberOfLikes === 1 ? "like" : "likes")}
+              </p>
+              {currentUser &&
+                (currentUser._id === comment.userId || currentUser.isAdmin) && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleEdit}
+                      className="text-gray-400 hover:text-greenEx font-semibold"
+                    >
+                      Edit
+                    </button>
 
-                <button
-                  type="button"
-                  className="text-gray-400 hover:text-red-500 font-semibold"
-                >
-                  Delete
-                </button>
-              </>
-            )}
-        </div>
-        )        
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-red-500 font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
+            </div>
+          </>
         )}
-        </>
       </div>
     </div>
   );
