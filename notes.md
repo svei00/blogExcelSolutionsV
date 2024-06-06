@@ -3631,7 +3631,36 @@ export default function Comment({ comment }) {
 ## Add Edit Functionality to the Comment Component.
 1. Go to **/api/routes/** folder and open file: **comment.route.js** and add an the end around line of code 15: `router.put("/editComment/:commentId", verifyToken, editComment);`
 - Remember to import it on the top: `import { likeComment, editComment } from "../controllers/comment.controller.js";`
-2 Open **/api/controllers/** and open file **comment.controller.js** at the en of the file, aronn line of code 60 code:
+2. Create on **/client/src/components** a **ButtonInline.jsx** file to rehutilize the buttons and code:
+   `import { Button } from "flowbite-react";
+import PropTypes from "prop-types";
+
+const ButtonInline = ({ title, type, size }) => {
+  return (
+    <Button
+      type={type}
+      className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
+      size={size}
+    >
+      {title}
+    </Button>
+  );
+};
+
+ButtonInline.propTypes = {
+  title: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(["button", "submit", "reset"]),
+  size: PropTypes.oneOf(["sm", "md", "lg"]),
+  // onClick: PropTypes.func,
+  // width: PropTypes.string,
+  // loading: PropTypes.bool,
+  // padding: PropTypes.string,
+  // noIcon: PropTypes.bool
+};
+
+export default ButtonInline;
+`
+3. Open **/api/controllers/** and open file **comment.controller.js** at the en of the file, aronn line of code 60 code:
   `export const editComment = async (req, res, next) => {
   try {
     const comment = await Comment.findById(req.params.commentId);
@@ -3657,14 +3686,14 @@ export default function Comment({ comment }) {
   }
 };
 `
-3. Create the **handleEdit** function bedore the return:
+4. Create the **handleEdit** function bedore the return:
    - Around line of code 10 create a piece of state: `const [isEditing, setIsEditing] = useState(false);`
    - Around line of code 10 create another piece of state: `const [editContent, setEditContent] = useState(comment.content);`
    - Create the function aarond line of code 20
      ``
    - Around line of code 50 after the time or hours ago tag create the logic for isEditing:
      `` 
-4. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
+5. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
    - ``
   
 

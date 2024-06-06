@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Textarea } from "flowbite-react";
-import ButtonInline from "./Buttons";
+import ButtonInline from "./ButtonInline";
 
 export default function Comment({ comment, onLike }) {
   const [user, setUser] = useState({});
@@ -56,7 +56,7 @@ export default function Comment({ comment, onLike }) {
               onChange={(e) => setEditContent(e.target.value)}
             />
             <div className="">
-              <ButtonInline title="Edit" type="button" />
+              <ButtonInline title="Save" type="button" size="sm" />
             </div>
           </>
         ) : (
