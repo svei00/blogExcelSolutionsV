@@ -4,8 +4,9 @@ import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Textarea } from "flowbite-react";
 import ButtonInline from "./ButtonInline";
+import ButtonOutline from "./ButtonOutline";
 
-export default function Comment({ comment, onLike }) {
+export default function Comment({ comment, onLike, onEdit }) {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
@@ -30,6 +31,27 @@ export default function Comment({ comment, onLike }) {
     setIsEditing(true);
     setEditedContent(comment.content);
   };
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`/api/comment/editComment/${comment._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: editedContent,
+        }),
+      });
+      if (res.ok) {
+        setIsEditing(false);
+        onEdit(comment, editedContent);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="flex p-4 border-b dark:border-greenEx text-sm">
       <div className="flex-shrink-0 mr-3">
@@ -41,10 +63,10 @@ export default function Comment({ comment, onLike }) {
       </div>
       <div className="flex-1">
         <div className="flex items-center mb-1">
-          <span className="font-bold mr-1 text-xs">
+          <span className="font-bold mr-1 text-xs truncate">
             {user ? `@${user.username}` : "Anonymous User"}
           </span>
-          <span text-gray-500 text-xs>
+          <span className="text-gray-500 text-xs">
             {DateTime.fromISO(comment.createdAt).toRelative()}
           </span>
         </div>
@@ -53,10 +75,22 @@ export default function Comment({ comment, onLike }) {
             <Textarea
               className="mb2"
               value={editedContent}
-              onChange={(e) => setEditContent(e.target.value)}
+              onChange={(e) => setEditedContent(e.target.value)}
             />
-            <div className="">
-              <ButtonInline title="Save" type="button" size="sm" />
+            <div className="flex justify-end gap-2 text-xs">
+              <ButtonInline
+                title="Save"
+                type="button"
+                size="sm"
+                onClick={handleSave}
+              />
+              <ButtonOutline
+                title="Cancel"
+                type="button"
+                size="sm"
+                onClick={() => setIsEditing(false)}
+                outline
+              />
             </div>
           </>
         ) : (

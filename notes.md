@@ -3689,15 +3689,126 @@ export default ButtonInline;
 4. Create the **handleEdit** function bedore the return:
    - Around line of code 10 create a piece of state: `const [isEditing, setIsEditing] = useState(false);`
    - Around line of code 10 create another piece of state: `const [editContent, setEditContent] = useState(comment.content);`
-   - Create the function aarond line of code 20
-     ``
-   - Around line of code 50 after the time or hours ago tag create the logic for isEditing:
-     `` 
+   - Create the function arond line of code 20
+     `const handleEdit = () => {
+    setIsEditing(true);
+    setEditedContent(comment.content);
+  };`
+   - Around line of code 50 after the time or hours ago tag create the logic for **isEditing**:
+     `- `{isEditing ? (
+          <>
+            <Textarea
+              className="mb2"
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+            />
+            <div className="flex justify-end gap-2 text-xs">
+              <ButtonInline
+                title="Save"
+                type="button"
+                size="sm"
+                onClick={handleSave}
+              />
+              <ButtonOutline
+                title="Cancel"
+                type="button"
+                size="sm"
+                onClick={() => setIsEditing(false)}
+                outline
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-500 pb-2 text-justify">{comment.content}</p>
+            <div className="flex items-center pt-2 text-xs border-t dark:border-gray-700 max-w-fit gap-2">
+              <button
+                type="button"
+                onClick={() => onLike(comment._id)}
+                className={`text-gray-400 hover:text-blue-500 ${
+                  currentUser &&
+                  comment.likes.includes(currentUser._id) &&
+                  "!text-blue-500"
+                }`}
+              >
+                <FaThumbsUp className="text-sm" />
+              </button>
+              <p className="text-gray-400">
+                {comment.numberOfLikes > 0 &&
+                  comment.numberOfLikes +
+                    " " +
+                    (comment.numberOfLikes === 1 ? "like" : "likes")}
+              </p>
+              {currentUser &&
+                (currentUser._id === comment.userId || currentUser.isAdmin) && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleEdit}
+                      className="text-gray-400 hover:text-greenEx font-semibold"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-red-500 font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </>`` 
 5. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
-   - ``
+   `{currentUser &&
+                (currentUser._id === comment.userId || currentUser.isAdmin) && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleEdit}
+                      className="text-gray-400 hover:text-greenEx font-semibold"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-red-500 font-semibold"
+                    >
+                      Delete
+                    </button>
+`
+   
+6. Create the Function **handleEdit** on file **CommentSection.jsx** before the return around line of code 90:
+   `const handleSave = async (comment, editedContent) => {
+    setComents(
+      comments.map((c) =>
+        c._id === comment._id ? { ...c, content: editedContent } : c
+      )
+    );
+  };
+` 
+7. Again on **Comment.jsx** File create the functions **handleSave** around line of code 35:
+   `const handleSave = async () => {
+    try {
+      const res = await fetch(`/api/comment/editComment/${comment._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: editedContent,
+        }),
+      });
+      if (res.ok) {
+        setIsEditing(false);
+        onEdit(comment, editedContent);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };`
   
 
-9:33:39
+## Add Delete Functionality to the Comment Section.
 
 
 ## Biblography
