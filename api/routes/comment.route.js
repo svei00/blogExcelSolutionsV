@@ -16,6 +16,6 @@ router.post("/create", verifyToken, createComment);
 router.get("/getPostComments/:postId", getPostComments);
 router.put("/likeComment/:commentId", verifyToken, likeComment); // We use put since we need to update it sometimes.
 router.put("/editComment/:commentId", verifyToken, editComment);
-router.put("/deleteComment/:commentId", verifyToken, editComment);
+router.delete("/deleteComment/:commentId", verifyToken, deleteComment);
 
 export default router;

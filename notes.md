@@ -3783,7 +3783,7 @@ export default function Comment({ comment }) {
 ## Add Delete Functionality to the Comment Section.
 1. Close all the tabs so you won't get confussed.
 2. Go to **/api/routes** folder and open **comment.route.js** file.
-   - Around line of code 15 tipe: `router.put("/deleteComment/:commentId", verifyToken, editComment);`
+   - Around line of code 15 tipe: `router.delete("/deleteComment/:commentId", verifyToken, editComment);`
    - Remember to import from `deleteComment, import {deleteComment} from "../controllers/comment.controller.js";`
 3. So create that function go to **/api/controllers/** and open **comment.controller.js**
    - At the end around line of code 80:
@@ -3827,6 +3827,8 @@ export default function Comment({ comment }) {
    - Create another piece of state around line of code 15: `const [commentToDelete, setCommentToDelete] = useState(null);`
    - Create the **<Modal>** you can create it, or copy from *DashPost* (The last modal) and paste or better create a Modal Component to rehutilize the code. You can copy before the last closing **</div>** around line of code 180.
    - ``
+   * If not autoimport remember to import it: `import { Alert, Modal, Textarea } from "flowbite-react";`
+   * Same with the icon: `import { HiOutlineExclamationCircle } from "react-icons/hi";`
   
    
      
