@@ -3,10 +3,9 @@ import { DateTime } from "luxon";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Textarea } from "flowbite-react";
-import ButtonInline from "./ButtonInline";
-import ButtonOutline from "./Buttons";
+import ButtonEx from "./Buttons";
 
-export default function Comment({ comment, onLike, onEdit }) {
+export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
@@ -78,13 +77,13 @@ export default function Comment({ comment, onLike, onEdit }) {
               onChange={(e) => setEditedContent(e.target.value)}
             />
             <div className="flex justify-end gap-2 text-xs">
-              <ButtonInline
+              <ButtonEx
                 title="Save"
                 type="button"
                 size="sm"
                 onClick={handleSave}
               />
-              <ButtonOutline
+              <ButtonEx
                 title="Cancel"
                 type="button"
                 size="sm"
@@ -127,6 +126,7 @@ export default function Comment({ comment, onLike, onEdit }) {
 
                     <button
                       type="button"
+                      onClick={() => onDelete(comment._id)}
                       className="text-gray-400 hover:text-red-500 font-semibold"
                     >
                       Delete

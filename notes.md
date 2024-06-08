@@ -3631,36 +3631,8 @@ export default function Comment({ comment }) {
 ## Add Edit Functionality to the Comment Component.
 1. Go to **/api/routes/** folder and open file: **comment.route.js** and add an the end around line of code 15: `router.put("/editComment/:commentId", verifyToken, editComment);`
 - Remember to import it on the top: `import { likeComment, editComment } from "../controllers/comment.controller.js";`
-2. Create on **/client/src/components** a **ButtonInline.jsx** file to rehutilize the buttons and code:
-   `import { Button } from "flowbite-react";
-import PropTypes from "prop-types";
 
-const ButtonInline = ({ title, type, size }) => {
-  return (
-    <Button
-      type={type}
-      className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
-      size={size}
-    >
-      {title}
-    </Button>
-  );
-};
-
-ButtonInline.propTypes = {
-  title: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(["button", "submit", "reset"]),
-  size: PropTypes.oneOf(["sm", "md", "lg"]),
-  // onClick: PropTypes.func,
-  // width: PropTypes.string,
-  // loading: PropTypes.bool,
-  // padding: PropTypes.string,
-  // noIcon: PropTypes.bool
-};
-
-export default ButtonInline;
-`
-3. Open **/api/controllers/** and open file **comment.controller.js** at the en of the file, aronn line of code 60 code:
+2. Open **/api/controllers/** and open file **comment.controller.js** at the en of the file, aronn line of code 60 code:
   `export const editComment = async (req, res, next) => {
   try {
     const comment = await Comment.findById(req.params.commentId);
@@ -3686,7 +3658,7 @@ export default ButtonInline;
   }
 };
 `
-4. Create the **handleEdit** function bedore the return:
+3. Create the **handleEdit** function bedore the return:
    - Around line of code 10 create a piece of state: `const [isEditing, setIsEditing] = useState(false);`
    - Around line of code 10 create another piece of state: `const [editContent, setEditContent] = useState(comment.content);`
    - Create the function arond line of code 20
@@ -3757,7 +3729,7 @@ export default ButtonInline;
                       Delete
                     </button>
                   </>`` 
-5. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
+4. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
    `{currentUser &&
                 (currentUser._id === comment.userId || currentUser.isAdmin) && (
                   <>
@@ -3777,7 +3749,7 @@ export default ButtonInline;
                     </button>
 `
    
-6. Create the Function **handleEdit** on file **CommentSection.jsx** before the return around line of code 90:
+5. Create the Function **handleEdit** on file **CommentSection.jsx** before the return around line of code 90:
    `const handleSave = async (comment, editedContent) => {
     setComents(
       comments.map((c) =>
@@ -3786,7 +3758,7 @@ export default ButtonInline;
     );
   };
 ` 
-7. Again on **Comment.jsx** File create the functions **handleSave** around line of code 35:
+6. Again on **Comment.jsx** File create the functions **handleSave** around line of code 35:
    `const handleSave = async () => {
     try {
       const res = await fetch(`/api/comment/editComment/${comment._id}`, {
@@ -3809,6 +3781,55 @@ export default ButtonInline;
   
 
 ## Add Delete Functionality to the Comment Section.
+1. Close all the tabs so you won't get confussed.
+2. Go to **/api/routes** folder and open **comment.route.js** file.
+   - Around line of code 15 tipe: `router.put("/deleteComment/:commentId", verifyToken, editComment);`
+   - Remember to import from `deleteComment, import {deleteComment} from "../controllers/comment.controller.js";`
+3. So create that function go to **/api/controllers/** and open **comment.controller.js**
+   - At the end around line of code 80:
+     `export const deleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+    if (comment.userId !== req.user.id && !req.user.isAdmin) {
+      return next(
+        errorHandler(403, "You're not allowed to delete this comment")
+      );
+      await Comment.findByIdAndDelete(req.params.commentId);
+      res.status(200).json({ message: "Comment deleted" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};`
+### Comment.jsx
+4. Go to the frontEnd section **/client/src/componets** and on the file **Comment.jsx** it should look like this:
+   `<button
+                      type="button"
+                      onClick={() => onDelete(comment._id)}
+                      className="text-gray-400 hover:text-red-500 font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </>`
+5. Around line of code 10 add to the component at the top. I should look like this:
+   `export default function Comment({ comment, onLike, onEdit, onDelete }) {`
+### CommentSection.jsx
+6. Now on the **CommentSection.jsx** before the return around line of code 95 create the **handleDelete** function:
+   - Create a piece of state at the beggining around line of code 15: `const [showModal, setShowModal] = useState(false);`
+   - Pass the prop around line of code 160 inside the **<Comment>** tag:
+     `onDelete={(commentId) => {
+                setShowModal(true);
+                setCommentId(commentId);
+              }}` 
+   - Create another piece of state around line of code 15: `const [commentToDelete, setCommentToDelete] = useState(null);`
+   - Create the **<Modal>** you can create it, or copy from *DashPost* (The last modal) and paste or better create a Modal Component to rehutilize the code. You can copy before the last closing **</div>** around line of code 180.
+   - ``
+  
+   
+     
 
 
 ## Biblography

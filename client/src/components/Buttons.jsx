@@ -1,7 +1,7 @@
 import { Button } from "flowbite-react";
 import PropTypes from "prop-types";
 
-const ButtonOutline = ({ title, type, size, onClick, outline }) => {
+const ButtonEx = ({ title, type, size, onClick, outline }) => {
   return (
     <Button
       type={type}
@@ -15,7 +15,7 @@ const ButtonOutline = ({ title, type, size, onClick, outline }) => {
   );
 };
 
-ButtonOutline.propTypes = {
+ButtonEx.propTypes = {
   title: PropTypes.string.isRequired,
   type: PropTypes.oneOf(["button", "submit", "reset"]),
   size: PropTypes.oneOf(["sm", "md", "lg"]),
@@ -27,4 +27,4 @@ ButtonOutline.propTypes = {
   // noIcon: PropTypes.bool
 };
 
-export default ButtonOutline;
+export default ButtonEx;
