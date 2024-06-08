@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, Textarea } from "flowbite-react";
-import ButtonOutline from "./ButtonOutline";
+import ButtonOutline from "./Buttons";
 import { useEffect, useState } from "react";
 import Comment from "./Comment";
 

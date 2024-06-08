@@ -4,7 +4,7 @@ import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Textarea } from "flowbite-react";
 import ButtonInline from "./ButtonInline";
-import ButtonOutline from "./ButtonOutline";
+import ButtonOutline from "./Buttons";
 
 export default function Comment({ comment, onLike, onEdit }) {
   const [user, setUser] = useState({});
