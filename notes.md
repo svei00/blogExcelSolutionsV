@@ -3834,8 +3834,36 @@ export default function Comment({ comment }) {
 1. Close all the open tags we don't need anymore.
 2. Go to the FrlontEnd section an open **/client/src/pages** and open the file **PostPage.jsx**.
 3. After the **<CommentSeccion>** tab and before the closing **</main>** tag around line of code 80 write:
-   ``
-     
+   `<div className="flex flex-col justify-center items-center mb-5">
+        <h1 className="text-xl mt-5">Recent Articles</h1>
+        <div className="">
+          {
+            recentPosts &&
+            recentPosts.map((post) => {
+              <PostCard key={post._id} post={post} />
+            })
+          }
+        </div>
+      </div>`
+4. Create another piece of state around line of code 10: `const [recentPosts, setRecentPosts] = useState(null);`
+5. Around line of code 40 create another piece of state:
+   `useEffect(() => {
+    try {
+      const fetchRecentPost async () => {
+        fetchRecentPost();
+        const res = await fetch("/api/post/getposts?limit=3");
+        const data = await res.json();
+        if (res.ok) {
+          setRecentPosts(data.posts);
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  });` 
+6. Go to **/client/src/components** and create the file **PostCard.jsx**
+   - Use RFC (React Functional Component) 
+   - Remember to Import it into PostPage to make the **<PostCard/>** tag work: `import {PostCard} from "../components/PostCard";`
 
 
 ## Biblography
