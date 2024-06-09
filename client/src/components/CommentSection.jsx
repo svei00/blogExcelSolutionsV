@@ -185,7 +185,7 @@ export default function CommentSection({ postId }) {
               onEdit={handleEdit}
               onDelete={(commentId) => {
                 setShowModal(true);
-                setCommentId(commentId);
+                setCommentToDelete(commentId);
               }}
             />
           ))}
