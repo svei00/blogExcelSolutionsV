@@ -3829,8 +3829,12 @@ export default function Comment({ comment }) {
    - ``
    * If not autoimport remember to import it: `import { Alert, Modal, Textarea } from "flowbite-react";`
    * Same with the icon: `import { HiOutlineExclamationCircle } from "react-icons/hi";`
-  
-   
+
+## Add Recent Article Section to the Post Page.
+1. Close all the open tags we don't need anymore.
+2. Go to the FrlontEnd section an open **/client/src/pages** and open the file **PostPage.jsx**.
+3. After the **<CommentSeccion>** tab and before the closing **</main>** tag around line of code 80 write:
+   ``
      
 
 
