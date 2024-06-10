@@ -2242,7 +2242,7 @@
 2. Open **DashSidebar.jsx** File from **/client/src/components**
 3. After the *Profile* <Link> add:
    - Import the useSelector: `import { useSelector } from "react-redux";`
-   - then add the current user befire the useEffect aroun line of code 10:  ``
+   - then add the current user before the useEffect around line of code 10: 
    ` {currentUser.isAdmin && (
             <Link to="/dashboard?tab=post">
               <Sidebar.Item
@@ -2263,7 +2263,7 @@
     return <div>DashPosts</div>;
   }
   `
-7. In the **Dashboard.jsx** file from **/client/src/pages** around line of code 25 add:
+1. In the **Dashboard.jsx** file from **/client/src/pages** around line of code 25 add:
    - ` {/* Posts */}
       {tab === "posts" && <DashPosts />}` remember if not auto import  import it: `import DashPosts from "../components/DashPosts";`
 
@@ -3728,7 +3728,7 @@ export default function Comment({ comment }) {
                     >
                       Delete
                     </button>
-                  </>`` 
+                  </>`
 4. Go back to the FrontEnd secciont **/client/src/components** and open **Comment.jsx** file and around line of code 60 after the **<p>** tag of the like code:
    `{currentUser &&
                 (currentUser._id === comment.userId || currentUser.isAdmin) && (
@@ -3826,7 +3826,33 @@ export default function Comment({ comment }) {
               }}` 
    - Create another piece of state around line of code 15: `const [commentToDelete, setCommentToDelete] = useState(null);`
    - Create the **<Modal>** you can create it, or copy from *DashPost* (The last modal) and paste or better create a Modal Component to rehutilize the code. You can copy before the last closing **</div>** around line of code 180.
-   - ``
+   - `<Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-300">
+              Are you sure to delete this comment?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button
+                color="failure"
+                onClick={() => handleDelete(commentToDelete)}
+              >
+                Yes, I'm sure.
+              </Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>`
    * If not autoimport remember to import it: `import { Alert, Modal, Textarea } from "flowbite-react";`
    * Same with the icon: `import { HiOutlineExclamationCircle } from "react-icons/hi";`
 
@@ -3865,6 +3891,8 @@ export default function Comment({ comment }) {
    - Use RFC (React Functional Component) 
    - Remember to Import it into PostPage to make the **<PostCard/>** tag work: `import {PostCard} from "../components/PostCard";`
 
+
+10:03:25
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
