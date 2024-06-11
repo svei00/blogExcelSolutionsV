@@ -3940,6 +3940,14 @@ On PostPage.jsx should look like this around line of code 90:
 
 
 ## Add Comments Section to the Admin Dashboard.
+1. Go to **/client/src/components/**  and create the file **DashComments.jsx**
+   - Use the RFC (React Functional Component).
+     `export default function DashComments() {
+  return <div>DashComments</div>;
+}
+`
+
+10:09:09
 
 
 ## Biblography
