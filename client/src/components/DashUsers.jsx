@@ -23,9 +23,9 @@ export default function DashUsers() {
             setShowMore(false);
           }
         }
-        console.log(data);
+        //console.log(data);
       } catch (error) {
-        console.log(error);
+        console.log(error.message);
       }
     };
     if (currentUser.isAdmin) fetchUsers();

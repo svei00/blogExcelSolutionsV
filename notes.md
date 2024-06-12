@@ -3946,8 +3946,10 @@ On PostPage.jsx should look like this around line of code 90:
   return <div>DashComments</div>;
 }
 `
-
-10:09:09
+2. Now go to **/client/src/pages** open **Dashboard.jsx** and add around line of code 30:
+   - `{/* Comments */}
+      {tab === "comments" && <DashComments />}`
+   - Remember if not auto import do it: `import DashComments from "../components/DashComments";`
 
 
 ## Biblography
