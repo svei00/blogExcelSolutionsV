@@ -3940,16 +3940,224 @@ On PostPage.jsx should look like this around line of code 90:
 
 
 ## Add Comments Section to the Admin Dashboard.
-1. Go to **/client/src/components/**  and create the file **DashComments.jsx**
+1. Create the api route so go to **/api/routes/** and on **comment.route.js** add: `router.get("/getcomments", verifyToken, getComments);`
+2. Create the function on **/api/controllers** file **comments.controller.js** and at the end add the code:
+   `export const getComments = async (req, res, next) => {
+  if (!req.user.isAdmin)
+    return next(errorHandler(403, "You're not allowed to see comments"));
+
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "desc" ? -1 : 1;
+    const comments = await Comment.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    const totalComments = await Comment.countDocuments();
+    const now = new Date();
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+    const lastMonthComments = await Comment.countDocuments({
+      createdAt: {
+        $gte: oneMonthAgo,
+      },
+    });
+    res.status(200).json({
+      comments,
+      totalComments,
+      lastMonthComments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+`
+  * Remember to import it into **comment.route.js**: `import { getComments } from "../controllers/comment.controller.js"; `
+3. Go to **/client/src/components/**  and create the file **DashComments.jsx**
    - Use the RFC (React Functional Component).
      `export default function DashComments() {
   return <div>DashComments</div>;
 }
 `
-2. Now go to **/client/src/pages** open **Dashboard.jsx** and add around line of code 30:
+4. Now go to **/client/src/pages** open **Dashboard.jsx** and add around line of code 30:
    - `{/* Comments */}
       {tab === "comments" && <DashComments />}`
    - Remember if not auto import do it: `import DashComments from "../components/DashComments";`
+5. Now Copy the code from DashUser and paste into DashComments. Maybe later we can implemente a component of this too.
+   - Code should look like this:
+   `import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Button, Table, Modal } from "flowbite-react";
+import { CiCircleRemove } from "react-icons/ci";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+
+export default function DashComments() {
+  const { currentUser } = useSelector((state) => state.user);
+  const [comments, setComments] = useState([]);
+  const [showMore, setShowMore] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [commentIdToDelete, setCommentIdToDelete] = useState("");
+  // console.log(comments); // For testing purposes.
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/comment/getcomments`);
+        const data = await res.json();
+        if (res.ok) {
+          setComments(data.comments);
+          if (data.comments.length < 9) {
+            setShowMore(false);
+          }
+        }
+        //console.log(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    if (currentUser.isAdmin) fetchComments();
+  }, [currentUser._id]);
+
+  const handleShowMore = async () => {
+    const startIndex = comments.length;
+    try {
+      const res = await fetch(
+        `/api/comment/getcomments?startIndex=${startIndex}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setComments((prev) => [...prev, ...data.comments]);
+        if (data.comments.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteComment = async () => {
+    setShowModal(false);
+    try {
+      const res = await fetch(
+        `/api/comment/deleteComment/${commentIdToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        setcoments((prev) =>
+          prev.filter((comment) => comment._id !== commentIdToDelete)
+        );
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  return (
+    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
+      {currentUser.isAdmin && comments.length > 0 ? (
+        <>
+          <Table hoverable className="shadow-md">
+            <Table.Head>
+              <Table.HeadCell>Date Updated</Table.HeadCell>
+              <Table.HeadCell>Comment Content</Table.HeadCell>
+              <Table.HeadCell>Likes</Table.HeadCell>
+              <Table.HeadCell>PostId</Table.HeadCell>
+              <Table.HeadCell>UserId</Table.HeadCell>
+              <Table.HeadCell>Delete</Table.HeadCell>
+            </Table.Head>
+            {comments.map((comment) => (
+              <Table.Body className="divide-y" key={comment._id}>
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell>
+                    {new Date(comment.updatedAt).toLocaleDateString()}
+                  </Table.Cell>
+                  <Table.Cell>{comment.content}</Table.Cell>
+                  <Table.Cell>{comment.numberOfLikes}</Table.Cell>
+                  <Table.Cell>{comment.postId}</Table.Cell>
+                  <Table.Cell>{comment.userId}</Table.Cell>
+                  <Table.Cell>
+                    <span
+                      onClick={() => {
+                        setShowModal(true);
+                        setCommentIdToDelete(comment._id);
+                      }}
+                      className="text-red-700 text-2xl hover:text-3xl cursor-pointer"
+                    >
+                      <CiCircleRemove />
+                    </span>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            ))}
+          </Table>
+          {showMore && (
+            <button
+              onClick={handleShowMore}
+              className="w-full text-blueEx font-semibold self-center text-sm py-7 hover:text-greenEx"
+            >
+              Show More
+            </button>
+          )}
+        </>
+      ) : (
+        <p> You have no comments yet!!</p>
+      )}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-300">
+              Are you sure you want to delete this comment?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteComment}>
+                Yes, I'm sure.
+              </Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </div>
+  );
+}
+`
+6. Add the item inside the side bar. Go to **/client/src/components** and open file **DashSidebar.jsx** and code:
+   - After the User **<Sidebar.item>** add:
+     `</Link>
+              <Link to="/dashboard?tab=comments">
+                <Sidebar.Item
+                  active={tab === "comments"}
+                  icon={HiAnnotation}
+                  as="div"
+                >
+                  Comments
+                </Sidebar.Item>
+              </Link>` 
+   - Remember to put User and Comments inside empty tags **<></>**
+   - Also if not auto import theHiAnnotation do it: `import{ HiAnnotation} from "react-icons/hi";`
+
+## Add Dashboard Overview to the Admin Dashboard.
+
 
 
 ## Biblography
