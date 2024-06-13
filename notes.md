@@ -4157,6 +4157,12 @@ export default function DashComments() {
    - Also if not auto import theHiAnnotation do it: `import{ HiAnnotation} from "react-icons/hi";`
 
 ## Add Dashboard Overview to the Admin Dashboard.
+1. Close all the tabs, if any, you won't need.
+2. Go to **/client/src/components** and create file: **DashboardComp.jsx**
+   - Open it and create a RFC (React Functional Component).
+3. Open **/client/src/pages** folder and file **Dashboard.jsx**
+   - Add the **<DashboardComp>** component around line of code 35: `{tab === "dash" && <DashboardComp />}`
+   - Remember if not auto import do it: ``
 
 
 
