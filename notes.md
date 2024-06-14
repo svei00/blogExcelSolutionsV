@@ -4419,8 +4419,7 @@ export default function DashboardComp() {
             </Link>
           )}`
 
-
-10:34:33
+## Complete the Home Page.
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
