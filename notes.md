@@ -4420,6 +4420,8 @@ export default function DashboardComp() {
           )}`
 
 ## Complete the Home Page.
+1. Close all the tabs yow won't need for better readibility.
+2. Go to **/client/src/pages** and open **Home.jsx**
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
