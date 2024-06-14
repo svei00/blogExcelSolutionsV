@@ -4405,7 +4405,19 @@ export default function DashboardComp() {
 `
 5. Now go to **/client/src/components** and open **DashSidebar.jsx**
    - Around line of code 50 after the **<Sidebar.ItemGroup>** tag add:
-     ``
+     `{currentUser && currentUser.isAdmin && (
+            <Link to="/dashboard?tab=dash">
+              <Sidebar.Item
+                active={tab === "dash" || !tab}
+                icon={HiChartPie}
+                // label="Dashboard"
+                // labelColor="dark"
+                as="div"
+              >
+                Dashboard
+              </Sidebar.Item>
+            </Link>
+          )}`
 
 
 10:34:33
