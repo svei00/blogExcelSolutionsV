@@ -4499,6 +4499,23 @@ export default function Home() {
 6. Go to **/client** and open file **App.jsx**
    - Around line of code 25 add: `<Route path="/search" element={<Search />} />`
    - If not auto import do it: `import Search from "./pages/Search";`
+7. Comming back to the **Header.jsx** file around line of code 70 after the className add:
+   `value={searchTerm}
+   onChange={(e) => setSearchTerm(e.target.value)}`
+  - Also in the **<form>** tag add an *onSubmit* event around line of code 65:
+    `onSubmit={handleSubmit}`
+8. Before the return add the **handleSubmit** function:
+   - Around line of code 10 change `import { Link, useLocation } from "react-router-dom";` for `import { Link, useLocation, useNavigate } from "react-router-dom";`
+   - Then import it around line of code 20: `const navigate = useNavigate();` 
+   `const handleSubmit = (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("searchTerm", searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  };`
+9. Go to **Search.jsx** file and complete it:
+
 
 
 ## Biblography
