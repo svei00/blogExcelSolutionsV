@@ -4484,6 +4484,21 @@ export default function Home() {
 `
 
 ## Complete Search Page.
+1. Close the tabs you won't need.
+2. Go to **/client/src/componets** and open the **Header.jsx** file.
+3. Add a piece of state aroun line of code 20: 
+   - `const [searchTerm, setSearchTerm] = useState("");`
+   - Also add: `const path = useLocation().pathname;`
+4. Around line of code 25 add an **useStete**
+   - Should look like this:
+5. Go to **/client/src/pages** and create the file **Search.jsx**
+   - Add the RFC (React Functional Component):
+     `export default function Search() {
+  return <div>Search</div>;
+}`
+6. Go to **/client** and open file **App.jsx**
+   - Around line of code 25 add: `<Route path="/search" element={<Search />} />`
+   - If not auto import do it: `import Search from "./pages/Search";`
 
 
 ## Biblography
