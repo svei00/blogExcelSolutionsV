@@ -30,15 +30,64 @@ export default function Search() {
         category: categoryFromUrl,
       });
     }
+
+    const fetchPosts = async () => {
+      setLoading(true);
+      const searchQuery = urlParams.toString();
+      const res = await fetch(`/api/post/getposts?${searchQuery}`);
+      if (!res.ok) {
+        setLoading(false);
+        return;
+      }
+      if (res.ok) {
+        const data = await res.json();
+        setPosts(data.posts);
+        setLoading(false);
+        if (data.posts.length === 9) {
+          showMore(true);
+        } else {
+          showMore(false);
+        }
+      }
+    };
   }, location.search);
 
+  const handleChange = (e) => {
+    if (e.target.id === "searchTerm") {
+      setSidebarData({
+        ...sidebarData,
+        searchTerm: e.target.value,
+      });
+    }
+    if (e.target.id === "sort") {
+      const order = e.target.value || "desc";
+      setSidebarData({
+        ...sidebarData,
+        sort: order,
+      });
+    }
+    if (e.target.id === "category") {
+      const category = e.target.value || "uncategorized";
+      setSidebarData({
+        ...sidebarData,
+        category,
+      });
+    }
+  };
+
   return (
-    <div>
-      <div className="">
-        <form>
-          <div className="">
+    <div className="flex flex-col md:flex-row">
+      <div className="p-7 border-b md:border-r md:min-h-screen border-blueEx">
+        <form className="flex flex-col gap-8">
+          <div className="flex items-center gap-2">
             <label>Search Term: </label>
-            <TextInput placeholder="Search..." id="searchTerm" type="text" />
+            <TextInput
+              placeholder="Search..."
+              id="searchTerm"
+              type="text"
+              value={sidebarData.searchTerm}
+              onChange={handleChange}
+            />
           </div>
         </form>
       </div>
