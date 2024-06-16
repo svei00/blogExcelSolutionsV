@@ -1,6 +1,6 @@
-import { TextInput } from "flowbite-react";
+import { Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Search() {
   const [sidebarData, setSidebarData] = useState({
@@ -13,8 +13,10 @@ export default function Search() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -75,12 +77,40 @@ export default function Search() {
     }
   };
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/post/categories");
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("searchTerm", sidebarData.searchTerm);
+    urlParams.set("sort", sidebarData.sort);
+    urlParams.set("category", sidebarData.category);
+
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  };
+
   return (
     <div className="flex flex-col md:flex-row">
       <div className="p-7 border-b md:border-r md:min-h-screen border-blueEx">
-        <form className="flex flex-col gap-8">
+        <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+          {/* Search Term */}
           <div className="flex items-center gap-2">
-            <label>Search Term: </label>
+            <label className="whitespace-nowrap font-semibold">
+              Search Term:
+            </label>
+            {/* whitespace-nowrap. To keep the text in the same line */}
             <TextInput
               placeholder="Search..."
               id="searchTerm"
@@ -88,6 +118,31 @@ export default function Search() {
               value={sidebarData.searchTerm}
               onChange={handleChange}
             />
+          </div>
+
+          {/* Sort */}
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Sort:</label>
+            <Select onChange={handleChange} value={sidebarData.sort} id="sort">
+              <option value="desc">Latest</option>
+              <option value="asc">Oldest</option>
+            </Select>
+          </div>
+
+          {/* Category */}
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Category:</label>
+            <Select
+              onChange={handleChange}
+              value={sidebarData.category}
+              id="category"
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </Select>
           </div>
         </form>
       </div>
