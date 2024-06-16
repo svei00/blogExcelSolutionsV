@@ -1,6 +1,7 @@
 import { Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import ButtonEx from "../components/Buttons";
 
 export default function Search() {
   const [sidebarData, setSidebarData] = useState({
@@ -52,7 +53,7 @@ export default function Search() {
         }
       }
     };
-  }, location.search);
+  }, [location.search]);
 
   const handleChange = (e) => {
     if (e.target.id === "searchTerm") {
@@ -144,7 +145,18 @@ export default function Search() {
               ))}
             </Select>
           </div>
+          <ButtonEx title="Apply Filters" type="submit" outline />
         </form>
+      </div>
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold sm:border-b border-greenEx p-3 mt-5">
+          Posts Results
+        </h1>
+        <div className="p-7 flex flex-wrap gap-4">
+          {!loading && posts.length === 0 && (
+            <p className="text-xl text-gray-500">No Posts Found</p>
+          )}
+        </div>
       </div>
     </div>
   );
