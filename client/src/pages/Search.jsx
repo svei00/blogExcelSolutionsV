@@ -2,6 +2,7 @@ import { Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ButtonEx from "../components/Buttons";
+import PostCard from "../components/PostCard";
 
 export default function Search() {
   const [sidebarData, setSidebarData] = useState({
@@ -47,12 +48,13 @@ export default function Search() {
         setPosts(data.posts);
         setLoading(false);
         if (data.posts.length === 9) {
-          showMore(true);
+          setShowMore(true);
         } else {
-          showMore(false);
+          setShowMore(false);
         }
       }
     };
+    fetchPosts();
   }, [location.search]);
 
   const handleChange = (e) => {
@@ -100,6 +102,27 @@ export default function Search() {
 
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
+  };
+
+  const handleShowMore = async () => {
+    const numberOfPosts = posts.length;
+    const startIndex = numberOfPosts;
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("startIndex", startIndex);
+    const searchQuery = urlParams.toString();
+    const res = await fetch(`/api/post/getposts?${searchQuery}`);
+    if (!res.ok) {
+      return;
+    }
+    if (res.ok) {
+      const data = await res.json();
+      setPosts([...posts, ...data.posts]);
+      if (data.posts.length === 9) {
+        setShowMore(true);
+      } else {
+        setShowMore(false);
+      }
+    }
   };
 
   return (
@@ -154,7 +177,19 @@ export default function Search() {
         </h1>
         <div className="p-7 flex flex-wrap gap-4">
           {!loading && posts.length === 0 && (
-            <p className="text-xl text-gray-500">No Posts Found</p>
+            <p className="text-xl text-gray-500">No posts found.</p>
+          )}
+          {loading && <p className="text-xl text-gray-500">Loading...</p>}
+          {!loading &&
+            posts &&
+            posts.map((post) => <PostCard key={post._id} post={post} />)}
+          {showMore && (
+            <button
+              onClick={handleShowMore}
+              className="text-greenEx text-lg hover:text-blueEx p-7 w-full"
+            >
+              Show More
+            </button>
           )}
         </div>
       </div>
