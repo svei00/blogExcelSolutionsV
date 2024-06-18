@@ -14,6 +14,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
+import NavLinkEx from "./NavLinkEx";
 
 export default function Header() {
   const path = useLocation().pathname;
@@ -128,7 +129,8 @@ export default function Header() {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link active={path === "/"} as={"div"}>
+        {/* Without cutom */}
+        {/* <Navbar.Link active={path === "/"} as={"div"}>
           <Link to="/">Home</Link>
         </Navbar.Link>
         <Navbar.Link active={path === "/about"} as={"div"}>
@@ -136,7 +138,12 @@ export default function Header() {
         </Navbar.Link>
         <Navbar.Link active={path === "/projects"} as={"div"}>
           <Link to="/projects">Projects</Link>
-        </Navbar.Link>
+        </Navbar.Link> */}
+
+        {/* Custom NavBar */}
+        <NavLinkEx to="/">Home</NavLinkEx>
+        <NavLinkEx to="/about">About</NavLinkEx>
+        <NavLinkEx to="/projects">Projects</NavLinkEx>
       </Navbar.Collapse>
     </Navbar>
   );
