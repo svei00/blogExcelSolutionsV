@@ -4800,9 +4800,18 @@ export default function Projects() {
 `
 
 ## Deploy to Render.
+1. Close all the tabs you won't need.
+2. Go to the **/** root directory it is the same where the **/api** directory is and open file **package.json**.
+3. Go to script section and add at the end the following script to deploy the front and back end together:
+   - Via **NPM** `"build": "npm install && npm install --prefix client && npm run build --prefix client",`
+   - Via **YARN** `"build": "yarn install && yarn --cwd client install && yarn --cwd client build",`
+4. Now go to **/api** folder and open **index.js** file and add in order to get the current directory:
+   - Around line of code 10 add: `import path from "path";`
+   - Then around line of code 20 before the `const app = express();` add: `const __dirname = path.resolve(); // This is for getting the current directory no mather where it is`
+   - In order to see the FrontEnd pages add around line of code 40: `// Static pages of the FrontEnd
+app.use(express.static(path.join(__dirname, "/client/build"))); // Use build for React. Use dist for Vite`
 
-
-**Custom NavBar with Flowbite**
+**Custom NavBar with Flowbite This is Done and worked**
 1. `import { Link, useLocation } from "react-router-dom";
 import { Navbar } from "flowbite-react";
 

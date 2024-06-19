@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.route.js";
 import postRouters from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+
+const __dirname = path.resolve(); // This is for getting the current directory no mather where it is
 
 const app = express();
 
@@ -32,6 +35,14 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRouters);
 app.use("/api/comment", commentRoutes);
+
+// Static pages of the FrontEnd
+app.use(express.static(path.join(__dirname, "/client/dist"))); // Use build for React. Use dist for Vite
+
+// Whatever is not defined in the 4 aap.use above will be sent to the index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html")); // Remember in ReactJS use build
+});
 
 // Middleware
 app.use((err, req, res, next) => {
