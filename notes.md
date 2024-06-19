@@ -4810,8 +4810,22 @@ export default function Projects() {
    - Then around line of code 20 before the `const app = express();` add: `const __dirname = path.resolve(); // This is for getting the current directory no mather where it is`
    - In order to see the FrontEnd pages add around line of code 40: `// Static pages of the FrontEnd
 app.use(express.static(path.join(__dirname, "/client/build"))); // Use build for React. Use dist for Vite`
+5. Now you can search in Google [Render](https://render.com/) or simply hit the hyperlink.
+   - Go to Dashboard. If not registered do it in **Get Started**. You can do it with your Google Account or **GitHub**. 
+   - Add a new project by hitting **New** of if first time simply hit **Web Services**
+   - We're going to render from Git Repository:
+     * Select All the repositories that way you can choose one or more for future projects.
+     * Select the project you want to render in the source code.
+     * Name: Write a name. Ex. Excel SolutionsV Blog
+     * Language: In this case node.
+     * Branch: main
+     * Region: Choose the closest region to the audience. In this case Oregon.
+     * Root Directory: Since we did it on the **index.js** file leave in blank
+     * Build Command: Since we used **yarn** you can use: `yarn run build` if you're using **npn** `npn run build`
+     * Start command: **yarn** yarn start or **npn** npn start
 
-**Custom NavBar with Flowbite This is Done and worked**
+
+**Custom NavBar with Flowbite - This is Done and worked**
 1. `import { Link, useLocation } from "react-router-dom";
 import { Navbar } from "flowbite-react";
 

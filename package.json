@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon api/index.js",
-    "start": "start api/index.js",
+    "start": "node api/index.js",
     "build": "yarn install && yarn --cwd client install && yarn --cwd client build"
   },
   "repository": "https://github.com/svei00/blogExcelSolutionsV.git",
