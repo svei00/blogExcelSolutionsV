@@ -90,7 +90,7 @@
        plugins: [require("flowbite/plugin")],
        `
 13. On File Header type: <Navbar><Navbar> to create the navbar
-    - <Navbar className="border-b-2">Home!</Navbar>; to add a border between the page and the navbar
+    - <Navbar className="border-b-2">Home!</Navbar>; to add a border between the page and the navbar. The fixed top-0 w-full z-50 is to make the navbar sticky
     - Import **import { Link } from "react-router-dom";** so you can go to the page without updating the whole page.
     - Install React Icons **npm i react-icons** or **yarn add react-icons**
       * Import the Icon **import {AiOutlineSearch} from 'react-icons/ai';** 
@@ -103,7 +103,7 @@
           className="hidden lg:inline"
       />`
      - For small screens we're going to add a Button:
-       `<Button className="w-12 h-10 lg:hidden" color="gray" pill>
+       `<Button className="w-12 h-10 lg:hidden" color="gray" pill onClick={handleSubmit}>
         <AiOutlineSearch />
        </Button>`
      - Add a <div> tag for the dark mode toggle button:
@@ -4847,6 +4847,60 @@ export default CustomNavLink;`
         <CustomNavLink to="/about">About</CustomNavLink>
         <CustomNavLink to="/projects">Projects</CustomNavLink>
   `
+
+## Fixed Header.
+1. Create on **/client/src/components** file **HeaderLayot** to prevent that the header overlaps the page content:
+   `import { useEffect, useRef, useState } from "react";
+import Header from "./Header";
+
+const HeaderLayout = ({ children }) => {
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    }
+  }, []);
+
+  return (
+    <div>
+      <div ref={headerRef} className="fixed top-0 w-full z-50">
+        <Header />
+      </div>
+      <div style={{ marginTop: headerHeight }}>{children}</div>
+    </div>
+  );
+};
+
+export default HeaderLayout;
+`
+2. Go to the **/client/src** and open **App.jsx** file and add the **<HeaderLayout>** tag.
+   - This is a sample of how it will looks:
+      `return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <HeaderLayout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/search" element={<Search />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
+          <Route element={<OnlyAdminPrivateRoute />}>
+            <Route path="/create-post" element={<CreatePost />} />
+            <Route path="/update-post/:postId" element={<UpdatePost />} />
+          </Route>
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/post/:postSlug" element={<PostPage />} />
+        </Routes>
+      </HeaderLayout>
+      <Footer />
+    </BrowserRouter>` 
+    
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
