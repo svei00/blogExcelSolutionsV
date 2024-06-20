@@ -4822,7 +4822,7 @@ app.use(express.static(path.join(__dirname, "/client/build"))); // Use build for
      * Region: Choose the closest region to the audience. In this case Oregon.
      * Root Directory: Since we did it on the **index.js** file leave in blank
      * Build Command: Since we used **yarn** you can use: `yarn run build` if you're using **npn** `npn run build`
-     * Start command: **yarn** yarn start or **npn** npn start
+     * Start command: **yarn** yarn start or **npn** npn start.
 
 
 **Custom NavBar with Flowbite - This is Done and worked**
