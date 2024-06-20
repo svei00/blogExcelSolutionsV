@@ -1,11 +1,4 @@
-import {
-  Avatar,
-  Button,
-  Dropdown,
-  DropdownDivider,
-  Navbar,
-  TextInput,
-} from "flowbite-react";
+import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -86,7 +79,12 @@ export default function Header() {
           // }}
         />
       </form>
-      <Button className="w-12 h-10 lg:hidden" color="gray" pill>
+      <Button
+        className="w-12 h-10 lg:hidden"
+        color="gray"
+        pill
+        onClick={handleSubmit}
+      >
         <AiOutlineSearch />
       </Button>
       <div className="flex gap-2 md:order-2">
