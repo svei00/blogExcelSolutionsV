@@ -53,12 +53,11 @@ export default function Header() {
 
   return (
     <Navbar className=" border-b-2 ">
-      <div className="flex items-center"></div>
       <Link
         to="/"
         className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
       >
-        <span className="flex items-end justify-center ">
+        <span className="flex items-end justify-center">
           <img src={logo} alt="Logo Excel Solutions" className="h-10" />
           <span className="text-greenEx"> Blog</span>
         </span>
@@ -67,6 +66,7 @@ export default function Header() {
         </span>
         Blog */}
       </Link>
+
       <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
@@ -127,6 +127,7 @@ export default function Header() {
 
         <Navbar.Toggle />
       </div>
+
       <Navbar.Collapse>
         {/* Without cutom */}
         {/* <Navbar.Link active={path === "/"} as={"div"}>
