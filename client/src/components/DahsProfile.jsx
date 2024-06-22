@@ -54,7 +54,20 @@ export default function DahsProfile() {
   }, [imageFile]);
 
   const uploadImage = async () => {
+    // Firebase Code
+    // service firebase.storage {
+    //   match /b/{bucket}/o {
+    //     match /{allPaths=**} {
+    //       allow read;
+    //       allow write: if
+    //       request.resource.size < 2 * 1024 * 1024 &&
+    //       request.resource.contentType.matches('image/.*')
+    //     }
+    //   }
+    // }
+
     // console.log("Uploading image..."); Testing Purposes.
+
     setImageFileUploading(true);
     setImageFileUploadError(null);
     const storage = getStorage(app); // Since Firebase Version 9 we can use getStore directly
@@ -72,7 +85,7 @@ export default function DahsProfile() {
       },
       (error) => {
         setImageFileUploadError(
-          "Could not Upload Image (File must be less than 2MB)."
+          "Could not Upload Image (File must be less than 2MB."
         );
         setImageFileUploadProgress(null);
         setImageFile(null);
