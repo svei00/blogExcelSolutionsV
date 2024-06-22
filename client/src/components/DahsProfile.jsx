@@ -46,7 +46,7 @@ export default function DahsProfile() {
     }
   };
 
-  // console.log(imageFile, imageFileUrl); Testing purposes
+  // console.log(imageFile, imageFileUrl); // Testing purposes
   useEffect(() => {
     if (imageFile) {
       uploadImage();
