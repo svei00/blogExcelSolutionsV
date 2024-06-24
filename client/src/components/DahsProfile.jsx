@@ -18,12 +18,12 @@ import {
   deleteUserSuccess,
   deleteUserFailure,
   signoutSuccess,
-} from "../redux/user/userSlice.js";
+} from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 
-export default function DahsProfile() {
+export default function DashProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
@@ -85,7 +85,7 @@ export default function DahsProfile() {
       },
       (error) => {
         setImageFileUploadError(
-          "Could not Upload Image (File must be less than 2MB."
+          "Could not Upload Image (File must be less than 2MB ."
         );
         setImageFileUploadProgress(null);
         setImageFile(null);
