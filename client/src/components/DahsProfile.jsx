@@ -81,7 +81,7 @@ export default function DashProfile() {
         // Piece of information when we upload byte by byte.
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setImageFileUploadProgress(progress.toFixed(0)); // We use toFixed(0) to round the quantity
+        setImageFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
         setImageFileUploadError(
