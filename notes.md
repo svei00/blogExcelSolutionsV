@@ -1410,8 +1410,8 @@
             match /{allPaths=**} {
               allow read; 
               allow write: if
-              request.resourse.size < 2 * 1024 * 1024 &&
-              request.resourse.contentType.matches('image/.*')
+              request.resource.size < 2 * 1024 * 1024 &&
+              request.resource.contentType.matches('image/.*')
             }
           }
         }`
