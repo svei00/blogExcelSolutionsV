@@ -85,7 +85,7 @@ export default function DashProfile() {
       },
       (error) => {
         setImageFileUploadError(
-          "Could not Upload Image (File must be less than 2MB ."
+          "Could not Upload Image (File must be less than 2MB.)"
         );
         setImageFileUploadProgress(null);
         setImageFile(null);
@@ -112,7 +112,7 @@ export default function DashProfile() {
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
     if (Object.keys(formData).length === 0) {
-      updateUserError("No changes have been made");
+      setUpdateUserError("No changes have been made");
       return;
     }
 
