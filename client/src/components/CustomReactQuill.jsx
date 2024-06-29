@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import ReactQuill from "react-quill";
+import PropTypes from "prop-types";
 import "react-quill/dist/quill.snow.css"; // Include the Quill CSS
 
 // Toolbar configuration with alignment options
@@ -19,17 +19,24 @@ const modules = {
   ],
 };
 
-const CustomReactQuill = () => {
-  const [value, setValue] = useState("");
-
+const CustomReactQuill = ({ value, onChange }) => {
   return (
     <ReactQuill
       theme="snow"
+      placeholder="Create a story..."
+      className="h-72 mb-12"
+      required
       value={value}
-      onChange={setValue}
+      onChange={onChange}
       modules={modules}
     />
   );
+};
+
+// Prop types validation
+CustomReactQuill.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default CustomReactQuill;

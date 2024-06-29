@@ -153,7 +153,7 @@ export default function CreatePost() {
           />
         )}
 
-        <ReactQuill
+        {/* <ReactQuill
           theme="snow"
           placeholder="Create a story..."
           className="h-72 mb-12"
@@ -161,7 +161,15 @@ export default function CreatePost() {
           onChange={(value) => {
             setFormData({ ...formData, content: value });
           }}
+        /> */}
+
+        <CustomReactQuill
+          value={formData.content || ""}
+          onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}
         />
+
         <Button
           type="submit"
           className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
@@ -174,7 +182,6 @@ export default function CreatePost() {
             {publishError}
           </Alert>
         )}
-        <CustomReactQuill />
       </form>
     </div>
   );
