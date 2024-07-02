@@ -116,6 +116,7 @@ export default function CreatePost() {
             <option value="printing">Printing and Sharing</option>
             <option value="accessibility">Accessibility</option>
             <option value="macros">Macros</option>
+            <option value="python">Python</option>
           </Select>
         </div>
         <div className="flex gap-4 items-center justify-between border-2 border-blueEx p-3">
