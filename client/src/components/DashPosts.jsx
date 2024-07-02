@@ -59,7 +59,7 @@ export default function DashPosts() {
         }
       );
       const data = await res.json();
-      if (res.ok) {
+      if (!res.ok) {
         console.log(data.message);
       } else {
         setUserPosts((prev) =>
