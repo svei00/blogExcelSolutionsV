@@ -18,10 +18,24 @@ export default function CreatePost() {
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    content: "",
+  });
   const [publishError, setPublishError] = useState(null);
   // console.log(formData); Testing purposes.
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.title) newErrors.title = "Title is required";
+    if (!formData.category) newErrors.category = "Category is required";
+    if (!formData.content) newErrors.content = "Content is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleUploadImage = async () => {
     try {
@@ -62,6 +76,8 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // To prevent reflesing the page
+    if (!validate()) return;
+
     try {
       const res = await fetch("/api/post/create", {
         method: "POST",
@@ -95,12 +111,15 @@ export default function CreatePost() {
             required
             id="title"
             className="flex-1"
+            value={formData.title}
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
           />
+          {errors.title && <span className="text-red-500">{errors.title}</span>}
           {/* <TextInput type="text" placeholder="Author" required /> */}
           <Select
+            value={formData.category}
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
@@ -118,6 +137,9 @@ export default function CreatePost() {
             <option value="macros">Macros</option>
             <option value="python">Python</option>
           </Select>
+          {errors.category && (
+            <span className="text-red-500">{errors.category}</span>
+          )}
         </div>
         <div className="flex gap-4 items-center justify-between border-2 border-blueEx p-3">
           <FileInput
@@ -170,6 +192,9 @@ export default function CreatePost() {
             setFormData({ ...formData, content: value });
           }}
         />
+        {errors.content && (
+          <span className="text-red-500">{errors.content}</span>
+        )}
 
         <Button
           type="submit"
