@@ -181,12 +181,20 @@ export default function UpdatePost() {
           />
         )}
 
+        {/* 
+        // Just React Quill
         <ReactQuill
           theme="snow"
           value={formData.content}
           placeholder="Create a story..."
           className="h-72 mb-12"
           required
+          onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}
+        /> */}
+        <CustomReactQuill
+          value={formData.content || ""}
           onChange={(value) => {
             setFormData({ ...formData, content: value });
           }}
@@ -203,7 +211,6 @@ export default function UpdatePost() {
             {publishError}
           </Alert>
         )}
-        <CustomReactQuill />
       </form>
     </div>
   );
