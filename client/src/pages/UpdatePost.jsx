@@ -1,5 +1,5 @@
 import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
-import ReactQuill from "react-quill";
+// import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import CustomReactQuill from "../components/CustomReactQuill";
 import { useEffect, useState } from "react";
@@ -19,10 +19,15 @@ export default function UpdatePost() {
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    content: "",
+  });
   const [publishError, setPublishError] = useState(null);
   const { postId } = useParams();
   // console.log(formData); Testing purposes.
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
@@ -85,6 +90,8 @@ export default function UpdatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // To prevent reflesing the page
+    if (!validate()) return;
+
     try {
       const res = await fetch(
         `/api/post/updatepost/${formData._id}/${currentUser._id}`,
@@ -110,6 +117,15 @@ export default function UpdatePost() {
     }
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.title) newErrors.title = "Title is Required";
+    if (!formData.category) newErrors.category = "Category is Required";
+    if (!formData.content) newErrors.content = "Content is Required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
       <h1 className="text-center text-3xl my-7 font-semibold">Update Post</h1>
@@ -126,6 +142,7 @@ export default function UpdatePost() {
             }
             value={formData.title}
           />
+          {errors.title && <span className="text-red-500">{errors.title}</span>}
           {/* <TextInput type="text" placeholder="Author" required /> */}
           <Select
             onChange={(e) =>
@@ -145,6 +162,9 @@ export default function UpdatePost() {
             <option value="accessibility">Accessibility</option>
             <option value="macros">Macros</option>
           </Select>
+          {errors.category && (
+            <span className="text-red-500">{errors.category}</span>
+          )}
         </div>
         <div className="flex gap-4 items-center justify-between border-2 border-blueEx p-3">
           <FileInput
@@ -199,6 +219,10 @@ export default function UpdatePost() {
             setFormData({ ...formData, content: value });
           }}
         />
+        {errors.content && (
+          <span className="text-red-500">{errors.content}</span>
+        )}
+
         <Button
           type="submit"
           className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"

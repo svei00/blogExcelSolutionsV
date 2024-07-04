@@ -4918,9 +4918,29 @@ export default HeaderLayout;
 5. In the form around line of code 115 after className add: `value={formData.title}`
    - After the closing tag ot  around line of code 120 Title add: `{errors.title && <span className="text-red-500">{errors.title}</span>}`
 6. In the form around line of code 120 after className add: `value={formData.category}`
-   - After the closing tag ot Category around line of code 140 add: `{errors.category && <span className="text-red-500">{errors.category}</span>}`
+   - After the closing tag ot <Select> around line of code 140 add: `{errors.category && <span className="text-red-500">{errors.category}</span>}`
+7. After the closing tag ot **React-Quill** around line of code 195 add: `{errors.content && <span className="text-red-500">{errors.content}</span>}`
 
-    
+## UpdatePost.jsx
+Do the same **than CreatePost.jsx**
+1. Around line of code 20 changed: ` const [formData, setFormData] = useState({});` to ` const [formData, setFormData] = useState({ title: "", category: "", content: "", });`
+2. Around line of code 30 Added: `const [errors, setErrors] = useState({});`
+3. before the return around line of code 120 added the function:
+   `const validate = () => {
+    const newErrors = {};
+    if (!formData.title) newErrors.title = "Title is required";
+    if (!formData.category) newErrors.category = "Category is required";
+    if (!formData.content) newErrors.content = "Content is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };` 
+4. Around line of code 93 after the preventDefault on **HandleSubmit** add: `if (!validate()) return;` 
+5. After the closing tag ot  around line of code 145 Title add: `{errors.title && <span className="text-red-500">{errors.title}</span>}`
+6. After the closing tag of <Select> around line of code 165 add: `{errors.category && <span className="text-red-500">{errors.category}</span>}`
+7. After the closing tag ot **React-Quill** around line of code 220 add: `{errors.content && <span className="text-red-500">{errors.content}</span>}`
+
+
+*** Make a <Select><Option /></Select> component in order to rehutilize in **CreatePost/UpdatePost** component    
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
