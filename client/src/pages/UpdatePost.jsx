@@ -89,10 +89,8 @@ export default function UpdatePost() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // To prevent refreshing the page
+    e.preventDefault(); // To prevent reflesing the page
     if (!validate()) return;
-
-    console.log("Submitting form with data:", formData); // Debugging line
 
     try {
       const res = await fetch(
@@ -107,17 +105,14 @@ export default function UpdatePost() {
       );
       const data = await res.json();
       if (!res.ok) {
-        console.log("Update failed:", data.message); // Debugging line
         setPublishError(data.message);
         return;
       }
       if (res.ok) {
-        console.log("Update successful:", data); // Debugging line
         setPublishError(null);
         navigate(`/post/${data.slug}`);
       }
     } catch (error) {
-      console.log("Update error:", error); // Debugging line
       setPublishError("Something went wrong!!");
     }
   };
@@ -206,6 +201,18 @@ export default function UpdatePost() {
           />
         )}
 
+        {/* 
+        // Just React Quill
+        <ReactQuill
+          theme="snow"
+          value={formData.content}
+          placeholder="Create a story..."
+          className="h-72 mb-12"
+          required
+          onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}
+        /> */}
         <CustomReactQuill
           value={formData.content || ""}
           onChange={(value) => {
