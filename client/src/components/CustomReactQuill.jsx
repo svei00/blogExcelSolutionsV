@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {
@@ -74,6 +74,40 @@ const CustomReactQuill = ({ value, onChange }) => {
 
   const quillRef = React.useRef(null);
 
+  useEffect(() => {
+    const setTooltips = () => {
+      const toolbar = quillRef.current.getEditor().getModule("toolbar");
+      const toolbarButtons = toolbar.container.querySelectorAll("button");
+
+      const tooltips = {
+        bold: "Bold text",
+        italic: "Italic text",
+        underline: "Underline text",
+        strike: "Strikethrough text",
+        list: "List",
+        script: "Subscript/Superscript",
+        indent: "Indent",
+        direction: "Text direction",
+        align: "Text alignment",
+        link: "Insert link",
+        image: "Insert image",
+        video: "Insert video",
+        clean: "Remove formatting",
+      };
+
+      toolbarButtons.forEach((button) => {
+        const format = button.className.split("-").pop();
+        if (tooltips[format]) {
+          button.title = tooltips[format];
+        }
+      });
+    };
+
+    if (quillRef.current) {
+      setTooltips();
+    }
+  }, []);
+
   return (
     <div className="relative">
       {isUploading && (
@@ -81,7 +115,7 @@ const CustomReactQuill = ({ value, onChange }) => {
           <div className="bg-white p-4 rounded-lg shadow-lg">
             <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blueEX"
+                className="h-full bg-blue-500"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
@@ -90,24 +124,6 @@ const CustomReactQuill = ({ value, onChange }) => {
         </div>
       )}
 
-      {/* // if you wanna the progressbar circular:
-      import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-
-// ...
-
-{isUploading && (
-  <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
-    <div className="bg-white p-4 rounded-lg shadow-lg">
-      <div className="w-24 h-24">
-        <CircularProgressbar
-          value={uploadProgress}
-          text={`${uploadProgress.toFixed(0)}%`}
-        />
-      </div>
-    </div>
-  </div>
-)} */}
       <ReactQuill
         ref={quillRef}
         theme="snow"
