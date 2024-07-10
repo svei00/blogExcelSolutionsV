@@ -23,6 +23,9 @@ const __dirname = path.resolve(); // This is for getting the current directory n
 
 const app = express();
 
+app.use(express.json({ limit: "500mb" })); // Increase limit as needed
+app.use(express.urlencoded({ limit: "500mb", extended: true })); // Increase limit as needed
+
 app.use(express.json());
 app.use(cookieParser());
 
