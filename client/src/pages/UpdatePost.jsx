@@ -32,24 +32,58 @@ export default function UpdatePost() {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    try {
-      const fetchPost = async () => {
+    const fetchPost = async () => {
+      try {
+        setPublishError(null);
         const res = await fetch(`/api/post/getposts?postId=${postId}`);
         const data = await res.json();
+
         if (!res.ok) {
-          console.log(data.message);
-          setPublishError(data.message);
-          return;
+          throw new Error(data.message || "Failed to fetch post");
         }
-        if (res.ok) {
-          setPublishError(null);
-          setFormData(data.posts[0]);
-        }
-      };
-      fetchPost();
-    } catch (error) {
-      console.log(error);
-    }
+
+        // Update state in separate microtasks to avoid potential blocking
+        setTimeout(
+          () =>
+            setFormData((prevState) => ({
+              ...prevState,
+              title: data.posts[0].title,
+            })),
+          0
+        );
+        setTimeout(
+          () =>
+            setFormData((prevState) => ({
+              ...prevState,
+              category: data.posts[0].category,
+            })),
+          0
+        );
+        setTimeout(
+          () =>
+            setFormData((prevState) => ({
+              ...prevState,
+              image: data.posts[0].image,
+            })),
+          0
+        );
+
+        // Debounce content update for large texts
+        const debounceContent = setTimeout(() => {
+          setFormData((prevState) => ({
+            ...prevState,
+            content: data.posts[0].content,
+          }));
+        }, 100); // Adjust timeout as needed
+
+        return () => clearTimeout(debounceContent);
+      } catch (error) {
+        console.error("Error fetching post:", error);
+        setPublishError(error.message);
+      }
+    };
+
+    fetchPost();
   }, [postId]);
 
   const handleUploadImage = async () => {
