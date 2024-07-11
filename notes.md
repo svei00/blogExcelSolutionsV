@@ -4942,6 +4942,10 @@ Do the same **than CreatePost.jsx**
 
 *** Make a <Select><Option /></Select> component in order to rehutilize in **CreatePost/UpdatePost** component    
 
+* Add the notes of the custom Select (Create and Update)
+* Add the notes of the fixied uploadPost
+* Add the custom select to the search
+
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
 * https://github.com/sahandghavidel/mern-blog - "Github Source Code"

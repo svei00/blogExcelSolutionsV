@@ -21,6 +21,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import CategoriesSelect from "../components/CategoriesSelect";
 
 export default function UpdatePost() {
   const [file, setFile] = useState(null);
@@ -196,24 +197,13 @@ export default function UpdatePost() {
               <span className="text-red-500">{errors.title}</span>
             )}
             {/* <TextInput type="text" placeholder="Author" required /> */}
-            <Select
+            <CategoriesSelect
+              value={formData.category}
               onChange={(e) =>
                 setFormData({ ...formData, category: e.target.value })
               }
-              value={formData.category}
-            >
-              <option value="uncategorized">Select a category</option>
-              <option value="formulas">Formulas and Functions</option>
-              <option value="data-entry">Data Entry</option>
-              <option value="data-analysis">Data Analysis</option>
-              <option value="data-visualization">Data Visualization</option>
-              <option value="collaboration">Collaboration and Security</option>
-              <option value="automation">Automation</option>
-              <option value="add-ins">Add-in and Extensions</option>
-              <option value="printing">Printing and Sharing</option>
-              <option value="accessibility">Accessibility</option>
-              <option value="macros">Macros</option>
-            </Select>
+            />
+
             {errors.category && (
               <span className="text-red-500">{errors.category}</span>
             )}
