@@ -1,11 +1,4 @@
-import {
-  Alert,
-  Button,
-  FileInput,
-  Select,
-  TextInput,
-  Spinner,
-} from "flowbite-react";
+import { Alert, Button, FileInput, TextInput, Spinner } from "flowbite-react";
 // import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import CustomReactQuill from "../components/CustomReactQuill";

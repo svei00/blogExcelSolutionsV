@@ -4940,12 +4940,58 @@ Do the same **than CreatePost.jsx**
 7. After the closing tag ot **React-Quill** around line of code 220 add: `{errors.content && <span className="text-red-500">{errors.content}</span>}`
 
 
-*** Make a <Select><Option /></Select> component in order to rehutilize in **CreatePost/UpdatePost** component    
+## Creation of <CategoriesSelect> Funtion. 
+1. In order to rehutilize the options in **CreatePost/UpdatePost** lets create a component.
+2. Go to **/client/src/components** and create <CategoriesSelect> component:
+   `import { Select } from "flowbite-react";
 
-* Add the notes of the custom Select (Create and Update)
+const CategoriesSelect = ({ value, onChange }) => (
+  <Select value={value} onChange={onChange}>
+    <option value="uncategorized">Select a category</option>
+    <option value="formulas">Formulas and Functions</option>
+    <option value="data-entry">Data Entry</option>
+    <option value="data-analysis">Data Analysis</option>
+    <option value="data-visualization">Data Visualization</option>
+    <option value="collaboration">Collaboration and Security</option>
+    <option value="contable">Excel para Contadores</option>
+    <option value="automation">Automation</option>
+    <option value="add-ins">Add-in and Extensions</option>
+    <option value="printing">Printing and Sharing</option>
+    <option value="accessibility">Accessibility</option>
+    <option value="macros">Macros</option>
+    <option value="python">Python</option>
+  </Select>
+);
+
+export default CategoriesSelect;
+`
+3. Go to **CreatePost.jsx** page:
+   - Add the import: `import CategoriesSelect from "../components/CategoriesSelect";`    
+   - Change: `<Select
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >
+            <option value="uncategorized">Select a category</option>
+            <option value="formulas">Formulas and Functions</option>
+            ...
+            ...
+            ...
+            <Select/>
+            `
+     to: ` <CategoriesSelect
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          />`
+4. Do the same in the file **UpdatePost.jsx** you have to change the same lies of code.
+   
+
+
 * Add the notes of the fixied uploadPost
-* Add the custom select to the search
-* Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "Post"
+
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
