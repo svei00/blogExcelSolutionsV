@@ -134,12 +134,12 @@ export default function UpdatePost() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // To prevent reflesing the page
+    e.preventDefault(); // To prevent refreshing the page
     if (!validate()) return;
 
     try {
       const res = await fetch(
-        `/api/post/updatepost/${formData._id}/${currentUser._id}`,
+        `/api/post/updatepost/${postId}/${currentUser._id}`, // Use postId instead of formData._id
         {
           method: "PUT",
           headers: {
@@ -158,6 +158,7 @@ export default function UpdatePost() {
         navigate(`/post/${data.slug}`);
       }
     } catch (error) {
+      console.error("Error updating post:", error);
       setPublishError("Something went wrong!!");
     }
   };

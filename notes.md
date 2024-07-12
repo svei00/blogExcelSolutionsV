@@ -4945,6 +4945,7 @@ Do the same **than CreatePost.jsx**
 * Add the notes of the custom Select (Create and Update)
 * Add the notes of the fixied uploadPost
 * Add the custom select to the search
+* Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "Post"
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
