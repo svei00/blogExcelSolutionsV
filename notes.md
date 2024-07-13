@@ -4991,6 +4991,169 @@ export default CategoriesSelect;
 
 
 * Add the notes of the fixied uploadPost
+* Funtion to make the dark/light mode being according to the user's system.
+* Check the toggle in the post.
+* Check the white in the header.
+* Check the posibility of English/Spanish and choose the language according to the system, if there's another lenguage select English.
+
+
+`
+export default function UpdatePost() {
+  // ... all your existing state declarations and useEffect ...
+
+  return (
+    <div className="p-3 max-w-3xl mx-auto min-h-screen">
+      <h1 className="text-center text-3xl my-7 font-semibold">Update Post</h1>
+      {isLoading ? (
+        <div className="text-center">
+          <Spinner size="xl" />
+          <p>Loading post data...</p>
+        </div>
+      ) : (
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-4 sm:flex-row justify-between">
+            <TextInput
+              type="text"
+              placeholder="Title"
+              required
+              id="title"
+              className="flex-1"
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              value={formData.title}
+            />
+            {errors.title && <span className="text-red-500">{errors.title}</span>}
+            <Select
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+              value={formData.category}
+            >
+              {/* ... your options ... */}
+            </Select>
+            {errors.category && (
+              <span className="text-red-500">{errors.category}</span>
+            )}
+          </div>
+          {/* ... rest of your form elements ... */}
+          <CustomReactQuill
+            value={formData.content || ""}
+            onChange={(value) => {
+              setFormData({ ...formData, content: value });
+            }}
+          />
+          {errors.content && (
+            <span className="text-red-500">{errors.content}</span>
+          )}
+          <Button
+            type="submit"
+            className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
+            required
+          >
+            Update!!
+          </Button>
+          {publishError && (
+            <Alert className="mt-5" color="failure">
+              {publishError}
+            </Alert>
+          )}
+        </form>
+      )}
+    </div>
+  );
+}
+`
+
+
+
+`
+useEffect(() => {
+  const fetchPost = async () => {
+    try {
+      setIsLoading(true); // Set loading to true when starting to fetch
+      setPublishError(null);
+      const res = await fetch(`/api/post/getposts?postId=${postId}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch post");
+      }
+
+      // Update state in separate microtasks to avoid potential blocking
+      setTimeout(() =>
+        setFormData((prevState) => ({
+          ...prevState,
+          title: data.posts[0].title,
+        }))
+      , 0);
+      setTimeout(() =>
+        setFormData((prevState) => ({
+          ...prevState,
+          category: data.posts[0].category,
+        }))
+      , 0);
+      setTimeout(() =>
+        setFormData((prevState) => ({
+          ...prevState,
+          image: data.posts[0].image,
+        }))
+      , 0);
+
+      // Debounce content update for large texts
+      const debounceContent = setTimeout(() => {
+        setFormData((prevState) => ({
+          ...prevState,
+          content: data.posts[0].content,
+        }));
+        setIsLoading(false); // Set loading to false after all data is set
+      }, 100); // Adjust timeout as needed
+
+      return () => clearTimeout(debounceContent);
+    } catch (error) {
+      console.error("Error fetching post:", error);
+      setPublishError(error.message);
+      setIsLoading(false); // Make sure to set loading to false even if there's an error
+    }
+  };
+
+  fetchPost();
+}, [postId]);
+`
+
+
+
+`const handleSubmit = async (e) => {
+  e.preventDefault(); // To prevent refreshing the page
+  if (!validate()) return;
+
+  try {
+    const res = await fetch(
+      `/api/post/updatepost/${postId}/${currentUser._id}`, // Use postId instead of formData._id
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+    const data = await res.json();
+    if (!res.ok) {
+      setPublishError(data.message);
+      return;
+    }
+    if (res.ok) {
+      setPublishError(null);
+      navigate(`/post/${data.slug}`);
+    }
+  } catch (error) {
+    setPublishError("Something went wrong!!");
+  }
+};
+`
+
+
 
 
 ## Biblography
