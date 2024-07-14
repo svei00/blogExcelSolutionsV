@@ -9,14 +9,29 @@ const HeaderLayout = ({ children }) => {
     if (headerRef.current) {
       setHeaderHeight(headerRef.current.offsetHeight);
     }
+
+    // Add resize listener to update header height if window size changes
+    const handleResize = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <div>
-      <div ref={headerRef} className="fixed top-0 w-full z-50">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
+      <div
+        ref={headerRef}
+        className="fixed top-0 w-full z-50 bg-white dark:bg-gray-900 transition-colors duration-300"
+      >
         <Header />
       </div>
-      <div style={{ marginTop: headerHeight }}>{children}</div>
+      <div className="flex-grow" style={{ marginTop: `${headerHeight}px` }}>
+        {children}
+      </div>
     </div>
   );
 };

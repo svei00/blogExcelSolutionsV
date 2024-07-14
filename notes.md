@@ -5126,7 +5126,6 @@ export default themeSlice.reducer;
 
 
 * Add the notes of the fixied uploadPost
-* Funtion to make the dark/light mode being according to the user's system.
 * Check the toggle in the post.
 * Check the white in the header.
 * Check the posibility of English/Spanish and choose the language according to the system, if there's another lenguage select English.
