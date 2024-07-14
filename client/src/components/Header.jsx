@@ -51,6 +51,17 @@ export default function Header() {
     navigate(`/search?${searchQuery}`);
   };
 
+  // Detect System Preferences
+  const getSystemThemePreference = () => {
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      return "dark";
+    }
+    return "light";
+  };
+
   return (
     <Navbar className=" border-b-2 ">
       <Link
