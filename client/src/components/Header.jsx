@@ -2,9 +2,9 @@ import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon, FaSun } from "react-icons/fa";
+import { FaDesktop, FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { toggleTheme } from "../redux/theme/themeSlice";
+import { toggleTheme, setTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import NavLinkEx from "./NavLinkEx";
@@ -25,7 +25,17 @@ export default function Header() {
     if (searchTermFromUrl) {
       setSearchTerm(searchTermFromUrl);
     }
-  }, [location.search]);
+
+    // Theme Detection
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleThemeChange = () => {
+      dispatch(setTheme(getSystemThemePreference()));
+    };
+
+    mediaQuery.addListener(handleThemeChange);
+    handleThemeChange(); // Call it initially to set the correct theme
+    return () => mediaQuery.removeListener(handleThemeChange);
+  }, [location.search, theme, dispatch]);
 
   const handleSignout = async () => {
     try {
@@ -106,7 +116,13 @@ export default function Header() {
           pill
           onClick={() => dispatch(toggleTheme())}
         >
-          {theme === "light" ? <FaSun /> : <FaMoon />}
+          {theme === "light" ? (
+            <FaSun />
+          ) : theme === "dark" ? (
+            <FaMoon />
+          ) : (
+            <FaDesktop />
+          )}
         </Button>
         {currentUser ? (
           <Dropdown

@@ -4987,6 +4987,141 @@ export default CategoriesSelect;
             }
           />`
 4. Do the same in the file **UpdatePost.jsx** you have to change the same lies of code.
+
+## Update the Header to make it take the user dark/light theme.
+1. Go the **/client/scr/components** and open **Header.jsx** file.
+2. Crete the function **getSystemThemePreference** before the return:
+   `const getSystemThemePreference = () => {
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      return "dark";
+    }
+    return "light";
+  };`
+3. Around line of code 20 modify the userEffect from:
+   `useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get("searchTerm");
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+  }, [location.search]);`
+  To:
+  `
+   useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get("searchTerm");
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+
+    // Theme Detection
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleThemeChange = () => {
+      dispatch(setTheme(getSystemThemePreference()));
+    };
+
+    mediaQuery.addListener(handleThemeChange);
+    return () => mediaQuery.removeListener(handleThemeChange);
+  }, [location.search, dispatch]);
+  `
+4. Now around line of code 110 change the button from:
+   `
+   <Button
+          className="w-12 h-10 hidden sm:inline"
+          color="gray"
+          pill
+          onClick={() => dispatch(toggleTheme())}
+        >
+          {theme === "light" ? <FaSun /> : <FaMoon />}
+        </Button>
+   `
+   To:
+   `
+   <Button
+          className="w-12 h-10 hidden sm:inline"
+          color="gray"
+          pill
+          onClick={() => dispatch(toggleTheme())}
+        >
+          {theme === "light" ? (
+            <FaSun />
+          ) : theme === "dark" ? (
+            <FaMoon />
+          ) : (
+            <FaDesktop />
+          )}
+        </Button>
+   `
+   * If the <FaDesktop /> icon won't auto import add it into the import: `import { FaDesktop, FaMoon, FaSun } from "react-icons/fa";`
+
+5. Go to **/client/src/redux/theme** and open the file themeSlice.js.
+   Change from:
+   `
+   import { createSlice } from "@reduxjs/toolkit";
+
+const initialState = {
+  theme: "light",
+};
+
+const themeSlice = createSlice({
+  name: "theme",
+  initialState,
+  reducers: {
+    toggleTheme: (state) => {
+      state.theme = state.theme === "light" ? "dark" : "light";
+    },
+  },
+});
+
+export const { toggleTheme } = themeSlice.actions;
+
+export default themeSlice.reducer;
+   `
+   To:
+   `
+   import { createSlice } from "@reduxjs/toolkit";
+
+const getSystemThemePreference = () => {
+  if (
+    window.matchMedia &&
+    Window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    return "dark";
+  }
+  return "light";
+};
+
+const initialState = {
+  theme: "system",
+};
+
+const themeSlice = createSlice({
+  name: "theme",
+  initialState,
+  reducers: {
+    setTheme: (state, action) => {
+      state.theme = action.payload;
+    },
+    toggleTheme: (state) => {
+      if (state.theme === "system") {
+        state.theme = "light";
+      } else if (state.theme === "light") {
+        state.theme = "dark";
+      } else {
+        state.theme = "system";
+      }
+    },
+  },
+});
+
+export const { toggleTheme } = themeSlice.actions;
+
+export default themeSlice.reducer;
+   `
+6. Modify the `import { toggleTheme, setTheme } from "../redux/theme/themeSlice"`; to `import { toggleTheme, setTheme } from "../redux/theme/themeSlice";` from **/client/src/componets/Header.jsx**
    
 
 
