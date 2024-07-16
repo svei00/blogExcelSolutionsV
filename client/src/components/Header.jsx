@@ -9,6 +9,17 @@ import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import NavLinkEx from "./NavLinkEx";
 
+// Detect System Preferences
+const getSystemThemePreference = () => {
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    return "dark";
+  }
+  return "light";
+};
+
 export default function Header() {
   const path = useLocation().pathname;
   const location = useLocation();
@@ -29,7 +40,19 @@ export default function Header() {
     // Theme Detection
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleThemeChange = () => {
-      dispatch(setTheme(getSystemThemePreference()));
+      if (theme === "system") {
+        if (mediaQuery.matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      } else {
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      }
     };
 
     mediaQuery.addListener(handleThemeChange);
@@ -59,17 +82,6 @@ export default function Header() {
     urlParams.set("searchTerm", searchTerm);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
-  };
-
-  // Detect System Preferences
-  const getSystemThemePreference = () => {
-    if (
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
-      return "dark";
-    }
-    return "light";
   };
 
   return (
