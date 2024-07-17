@@ -5199,14 +5199,114 @@ export default HeaderLayout;
    to:
    `<Navbar className=" border-b-2 bg-white dark:bg-gray-900 transition-colors duration-300">`  
 
+## Updating the UpdatePost.jsx file.
 
+1. Add validations in the form, that way we ensure that the user fill all the form.
 
-* Add the notes of the fixied uploadPost
-* Check the toggle in the post.
-* Check the white in the header.
-* Check the posibility of English/Spanish and choose the language according to the system, if there's another lenguage select English.
+Change:
 
+`
+return (
+    <div className="p-3 max-w-3xl mx-auto min-h-screen">
+      <h1 className="text-center text-3xl my-7 font-semibold">Update a Post</h1>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-4 sm:flex-row justify-between">
+          <TextInput
+            type="text"
+            placeholder="Title"
+            required
+            id="title"
+            className="flex-1"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
+            value={formData.title}
+          />
+          {/* <TextInput type="text" placeholder="Author" required /> */}
+          <Select
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            value={formData.category}
+          >
+            <option value="uncategorized">Select a category</option>
+            <option value="formulas">Formulas and Functions</option>
+            <option value="data-entry">Data Entry</option>
+            <option value="data-analysis">Data Analysis</option>
+            <option value="data-visualization">Data Visualization</option>
+            <option value="collaboration">Collaboration and Security</option>
+            <option value="automation">Automation</option>
+            <option value="add-ins">Add-in and Extensions</option>
+            <option value="printing">Printing and Sharing</option>
+            <option value="accessibility">Accessibility</option>
+            <option value="macros">Macros</option>
+          </Select>
+        </div>
+        <div className="flex gap-4 items-center justify-between border-2 border-blueEx p-3">
+          <FileInput
+            type="file"
+            accept="image/*"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+          <Button
+            type="button"
+            className="bg-gradient-to-r from-greenEx to-blueEx "
+            outline
+            size="sm"
+            onClick={handleUploadImage}
+            disabled={imageUploadProgress}
+          >
+            {imageUploadProgress ? (
+              <div className="w-16 h-16">
+                <CircularProgressbar
+                  value={imageUploadProgress}
+                  text={`${imageUploadProgress || 0} %`}
+                />
+              </div>
+            ) : (
+              "Upload Image"
+            )}
+          </Button>
+        </div>
+        {imageUploadError && <Alert color="failure">{imageUploadError}</Alert>}
+        {formData.image && (
+          <img
+            src={formData.image}
+            alt="Uploaded Image"
+            className="w-full h-72 object-cover"
+          />
+        )}
 
+        <ReactQuill
+          theme="snow"
+          value={formData.content}
+          placeholder="Create a story..."
+          className="h-72 mb-12"
+          required
+          onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}
+        />
+        <Button
+          type="submit"
+          className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
+          required
+        >
+          Update!!
+        </Button>
+        {publishError && (
+          <Alert className="mt-5" color="failure">
+            {publishError}
+          </Alert>
+        )}
+        <CustomReactQuill />
+      </form>
+    </div>
+  );
+}
+`
+
+To
 `
 export default function UpdatePost() {
   // ... all your existing state declarations and useEffect ...
@@ -5275,7 +5375,27 @@ export default function UpdatePost() {
 }
 `
 
-
+2. Change the useEffect to fecth the data correctly (Solving the issue with the Category)
+`
+useEffect(() => {
+    try {
+      const fetchPost = async () => {
+        if (!res.ok) {
+          console.log(data.message);
+          setPublishError(data.message);
+          return;
+        }
+         if (res.ok) {
+          setPublishError(null);
+          setFormData(data.posts[0]);
+        }
+      };
+      fetchPost();
+    } catch (error) {
+      console.log(error);
+    }
+`
+To:
 
 `
 useEffect(() => {
@@ -5331,8 +5451,36 @@ useEffect(() => {
 }, [postId]);
 `
 
+3. Changing the handleSubmit to upload the post without any error from:
+`
+const handleSubmit = async (e) => {
+    e.preventDefault(); // To prevent reflesing the page
+    if (!validate()) return;
 
+    try {
+      const res = await fetch("/api/post/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPublishError(data.message);
+        return;
+      }
+      if (res.ok) {
+        setPublishError(null);
+        navigate(/post/${data.slug});
+      }
+    } catch (error) {
+      setPublishError("Something went wrong!!");
+    }
+  };
+`
 
+To:
 `const handleSubmit = async (e) => {
   e.preventDefault(); // To prevent refreshing the page
   if (!validate()) return;
@@ -5362,6 +5510,9 @@ useEffect(() => {
   }
 };
 `
+
+* Check the toggle in the post.
+* Check the posibility of English/Spanish and choose the language according to the system, if there's another lenguage select English.
 
 
 
