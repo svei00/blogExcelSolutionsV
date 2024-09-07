@@ -5514,6 +5514,10 @@ To:
 * Check the toggle in the post.
 * Check the posibility of English/Spanish and choose the language according to the system, if there's another lenguage select English.
 
+## Installing React-Helmet for dynamic meta data
+1. Install React Helmet:
+   - Via **npm**: npm install react-helmet
+   - Via **yarn**: yarn add react-helmet
 
 
 
