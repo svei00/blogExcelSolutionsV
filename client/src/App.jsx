@@ -5,7 +5,6 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
-import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PrivateRoute from "./components/PrivateRoute";
 import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";
@@ -15,10 +14,15 @@ import PostPage from "./pages/PostPage";
 import ScrollToTop from "./components/ScrollToTop";
 import Search from "./pages/Search";
 import HeaderLayout from "./components/HeaderLayout";
+import { Helmet } from "react-helmet";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Helmet>
+        <title>ExcelSolutionsV Blog</title>
+        <meta name="description" content="Welcome to ExcelSolutionsV Blot!" />
+      </Helmet>
       <ScrollToTop />
       <HeaderLayout>
         <Routes>
