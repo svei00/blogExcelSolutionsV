@@ -63,7 +63,7 @@ export default function PostPage() {
 
   const getMetaDescription = (content) => {
     // Strip HTML tagas and get first 160 characters
-    return content.replace(/<[^>]*>?/gm, "").substring(0, 160);
+    return content.replace(/<[^>]*>?/gm, "").substring(0, 160); // Forst 160 Char
   };
 
   return (
