@@ -63,11 +63,34 @@ export default function PostPage() {
 
   const getMetaDescription = (content) => {
     // Strip HTML tagas and get first 160 characters
-    return content.replace(/<[^>]*>?/gm, "").substring(0, 160); // Forst 160 Char
+    return content.replace(/<[^>]*>?/gm, "").substring(0, 160);
   };
 
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
+      {/* {post && (
+        <Helmet>
+          <title>{post.title} | Excel SolutionsV Blog</title>
+          <meta name="description" content={getMetaDescription(post.content)} />
+          <meta property="og:title" content={post.title} />
+          <meta
+            property="og:description"
+            content={getMetaDescription(post.content)}
+          />
+          <meta property="og:image" content={post.image} />
+          <meta
+            property="og:url"
+            content={`https://blog.excel-solutionsv.com/post/${post.slug}`}
+          />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={post.title} />
+          <meta
+            name="twitter:description"
+            content={getMetaDescription(post.content)}
+          />
+          <meta name="twitter:image" content={post.image} />
+        </Helmet>
+      )} */}
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
         {post && post.title}
       </h1>
