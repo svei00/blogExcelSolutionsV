@@ -12,29 +12,4 @@ export default defineConfig({
     },
   },
   plugins: [react()],
-  build: {
-    rollupOptions: {
-      external: ["react", "react-dom", "react-helmet-async"],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react-helmet-async": "ReactHelmetAsync",
-        },
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            return id
-              .toString()
-              .split("node_modules/")[1]
-              .split("/")[0]
-              .toString();
-          }
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1600,
-  },
-  optimizeDeps: {
-    include: ["react", "react-dom", "react-helmet-async"],
-  },
 });
