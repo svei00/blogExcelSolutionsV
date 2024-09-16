@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection.jsx";
 import PostCard from "../components/PostCard.jsx";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 export default function PostPage() {
   const { postSlug } = useParams();

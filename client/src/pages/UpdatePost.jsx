@@ -15,6 +15,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import CategoriesSelect from "../components/CategoriesSelect";
+import { Helmet } from "react-helmet-async";
 
 export default function UpdatePost() {
   const [file, setFile] = useState(null);
@@ -167,6 +168,16 @@ export default function UpdatePost() {
 
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
+      <Helmet>
+        <title>
+          {formData.title ? `Update: ${formData.title}` : `Update Post}`} |
+          Excel SolutionsV Blog
+        </title>
+        <meta
+          name="description"
+          content={`Update blog post: ${formData.title}`}
+        />
+      </Helmet>
       <h1 className="text-center text-3xl my-7 font-semibold">Update Post</h1>
       {isLoading ? (
         <div className="flex justify-center items-center">
