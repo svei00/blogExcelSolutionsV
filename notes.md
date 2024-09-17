@@ -5514,12 +5514,81 @@ To:
 * Check the toggle in the post.
 * Check the posibility of English/Spanish and choose the language according to the system, if there's another lenguage select English.
 
-## Installing React-Helmet for dynamic meta data
+## Installing React-Helmet-Async for dynamic meta data
 1. Install React Helmet:
-   - Via **npm**: npm install react-helmet
-   - Via **yarn**: yarn add react-helmet
-
-
+   - Via **npm**: npm install react-helmet-async
+   - Via **yarn**: yarn add react-helmet-async
+2. Go to **PostPage.jsx** and add:
+   - Add the library around line of code 10:
+     `
+     import { Helmet } from "react-helmet-async";
+     ` 
+   - Around line of code 65:
+     `
+     const getMetaDescription = (content) => {
+      // Strip HTML tagas and get first 160 characters
+      return content.replace(/<[^>]*>?/gm, "").substring(0, 160);
+    };
+    `
+    - Then around line of code 70: before the **<h1>** tag add:
+    `
+    (
+        <Helmet>
+          <title>{post.title} | Excel SolutionsV Blog</title>
+          <meta name="description" content={getMetaDescription(post.content)} />
+          <meta property="og:title" content={post.title} />
+          <meta
+            property="og:description"
+            content={getMetaDescription(post.content)}
+          />
+          <meta property="og:image" content={post.image} />
+          <meta
+            property="og:url"
+            content={`https://blog.excel-solutionsv.com/post/${post.slug}`}
+          />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={post.title} />
+          <meta
+            name="twitter:description"
+            content={getMetaDescription(post.content)}
+          />
+          <meta name="twitter:image" content={post.image} />
+        </Helmet>
+      )}
+    `
+3. On **UpdatePage.jsx**
+   -Around line code 20:
+   `
+   import { Helmet } from "react-helmet-async";
+   `
+   - Around line code 170 before the **<h1>** tag add:
+   `
+   <Helmet>
+        <title>
+          {formData.title ? `Update: ${formData.title}` : `Update Post}`} |
+          Excel SolutionsV Blog
+        </title>
+        <meta
+          name="description"
+          content={`Update blog post: ${formData.title}`}
+        />
+      </Helmet>
+    `
+4. On **CreatePage.jsx**
+   - Around line code 20:
+   `
+   import { Helmet } from "react-helmet-async";
+   `
+   - Around line of code 110 before the **<h1>** tag add:
+     `
+     <Helmet>
+        <title>Create a New Post | Excel SolutionsV Blog</title>
+        <meta
+          name="description"
+          content="Create a new blog post for Excel SolutionsV Blog"
+        />
+      </Helmet>
+     ` 
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
