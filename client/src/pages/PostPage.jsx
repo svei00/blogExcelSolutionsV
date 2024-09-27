@@ -89,6 +89,11 @@ export default function PostPage() {
             content={getMetaDescription(post.content)}
           />
           <meta name="twitter:image" content={post.image} />
+          {/* Google AdSense meta tag  */}
+          <meta
+            name="google-adsense-account"
+            content="ca-pub-5050087617356218"
+          />
         </Helmet>
       )}
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
