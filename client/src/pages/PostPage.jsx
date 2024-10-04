@@ -120,7 +120,7 @@ export default function PostPage() {
         </span>
       </div>
       <div
-        className="p-3 max-w-2xl mx-auto w-full post-content text-justify  [&>img]:mx-auto [&>img]:block" // The  [&>img]:mx-auto [&>img]:block is for center the images
+        className="p-3 max-w-2xl mx-auto w-full post-content text-justify [&>img]:mx-auto [&>img]:block" // The  [&>img]:mx-auto [&>img]:block is for center the images
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
       <div className="max-w-4xl mx-auto w-full">
