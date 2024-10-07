@@ -4823,6 +4823,10 @@ app.use(express.static(path.join(__dirname, "/client/build"))); // Use build for
      * Root Directory: Since we did it on the **index.js** file leave in blank
      * Build Command: Since we used **yarn** you can use: `yarn run build` if you're using **npn** `npn run build`
      * Start command: **yarn** yarn start or **npn** npn start.
+6. Remeber the enviromental variables:
+   * JWT_SECRET
+   * MongoDB
+   * VITE_FIREBASE_API_KEY
 
 
 **Custom NavBar with Flowbite - This is Done and worked**
