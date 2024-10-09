@@ -65,6 +65,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         [{ align: [] }],
         ["link", "image", "video"],
         ["clean"],
+        ["code-block"], // Includes the code-block tool
       ],
       handlers: {
         image: imageHandler,
@@ -93,6 +94,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         image: "Insert image",
         video: "Insert video",
         clean: "Remove formatting",
+        "code-block": "Insert code block", // Code-Block tooltip
       };
 
       toolbarButtons.forEach((button) => {
