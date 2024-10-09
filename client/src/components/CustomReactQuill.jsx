@@ -58,6 +58,7 @@ const CustomReactQuill = ({ value, onChange }) => {
       container: [
         [{ header: [1, 2, false] }],
         ["bold", "italic", "underline", "strike"],
+        ["blockquote", "code-block"], // Includes the code-block tool
         [{ list: "ordered" }, { list: "bullet" }],
         [{ script: "sub" }, { script: "super" }],
         [{ indent: "-1" }, { indent: "+1" }],
@@ -65,7 +66,6 @@ const CustomReactQuill = ({ value, onChange }) => {
         [{ align: [] }],
         ["link", "image", "video"],
         ["clean"],
-        ["code-block"], // Includes the code-block tool
       ],
       handlers: {
         image: imageHandler,
@@ -130,7 +130,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         ref={quillRef}
         theme="snow"
         placeholder="Create a story..."
-        className="h-72 mb-12 border-color:greenEx"
+        className="h-72 mb-12 border-color:greenEx dark:text-white dark:placeholder-gray-400"
         required
         value={value}
         onChange={onChange}
