@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.snow.css";
 import {
   getDownloadURL,
   getStorage,
@@ -130,7 +131,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         ref={quillRef}
         theme="snow"
         placeholder="Create a story..."
-        className="h-72 mb-12 border-color:greenEx dark:text-white dark:placeholder-gray-400"
+        className="h-72 mb-12 border-color:greenEx"
         required
         value={value}
         onChange={onChange}

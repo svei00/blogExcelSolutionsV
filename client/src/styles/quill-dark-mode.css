@@ -1,0 +1,46 @@
+@layer components {
+    .dark .ql-snow.ql-toolbar button,
+    .dark .ql-snow .ql-toolbar button {
+      @apply text-white;
+    }
+  
+    .dark .ql-snow.ql-toolbar button:hover,
+    .dark .ql-snow .ql-toolbar button:hover,
+    .dark .ql-snow.ql-toolbar button.ql-active,
+    .dark .ql-snow .ql-toolbar button.ql-active,
+    .dark .ql-snow.ql-toolbar .ql-picker-label:hover,
+    .dark .ql-snow .ql-toolbar .ql-picker-label:hover,
+    .dark .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+    .dark .ql-snow .ql-toolbar .ql-picker-label.ql-active,
+    .dark .ql-snow.ql-toolbar .ql-picker-item:hover,
+    .dark .ql-snow .ql-toolbar .ql-picker-item:hover,
+    .dark .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+    .dark .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+      @apply text-blue-500;
+    }
+  
+    .dark .ql-snow .ql-stroke {
+      @apply stroke-white;
+    }
+  
+    .dark .ql-snow .ql-fill,
+    .dark .ql-snow .ql-stroke.ql-fill {
+      @apply fill-white;
+    }
+  
+    .dark .ql-editor.ql-blank::before {
+      @apply text-gray-400;
+    }
+  
+    .dark .ql-snow .ql-picker {
+      @apply text-white;
+    }
+  
+    .dark .ql-snow .ql-picker-options {
+      @apply bg-gray-800;
+    }
+  
+    .dark .ql-editor {
+      @apply text-white;
+    }
+  }

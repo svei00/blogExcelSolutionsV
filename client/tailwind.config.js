@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "node_modules/flowbite-react/lib/esm/**/*.js",
+    "./src/styles/quill-dark-mode.css", // Add this line
   ],
 
   theme: {
