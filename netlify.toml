@@ -1,9 +1,9 @@
 [build]
   command = "npm run build"
-  publish = "client/dist"
+  publish = "client/dist"  # The correct directory for your Vite build output
 
 [environment]
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"  # Explicitly disable the Next.js plugin
 
 [[redirects]]
   from = "/*"
