@@ -2,12 +2,10 @@
   command = "npm run build"
   publish = "client/dist"
 
+[environment]
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
   status = 200
