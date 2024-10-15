@@ -1,19 +1,13 @@
-[
-build
-]
+[build]
   command = "npm run build"
   publish = "client/dist"
 
-[[
-redirects
-]]
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[[
-redirects
-]]
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
