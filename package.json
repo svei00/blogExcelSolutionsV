@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "nodemon api/index.js",
     "start": "node api/index.js",
-    "build": "cd client && npm install && npm run build && cd .. && npm install",
-    "netlify-build": "npm run build"
+    // "build": "cd client && npm install && npm run build && cd .. && npm install", // Render
+    "build:client": "cd client && npm install && npm run build", // Netlify
+    "build:server": "npm install", // Netlify
+    "build": "npm run build:client && npm run build:server", // Netlify
+    "netlify-build": "npm run build:client" // Netlify
   },
   "repository": "https://github.com/svei00/blogExcelSolutionsV.git",
   "author": "svei00 <79055634+svei00@users.noreply.github.com>",

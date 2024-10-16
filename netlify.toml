@@ -1,11 +1,19 @@
-[build]
-  command = "npm run build"
-  publish = "client/dist"  # The correct directory for your Vite build output
+[
+build
+]
+  command = "npm run netlify-build"
+  publish = "client/dist"
 
-[environment]
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"  # Explicitly disable the Next.js plugin
-
-[[redirects]]
+[[
+redirects
+]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+[[
+redirects
+]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
   status = 200
