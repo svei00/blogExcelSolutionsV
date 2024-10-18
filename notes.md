@@ -4828,6 +4828,22 @@ app.use(express.static(path.join(__dirname, "/client/build"))); // Use build for
    * MongoDB
    * VITE_FIREBASE_API_KEY
 
+7. If render on Netlify don't forger to add the Enviromental Variable:
+   * `NETLIFY_NEXT_PLUGIN_SKIP = TRUE`
+   * Create on the root directory a file called **netlify.toml**
+     `[build]
+      command = "npm run build"
+      publish = "client/dist"  # The correct directory for your Vite build output
+
+      [environment]
+      NETLIFY_NEXT_PLUGIN_SKIP = "true"  # Explicitly disable the Next.js plugin
+
+      [[redirects]]
+      from = "/*"
+      to = "/index.html"
+      status = 200`
+
+
 
 **Custom NavBar with Flowbite - This is Done and worked**
 1. `import { Link, useLocation } from "react-router-dom";
