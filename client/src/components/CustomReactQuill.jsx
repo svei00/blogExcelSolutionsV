@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { Check } from "lucide-react";
 import {
   getDownloadURL,
   getStorage,
@@ -9,48 +10,49 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 
+// Register custom blot for check lists
+const CheckBlot = ReactQuill.Quill.import("formats/list");
+
+class CheckList extends CheckBlot {
+  static create(value) {
+    const node = super.create(value);
+    node.classList.add("ql-check-list");
+    return node;
+  }
+}
+
+CheckList.blotName = "check-list";
+CheckList.tagName = "UL";
+
+// Register the new format
+ReactQuill.Quill.register(CheckList);
+
 /**
- * CustomReactQuill - A rich text editor component with image upload capabilities
+ * CustomReactQuill - A rich text editor component with image upload and custom list formatting
  * @param {string} value - Initial content of the editor
  * @param {function} onChange - Callback function when content changes
- *
- * Troubleshooting:
- * - If images don't upload: Check Firebase storage rules and app initialization
- * - If toolbar missing options: Verify modules configuration
- * - If content not updating: Check onChange handler and parent component state
  */
 const CustomReactQuill = ({ value, onChange }) => {
-  // Track upload progress and editor content state
+  // State management
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [text, setText] = useState(value || "");
+  const quillRef = React.useRef(null);
 
   /**
    * Sanitizes HTML content to prevent XSS and remove unwanted formatting
-   * @param {string} input - Raw HTML content
-   * @returns {string} - Cleaned HTML content
-   *
-   * Debug: If content looks wrong after pasting, check these regex patterns
    */
   const cleanHTML = (input) => {
     if (!input) return "";
     let content = input;
-    // Remove MS Word formatting
     content = content.replace(/<\/?[^>]+(xml|w:|o:|v:|m:)[^>]*>/gi, "");
-    // Remove style tags and contents
     content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
-    // Remove inline styles
     content = content.replace(/\s*style="[^"]*"/gi, "");
-    // Remove class attributes
     content = content.replace(/\s*class="[^"]*"/gi, "");
-    // Clean up spans
     content = content.replace(/<\/?span[^>]*>/gi, "");
-    // Convert divs to breaks
     content = content.replace(/<div[^>]*>/gi, "");
     content = content.replace(/<\/div>/gi, "<br>");
-    // Remove comments
     content = content.replace(/<!--[\s\S]*?-->/g, "");
-    // Clean up whitespace
     content = content.replace(/\n\s*\n/g, "\n");
     content = content.replace(/  +/g, " ");
     return content.trim();
@@ -58,13 +60,6 @@ const CustomReactQuill = ({ value, onChange }) => {
 
   /**
    * Handles image upload process using Firebase Storage
-   * Steps:
-   * 1. Create file input
-   * 2. Handle file selection
-   * 3. Upload to Firebase
-   * 4. Insert image URL into editor
-   *
-   * Debug: Check console for upload errors
    */
   const imageHandler = useCallback(() => {
     const input = document.createElement("input");
@@ -79,27 +74,22 @@ const CustomReactQuill = ({ value, onChange }) => {
       setIsUploading(true);
       setUploadProgress(0);
 
-      // Initialize Firebase upload
       const storage = getStorage(app);
       const fileName = new Date().getTime() + "-" + file.name;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      // Handle upload states
       uploadTask.on(
         "state_changed",
-        // Progress updates
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setUploadProgress(progress);
         },
-        // Error handling
         (error) => {
           console.error("Image upload failed:", error);
           setIsUploading(false);
         },
-        // Success handling
         async () => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -116,11 +106,28 @@ const CustomReactQuill = ({ value, onChange }) => {
     };
   }, []);
 
-  /**
-   * Editor toolbar configuration
-   * Add/remove features by modifying the container array
-   * Format: [category, option]
-   */
+  // Supported formats
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "code-block",
+    "list",
+    "check-list",
+    "bullet",
+    "script",
+    "indent",
+    "direction",
+    "align",
+    "link",
+    "image",
+    "video",
+  ];
+
+  // Editor configuration
   const modules = {
     toolbar: {
       container: [
@@ -137,16 +144,79 @@ const CustomReactQuill = ({ value, onChange }) => {
       ],
       handlers: {
         image: imageHandler,
+        list: function (value) {
+          if (value === "check") {
+            const quill = quillRef.current.getEditor();
+            const format = quill.getFormat();
+            if (format["check-list"]) {
+              quill.format("check-list", false);
+            } else {
+              quill.format("check-list", true);
+            }
+          }
+        },
       },
+    },
+    clipboard: {
+      matchVisual: false,
     },
   };
 
-  // Reference to the Quill editor instance
-  const quillRef = React.useRef(null);
+  // Add custom CSS for check lists
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      .ql-check-list {
+        list-style: none;
+        padding-left: 0;
+      }
+      
+      .ql-check-list li {
+        position: relative;
+        padding-left: 1.5em;
+        margin-bottom: 0.5em;
+      }
+      
+      .ql-check-list li:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.2em;
+        height: 1.2em;
+      }
+
+      .ql-check-list li[data-checked="true"]:before {
+        content: "✓";
+        color: #4CAF50;
+      }
+
+      .ql-check-list li[data-checked="false"]:before {
+        content: "□";
+      }
+
+      /* Custom list styles */
+      .ql-editor ol {
+        counter-reset: list-counter;
+      }
+      
+      .ql-editor ol li {
+        counter-increment: list-counter;
+        display: block;
+      }
+
+      .ql-editor ol li:before {
+        content: counter(list-counter) ". ";
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   /**
    * Handles content changes in the editor
-   * Cleans HTML before passing to parent component
    */
   const handleChange = (content) => {
     setText(content);
@@ -156,50 +226,8 @@ const CustomReactQuill = ({ value, onChange }) => {
     }
   };
 
-  /**
-   * Sets up tooltips for toolbar buttons
-   * Debug: If tooltips don't appear, check toolbar button selectors
-   */
-  useEffect(() => {
-    const setTooltips = () => {
-      if (!quillRef.current) return;
-
-      const toolbar = quillRef.current.getEditor().getModule("toolbar");
-      const toolbarButtons = toolbar.container.querySelectorAll("button");
-
-      // Tooltip text for each button type
-      const tooltips = {
-        bold: "Bold text",
-        italic: "Italic text",
-        underline: "Underline text",
-        strike: "Strikethrough text",
-        list: "List",
-        script: "Subscript/Superscript",
-        indent: "Indent",
-        direction: "Text direction",
-        align: "Text alignment",
-        link: "Insert link",
-        image: "Insert image",
-        video: "Insert video",
-        clean: "Remove formatting",
-        "code-block": "Insert code block",
-      };
-
-      // Apply tooltips to buttons
-      toolbarButtons.forEach((button) => {
-        const format = button.className.split("-").pop();
-        if (tooltips[format]) {
-          button.title = tooltips[format];
-        }
-      });
-    };
-
-    setTooltips();
-  }, []);
-
   return (
     <div className="relative">
-      {/* Upload progress overlay */}
       {isUploading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
           <div className="bg-white p-4 rounded-lg shadow-lg">
@@ -214,7 +242,6 @@ const CustomReactQuill = ({ value, onChange }) => {
         </div>
       )}
 
-      {/* Main editor component */}
       <ReactQuill
         ref={quillRef}
         theme="snow"
@@ -224,6 +251,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         value={text}
         onChange={handleChange}
         modules={modules}
+        formats={formats}
       />
     </div>
   );
