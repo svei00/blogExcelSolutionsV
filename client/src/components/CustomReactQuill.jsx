@@ -1,260 +1,215 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Check } from "lucide-react";
 import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { app } from "../firebase";
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+  ListOrdered,
+  Type,
+  Highlighter,
+  Paintbrush,
+} from "lucide-react";
 
-// Register custom blot for check lists
-const CheckBlot = ReactQuill.Quill.import("formats/list");
-
-class CheckList extends CheckBlot {
-  static create(value) {
-    const node = super.create(value);
-    node.classList.add("ql-check-list");
-    return node;
-  }
-}
-
-CheckList.blotName = "check-list";
-CheckList.tagName = "UL";
-
-// Register the new format
-ReactQuill.Quill.register(CheckList);
-
-/**
- * CustomReactQuill - A rich text editor component with image upload and custom list formatting
- * @param {string} value - Initial content of the editor
- * @param {function} onChange - Callback function when content changes
- */
-const CustomReactQuill = ({ value, onChange }) => {
-  // State management
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
+const CustomWordEditor = ({ value, onChange }) => {
   const [text, setText] = useState(value || "");
   const quillRef = React.useRef(null);
 
-  /**
-   * Sanitizes HTML content to prevent XSS and remove unwanted formatting
-   */
-  const cleanHTML = (input) => {
-    if (!input) return "";
-    let content = input;
-    content = content.replace(/<\/?[^>]+(xml|w:|o:|v:|m:)[^>]*>/gi, "");
-    content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
-    content = content.replace(/\s*style="[^"]*"/gi, "");
-    content = content.replace(/\s*class="[^"]*"/gi, "");
-    content = content.replace(/<\/?span[^>]*>/gi, "");
-    content = content.replace(/<div[^>]*>/gi, "");
-    content = content.replace(/<\/div>/gi, "<br>");
-    content = content.replace(/<!--[\s\S]*?-->/g, "");
-    content = content.replace(/\n\s*\n/g, "\n");
-    content = content.replace(/  +/g, " ");
-    return content.trim();
-  };
+  // Custom font sizes to match Word-like editing
+  const fontSizes = [
+    "8px",
+    "9px",
+    "10px",
+    "11px",
+    "12px",
+    "14px",
+    "16px",
+    "18px",
+    "20px",
+    "24px",
+    "30px",
+    "36px",
+    "48px",
+    "60px",
+    "72px",
+    "96px",
+  ];
 
-  /**
-   * Handles image upload process using Firebase Storage
-   */
-  const imageHandler = useCallback(() => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
-
-    input.onchange = async () => {
-      const file = input.files[0];
-      if (!file) return;
-
-      setIsUploading(true);
-      setUploadProgress(0);
-
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + "-" + file.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        },
-        (error) => {
-          console.error("Image upload failed:", error);
-          setIsUploading(false);
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            const editor = quillRef.current.getEditor();
-            const range = editor.getSelection();
-            editor.insertEmbed(range.index, "image", downloadURL);
-          } catch (error) {
-            console.error("Error getting download URL:", error);
-          } finally {
-            setIsUploading(false);
-          }
-        }
-      );
-    };
-  }, []);
-
-  // Supported formats
+  // Custom formats allowing Word-like styling
   const formats = [
     "header",
+    "font",
+    "size",
     "bold",
     "italic",
     "underline",
     "strike",
     "blockquote",
-    "code-block",
     "list",
-    "check-list",
     "bullet",
-    "script",
     "indent",
-    "direction",
     "align",
+    "color",
+    "background",
+    "script",
     "link",
-    "image",
-    "video",
   ];
 
-  // Editor configuration
+  // Define custom styles similar to Word
+  const customStyles = {
+    Normal: { size: "12px", font: "Arial" },
+    "No Spacing": { size: "12px", font: "Arial", lineHeight: "1" },
+    "Heading 1": { size: "16px", font: "Arial", bold: true },
+    "Heading 2": { size: "14px", font: "Arial", bold: true },
+    Title: { size: "26px", font: "Arial", bold: true },
+  };
+
+  // Editor modules configuration
   const modules = {
     toolbar: {
       container: [
-        [{ header: [1, 2, 3, 4, false] }],
+        [{ font: [] }],
+        [{ size: fontSizes }],
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
         ["bold", "italic", "underline", "strike"],
-        ["blockquote", "code-block"],
-        [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-        [{ script: "sub" }, { script: "super" }],
-        [{ indent: "-1" }, { indent: "+1" }],
-        [{ direction: "rtl" }],
+        [{ color: [] }, { background: [] }],
         [{ align: [] }],
-        ["link", "image", "video"],
+        [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+        [{ indent: "-1" }, { indent: "+1" }],
+        ["link"],
         ["clean"],
       ],
       handlers: {
-        image: imageHandler,
-        list: function (value) {
-          if (value === "check") {
-            const quill = quillRef.current.getEditor();
-            const format = quill.getFormat();
-            if (format["check-list"]) {
-              quill.format("check-list", false);
-            } else {
-              quill.format("check-list", true);
-            }
+        // Custom handler for applying Word-like styles
+        style: function (value) {
+          const quill = quillRef.current.getEditor();
+          const style = customStyles[value];
+          if (style) {
+            quill.format("size", style.size);
+            quill.format("font", style.font);
+            if (style.bold) quill.format("bold", true);
           }
         },
       },
     },
-    clipboard: {
-      matchVisual: false,
-    },
   };
 
-  // Add custom CSS for check lists
+  // Custom toolbar component
+  const CustomToolbar = () => (
+    <div className="flex items-center space-x-2 p-2 border-b bg-gray-50">
+      <select className="border rounded px-2 py-1">
+        <option>Arial</option>
+        <option>Times New Roman</option>
+        <option>Calibri</option>
+      </select>
+      <select className="border rounded px-2 py-1">
+        {fontSizes.map((size) => (
+          <option key={size}>{size}</option>
+        ))}
+      </select>
+      <div className="flex space-x-1 border-l pl-2">
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <Bold size={18} />
+        </button>
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <Italic size={18} />
+        </button>
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <Underline size={18} />
+        </button>
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <Strikethrough size={18} />
+        </button>
+      </div>
+      <div className="flex space-x-1 border-l pl-2">
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <AlignLeft size={18} />
+        </button>
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <AlignCenter size={18} />
+        </button>
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <AlignRight size={18} />
+        </button>
+      </div>
+      <div className="flex space-x-1 border-l pl-2">
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <List size={18} />
+        </button>
+        <button className="p-1 hover:bg-gray-200 rounded">
+          <ListOrdered size={18} />
+        </button>
+      </div>
+    </div>
+  );
+
+  // Add custom styles
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
-      .ql-check-list {
-        list-style: none;
-        padding-left: 0;
+      .ql-container {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
       }
       
-      .ql-check-list li {
-        position: relative;
-        padding-left: 1.5em;
-        margin-bottom: 0.5em;
-      }
-      
-      .ql-check-list li:before {
-        content: "";
-        position: absolute;
-        left: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 1.2em;
-        height: 1.2em;
+      .ql-editor {
+        padding: 2cm;
+        min-height: 29.7cm;
+        width: 21cm;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
       }
 
-      .ql-check-list li[data-checked="true"]:before {
-        content: "✓";
-        color: #4CAF50;
+      .ql-toolbar {
+        border-radius: 4px 4px 0 0;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e2e8f0;
       }
 
-      .ql-check-list li[data-checked="false"]:before {
-        content: "□";
+      .style-btn {
+        padding: 4px 8px;
+        margin: 0 2px;
+        border-radius: 4px;
+        cursor: pointer;
       }
 
-      /* Custom list styles */
-      .ql-editor ol {
-        counter-reset: list-counter;
-      }
-      
-      .ql-editor ol li {
-        counter-increment: list-counter;
-        display: block;
-      }
-
-      .ql-editor ol li:before {
-        content: counter(list-counter) ". ";
+      .style-btn:hover {
+        background-color: #e2e8f0;
       }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, []);
 
-  /**
-   * Handles content changes in the editor
-   */
   const handleChange = (content) => {
     setText(content);
     if (onChange) {
-      const cleanedContent = cleanHTML(content);
-      onChange(cleanedContent);
+      onChange(content);
     }
   };
 
   return (
-    <div className="relative">
-      {isUploading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
-            </div>
-            <p className="text-center mt-2">{uploadProgress.toFixed(0)}%</p>
-          </div>
-        </div>
-      )}
-
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        placeholder="Create a story..."
-        className="h-72 mb-12 border-greenEx dark:text-white"
-        required
-        value={text}
-        onChange={handleChange}
-        modules={modules}
-        formats={formats}
-      />
+    <div className="border rounded-lg shadow-sm bg-white">
+      <CustomToolbar />
+      <div className="bg-gray-100 p-4">
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={text}
+          onChange={handleChange}
+          modules={modules}
+          formats={formats}
+          className="bg-white rounded-lg shadow"
+        />
+      </div>
     </div>
   );
 };
 
-export default CustomReactQuill;
+export default CustomWordEditor;
