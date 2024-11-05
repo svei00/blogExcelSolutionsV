@@ -11,8 +11,7 @@ import {
 import { app } from "../firebase";
 
 // Register custom blot for check lists
-const Quill = ReactQuill.Quill;
-const CheckBlot = Quill.import("formats/list");
+const CheckBlot = ReactQuill.Quill.import("formats/list");
 
 class CheckList extends CheckBlot {
   static create(value) {
@@ -20,24 +19,29 @@ class CheckList extends CheckBlot {
     node.classList.add("ql-check-list");
     return node;
   }
-
-  static formats(node) {
-    return node.tagName === this.tagName ? true : undefined;
-  }
 }
 
 CheckList.blotName = "check-list";
 CheckList.tagName = "UL";
 
 // Register the new format
-Quill.register(CheckList);
+ReactQuill.Quill.register(CheckList);
 
+/**
+ * CustomReactQuill - A rich text editor component with image upload and custom list formatting
+ * @param {string} value - Initial content of the editor
+ * @param {function} onChange - Callback function when content changes
+ */
 const CustomReactQuill = ({ value, onChange }) => {
+  // State management
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [text, setText] = useState(value || "");
   const quillRef = React.useRef(null);
 
+  /**
+   * Sanitizes HTML content to prevent XSS and remove unwanted formatting
+   */
   const cleanHTML = (input) => {
     if (!input) return "";
     let content = input;
@@ -54,6 +58,9 @@ const CustomReactQuill = ({ value, onChange }) => {
     return content.trim();
   };
 
+  /**
+   * Handles image upload process using Firebase Storage
+   */
   const imageHandler = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -87,7 +94,7 @@ const CustomReactQuill = ({ value, onChange }) => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
             const editor = quillRef.current.getEditor();
-            const range = editor.getSelection(true);
+            const range = editor.getSelection();
             editor.insertEmbed(range.index, "image", downloadURL);
           } catch (error) {
             console.error("Error getting download URL:", error);
@@ -99,6 +106,7 @@ const CustomReactQuill = ({ value, onChange }) => {
     };
   }, []);
 
+  // Supported formats
   const formats = [
     "header",
     "bold",
@@ -119,6 +127,7 @@ const CustomReactQuill = ({ value, onChange }) => {
     "video",
   ];
 
+  // Editor configuration
   const modules = {
     toolbar: {
       container: [
@@ -136,15 +145,14 @@ const CustomReactQuill = ({ value, onChange }) => {
       handlers: {
         image: imageHandler,
         list: function (value) {
-          const quill = quillRef.current.getEditor();
-          const format = quill.getFormat();
-
           if (value === "check") {
-            quill.format("list", false); // First remove any existing list format
-            quill.format("check-list", !format["check-list"]); // Toggle check-list
-          } else {
-            quill.format("check-list", false); // Remove check-list if exists
-            quill.format("list", value); // Apply regular list
+            const quill = quillRef.current.getEditor();
+            const format = quill.getFormat();
+            if (format["check-list"]) {
+              quill.format("check-list", false);
+            } else {
+              quill.format("check-list", true);
+            }
           }
         },
       },
@@ -152,13 +160,9 @@ const CustomReactQuill = ({ value, onChange }) => {
     clipboard: {
       matchVisual: false,
     },
-    keyboard: {
-      bindings: {
-        // Add keyboard handlers if needed
-      },
-    },
   };
 
+  // Add custom CSS for check lists
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
@@ -193,6 +197,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         content: "□";
       }
 
+      /* Custom list styles */
       .ql-editor ol {
         counter-reset: list-counter;
       }
@@ -205,15 +210,14 @@ const CustomReactQuill = ({ value, onChange }) => {
       .ql-editor ol li:before {
         content: counter(list-counter) ". ";
       }
-
-      .ql-editor {
-        min-height: 200px;
-      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, []);
 
+  /**
+   * Handles content changes in the editor
+   */
   const handleChange = (content) => {
     setText(content);
     if (onChange) {
@@ -243,11 +247,11 @@ const CustomReactQuill = ({ value, onChange }) => {
         theme="snow"
         placeholder="Create a story..."
         className="h-72 mb-12 border-greenEx dark:text-white"
+        required
         value={text}
         onChange={handleChange}
         modules={modules}
         formats={formats}
-        preserveWhitespace
       />
     </div>
   );
