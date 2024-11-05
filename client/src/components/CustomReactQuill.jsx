@@ -1,280 +1,232 @@
-import React, { useState, useCallback, useEffect } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import React, { useState, useEffect } from "react";
 import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { app } from "../firebase";
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  CheckSquare,
+  Circle,
+  Square,
+  Trash2,
+  Indent,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+} from "lucide-react";
 
-const CustomReactQuill = ({ value, onChange }) => {
-  // State management for file uploads and editor content
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
+const CustomRichEditor = ({ value, onChange }) => {
   const [text, setText] = useState(value || "");
+  const [selection, setSelection] = useState(null);
+  const [activeList, setActiveList] = useState(null);
 
-  // Function to clean HTML content by removing unwanted tags and attributes
   const cleanHTML = (input) => {
     let content = input;
-    // Remove Microsoft Word and other XML-based formatting
     content = content.replace(/<\/?[^>]+(xml|w:|o:|v:|m:)[^>]*>/gi, "");
-    // Remove style tags and their contents
     content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
-    // Remove inline styles
     content = content.replace(/\s*style="[^"]*"/gi, "");
-    // Remove class attributes
     content = content.replace(/\s*class="[^"]*"/gi, "");
-    // Remove span tags
     content = content.replace(/<\/?span[^>]*>/gi, "");
-    // Convert div tags to line breaks
     content = content.replace(/<div[^>]*>/gi, "");
     content = content.replace(/<\/div>/gi, "<br>");
-    // Remove HTML comments
     content = content.replace(/<!--[\s\S]*?-->/g, "");
-    // Remove conditional comments
     content = content.replace(/<!\[.*?\]>/g, "");
-    // Remove extra line breaks
     content = content.replace(/\n\s*\n/g, "\n");
-    // Remove extra spaces
     content = content.replace(/  +/g, " ");
     return content.trim();
   };
 
-  // Handle image uploads with Firebase Storage
-  const imageHandler = useCallback(() => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
+  const applyListStyle = (listType) => {
+    const editor = document.querySelector('[contenteditable="true"]');
+    const selection = window.getSelection();
 
-    input.onchange = async () => {
-      const file = input.files[0];
-      if (!file) return;
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      let container = range.commonAncestorContainer;
 
-      try {
-        setIsUploading(true);
-        setUploadProgress(0);
-
-        // Initialize Firebase Storage and create reference
-        const storage = getStorage(app);
-        const fileName = new Date().getTime() + "-" + file.name;
-        const storageRef = ref(storage, fileName);
-        const uploadTask = uploadBytesResumable(storageRef, file);
-
-        // Handle upload state changes
-        uploadTask.on(
-          "state_changed",
-          // Progress handler
-          (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploadProgress(progress);
-          },
-          // Error handler
-          (error) => {
-            console.error("Image upload failed:", error);
-            setIsUploading(false);
-          },
-          // Completion handler
-          async () => {
-            try {
-              // Get download URL and insert image into editor
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              const editor = quillRef.current.getEditor();
-              const range = editor.getSelection();
-              editor.insertEmbed(range.index, "image", downloadURL);
-            } catch (error) {
-              console.error("Error getting download URL:", error);
-            } finally {
-              setIsUploading(false);
-            }
-          }
-        );
-      } catch (error) {
-        console.error("Error initiating upload:", error);
-        setIsUploading(false);
+      // Find the closest list container
+      while (
+        container !== editor &&
+        container.nodeName !== "UL" &&
+        container.nodeName !== "OL"
+      ) {
+        container = container.parentNode;
       }
-    };
-  }, []);
 
-  // Handle paste events to clean pasted content
+      if (container === editor) {
+        // Create new list
+        if (listType === "ordered") {
+          document.execCommand("insertOrderedList", false, null);
+        } else {
+          document.execCommand("insertUnorderedList", false, null);
+          const list = selection.anchorNode.parentElement.closest("ul");
+          if (list) {
+            list.className = `list-style-${listType}`;
+          }
+        }
+      } else {
+        // Toggle existing list style
+        if (container.className === `list-style-${listType}`) {
+          document.execCommand("outdent", false, null);
+        } else {
+          container.className = `list-style-${listType}`;
+        }
+      }
+    }
+
+    setActiveList(listType);
+    const newContent = editor.innerHTML;
+    setText(newContent);
+    onChange && onChange(newContent);
+  };
+
+  const handleCommand = (command, param = null) => {
+    if (command === "removeFormat") {
+      const editableDiv = document.querySelector('[contenteditable="true"]');
+      const cleanedContent = cleanHTML(editableDiv.innerHTML);
+      editableDiv.innerHTML = cleanedContent;
+      setText(cleanedContent);
+      onChange && onChange(cleanedContent);
+    } else if (command === "list") {
+      applyListStyle(param);
+    } else {
+      document.execCommand(command, false, null);
+      const newContent = document.querySelector(
+        '[contenteditable="true"]'
+      ).innerHTML;
+      setText(newContent);
+      onChange && onChange(newContent);
+    }
+  };
+
   const handlePaste = (e) => {
-    const quill = quillRef.current.getEditor();
     e.preventDefault();
-    // Try to get HTML content first, fall back to plain text
     let pastedContent =
       e.clipboardData.getData("text/html") ||
       e.clipboardData.getData("text/plain");
     const cleanedContent = cleanHTML(pastedContent);
-    const range = quill.getSelection();
-    // Safely insert cleaned HTML content
-    quill.clipboard.dangerouslyPasteHTML(range.index, cleanedContent);
+    document.execCommand("insertHTML", false, cleanedContent);
   };
 
-  // Configure Quill editor modules
-  const modules = {
-    toolbar: {
-      container: [
-        [{ header: [1, 2, 3, 4, false] }],
-        ["bold", "italic", "underline", "strike"],
-        ["blockquote", "code-block"],
-        [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-        [{ script: "sub" }, { script: "super" }],
-        [{ indent: "-1" }, { indent: "+1" }],
-        [{ direction: "rtl" }],
-        [{ align: ["", "center", "right", "justify"] }],
-        ["link", "image", "video"],
-        ["clean"],
-      ],
-      handlers: {
-        image: imageHandler,
-      },
-    },
-    clipboard: {
-      matchVisual: false,
-      // Configure clipboard matchers for better paste handling
-      matchers: [
-        [
-          "br",
-          (node, delta) => {
-            return delta.compose(
-              new Delta().retain(delta.length(), { linebreak: true })
-            );
-          },
-        ],
-      ],
-    },
+  const handleKeyDown = (e) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      handleCommand("indent");
+    }
   };
 
-  // Define allowed formats in the editor
-  const formats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "code-block",
-    "list",
-    "bullet",
-    "check",
-    "script",
-    "indent",
-    "direction",
-    "align",
-    "link",
-    "image",
-    "video",
-    "linebreak",
+  // Enhanced format buttons with different list styles
+  const formatButtons = [
+    { icon: <Bold size={20} />, command: "bold", title: "Bold" },
+    { icon: <Italic size={20} />, command: "italic", title: "Italic" },
+    {
+      icon: <ListOrdered size={20} />,
+      command: "list",
+      param: "ordered",
+      title: "Numbered List",
+    },
+    {
+      icon: <List size={20} />,
+      command: "list",
+      param: "bullet",
+      title: "Bullet List",
+    },
+    {
+      icon: <CheckSquare size={20} />,
+      command: "list",
+      param: "check",
+      title: "Checkbox List",
+    },
+    {
+      icon: <Circle size={20} />,
+      command: "list",
+      param: "circle",
+      title: "Circle List",
+    },
+    {
+      icon: <Square size={20} />,
+      command: "list",
+      param: "square",
+      title: "Square List",
+    },
+    { icon: <Indent size={20} />, command: "indent", title: "Indent" },
+    {
+      icon: <AlignLeft size={20} />,
+      command: "justifyLeft",
+      title: "Align Left",
+    },
+    {
+      icon: <AlignCenter size={20} />,
+      command: "justifyCenter",
+      title: "Align Center",
+    },
+    {
+      icon: <AlignRight size={20} />,
+      command: "justifyRight",
+      title: "Align Right",
+    },
+    {
+      icon: <Trash2 size={20} />,
+      command: "removeFormat",
+      title: "Clear Formatting",
+    },
   ];
 
-  // Create reference to Quill editor instance
-  const quillRef = React.useRef(null);
-
-  // Set up tooltips for toolbar buttons
   useEffect(() => {
-    const setTooltips = () => {
-      if (!quillRef.current) return;
-
-      const toolbar = quillRef.current.getEditor().getModule("toolbar");
-      const toolbarButtons = toolbar.container.querySelectorAll("button");
-
-      // Define tooltips for each button type
-      const tooltips = {
-        bold: "Bold text",
-        italic: "Italic text",
-        underline: "Underline text",
-        strike: "Strikethrough text",
-        list: "List",
-        "list-ordered": "Numbered List",
-        "list-bullet": "Bullet List",
-        "list-check": "Checklist",
-        script: "Subscript/Superscript",
-        indent: "Indent",
-        direction: "Text direction",
-        align: "Text alignment",
-        link: "Insert link",
-        image: "Insert image",
-        video: "Insert video",
-        clean: "Remove formatting",
-        "code-block": "Insert code block",
-      };
-
-      // Apply tooltips to buttons
-      toolbarButtons.forEach((button) => {
-        const format = button.className.split("-").pop();
-        if (tooltips[format]) {
-          button.title = tooltips[format];
-        }
-      });
+    const saveSelection = () => {
+      const sel = window.getSelection();
+      if (sel.getRangeAt && sel.rangeCount) {
+        setSelection(sel.getRangeAt(0));
+      }
     };
 
-    setTooltips();
-  }, []);
-
-  // Add custom styles for checklist
-  useEffect(() => {
+    // Add custom styles for different list types
     const style = document.createElement("style");
     style.textContent = `
-      .ql-container .ql-editor ul[data-checked="true"] > li::before {
-        content: '☑';
-      }
-      .ql-container .ql-editor ul[data-checked="false"] > li::before {
-        content: '☐';
-      }
+      .list-style-bullet li::before { content: '•'; }
+      .list-style-check li::before { content: '☐'; }
+      .list-style-check li[data-checked="true"]::before { content: '☑'; }
+      .list-style-circle li::before { content: '○'; }
+      .list-style-square li::before { content: '■'; }
     `;
     document.head.appendChild(style);
 
-    // Cleanup function to remove styles when component unmounts
+    document.addEventListener("selectionchange", saveSelection);
     return () => {
+      document.removeEventListener("selectionchange", saveSelection);
       style.remove();
     };
   }, []);
 
-  // Handle changes to editor content
-  const handleChange = (content) => {
-    setText(content);
-    if (onChange) {
-      // Clean the HTML before passing it to the parent component
-      const cleanedContent = cleanHTML(content);
-      onChange(cleanedContent);
-    }
-  };
-
   return (
-    <div className="relative">
-      {/* Upload progress overlay */}
-      {isUploading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
-            </div>
-            <p className="text-center mt-2">{uploadProgress.toFixed(0)}%</p>
-          </div>
-        </div>
-      )}
+    <div className="w-full border rounded-lg shadow-sm">
+      <div className="flex items-center gap-1 p-2 border-b bg-gray-50">
+        {formatButtons.map((button, index) => (
+          <button
+            key={index}
+            onClick={() => handleCommand(button.command, button.param)}
+            className={`p-2 hover:bg-gray-200 rounded-lg transition-colors ${
+              activeList === button.param ? "bg-gray-200" : ""
+            }`}
+            title={button.title}
+          >
+            {button.icon}
+          </button>
+        ))}
+      </div>
 
-      {/* ReactQuill editor component */}
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        placeholder="Create a story..."
-        className="h-72 mb-12 border-greenEx dark:text-white"
-        required
-        value={text}
-        onChange={handleChange}
-        modules={modules}
-        formats={formats}
+      <div
+        contentEditable
+        className="min-h-[200px] p-4 focus:outline-none prose max-w-none"
+        dangerouslySetInnerHTML={{ __html: text }}
+        onInput={(e) => {
+          setText(e.currentTarget.innerHTML);
+          onChange && onChange(e.currentTarget.innerHTML);
+        }}
+        onKeyDown={handleKeyDown}
         onPaste={handlePaste}
       />
     </div>
   );
 };
 
-export default CustomReactQuill;
+export default CustomRichEditor;
