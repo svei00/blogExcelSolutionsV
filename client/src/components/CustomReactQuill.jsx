@@ -1,232 +1,143 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  CheckSquare,
-  Circle,
-  Square,
-  Trash2,
-  Indent,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-} from "lucide-react";
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase";
 
-const CustomRichEditor = ({ value, onChange }) => {
-  const [text, setText] = useState(value || "");
-  const [selection, setSelection] = useState(null);
-  const [activeList, setActiveList] = useState(null);
+const CustomReactQuill = ({ value, onChange }) => {
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const cleanHTML = (input) => {
-    let content = input;
-    content = content.replace(/<\/?[^>]+(xml|w:|o:|v:|m:)[^>]*>/gi, "");
-    content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
-    content = content.replace(/\s*style="[^"]*"/gi, "");
-    content = content.replace(/\s*class="[^"]*"/gi, "");
-    content = content.replace(/<\/?span[^>]*>/gi, "");
-    content = content.replace(/<div[^>]*>/gi, "");
-    content = content.replace(/<\/div>/gi, "<br>");
-    content = content.replace(/<!--[\s\S]*?-->/g, "");
-    content = content.replace(/<!\[.*?\]>/g, "");
-    content = content.replace(/\n\s*\n/g, "\n");
-    content = content.replace(/  +/g, " ");
-    return content.trim();
-  };
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
 
-  const applyListStyle = (listType) => {
-    const editor = document.querySelector('[contenteditable="true"]');
-    const selection = window.getSelection();
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
 
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      let container = range.commonAncestorContainer;
+      setIsUploading(true);
+      setUploadProgress(0);
 
-      // Find the closest list container
-      while (
-        container !== editor &&
-        container.nodeName !== "UL" &&
-        container.nodeName !== "OL"
-      ) {
-        container = container.parentNode;
-      }
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + "-" + file.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      if (container === editor) {
-        // Create new list
-        if (listType === "ordered") {
-          document.execCommand("insertOrderedList", false, null);
-        } else {
-          document.execCommand("insertUnorderedList", false, null);
-          const list = selection.anchorNode.parentElement.closest("ul");
-          if (list) {
-            list.className = `list-style-${listType}`;
-          }
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        },
+        (error) => {
+          console.error("Image upload failed:", error);
+          setIsUploading(false);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          const editor = quillRef.current.getEditor();
+          const range = editor.getSelection();
+          editor.insertEmbed(range.index, "image", downloadURL);
+          setIsUploading(false);
         }
-      } else {
-        // Toggle existing list style
-        if (container.className === `list-style-${listType}`) {
-          document.execCommand("outdent", false, null);
-        } else {
-          container.className = `list-style-${listType}`;
-        }
-      }
-    }
-
-    setActiveList(listType);
-    const newContent = editor.innerHTML;
-    setText(newContent);
-    onChange && onChange(newContent);
-  };
-
-  const handleCommand = (command, param = null) => {
-    if (command === "removeFormat") {
-      const editableDiv = document.querySelector('[contenteditable="true"]');
-      const cleanedContent = cleanHTML(editableDiv.innerHTML);
-      editableDiv.innerHTML = cleanedContent;
-      setText(cleanedContent);
-      onChange && onChange(cleanedContent);
-    } else if (command === "list") {
-      applyListStyle(param);
-    } else {
-      document.execCommand(command, false, null);
-      const newContent = document.querySelector(
-        '[contenteditable="true"]'
-      ).innerHTML;
-      setText(newContent);
-      onChange && onChange(newContent);
-    }
-  };
-
-  const handlePaste = (e) => {
-    e.preventDefault();
-    let pastedContent =
-      e.clipboardData.getData("text/html") ||
-      e.clipboardData.getData("text/plain");
-    const cleanedContent = cleanHTML(pastedContent);
-    document.execCommand("insertHTML", false, cleanedContent);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      handleCommand("indent");
-    }
-  };
-
-  // Enhanced format buttons with different list styles
-  const formatButtons = [
-    { icon: <Bold size={20} />, command: "bold", title: "Bold" },
-    { icon: <Italic size={20} />, command: "italic", title: "Italic" },
-    {
-      icon: <ListOrdered size={20} />,
-      command: "list",
-      param: "ordered",
-      title: "Numbered List",
-    },
-    {
-      icon: <List size={20} />,
-      command: "list",
-      param: "bullet",
-      title: "Bullet List",
-    },
-    {
-      icon: <CheckSquare size={20} />,
-      command: "list",
-      param: "check",
-      title: "Checkbox List",
-    },
-    {
-      icon: <Circle size={20} />,
-      command: "list",
-      param: "circle",
-      title: "Circle List",
-    },
-    {
-      icon: <Square size={20} />,
-      command: "list",
-      param: "square",
-      title: "Square List",
-    },
-    { icon: <Indent size={20} />, command: "indent", title: "Indent" },
-    {
-      icon: <AlignLeft size={20} />,
-      command: "justifyLeft",
-      title: "Align Left",
-    },
-    {
-      icon: <AlignCenter size={20} />,
-      command: "justifyCenter",
-      title: "Align Center",
-    },
-    {
-      icon: <AlignRight size={20} />,
-      command: "justifyRight",
-      title: "Align Right",
-    },
-    {
-      icon: <Trash2 size={20} />,
-      command: "removeFormat",
-      title: "Clear Formatting",
-    },
-  ];
-
-  useEffect(() => {
-    const saveSelection = () => {
-      const sel = window.getSelection();
-      if (sel.getRangeAt && sel.rangeCount) {
-        setSelection(sel.getRangeAt(0));
-      }
-    };
-
-    // Add custom styles for different list types
-    const style = document.createElement("style");
-    style.textContent = `
-      .list-style-bullet li::before { content: '•'; }
-      .list-style-check li::before { content: '☐'; }
-      .list-style-check li[data-checked="true"]::before { content: '☑'; }
-      .list-style-circle li::before { content: '○'; }
-      .list-style-square li::before { content: '■'; }
-    `;
-    document.head.appendChild(style);
-
-    document.addEventListener("selectionchange", saveSelection);
-    return () => {
-      document.removeEventListener("selectionchange", saveSelection);
-      style.remove();
+      );
     };
   }, []);
 
-  return (
-    <div className="w-full border rounded-lg shadow-sm">
-      <div className="flex items-center gap-1 p-2 border-b bg-gray-50">
-        {formatButtons.map((button, index) => (
-          <button
-            key={index}
-            onClick={() => handleCommand(button.command, button.param)}
-            className={`p-2 hover:bg-gray-200 rounded-lg transition-colors ${
-              activeList === button.param ? "bg-gray-200" : ""
-            }`}
-            title={button.title}
-          >
-            {button.icon}
-          </button>
-        ))}
-      </div>
+  const modules = {
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, 4, false] }],
+        ["bold", "italic", "underline", "strike"],
+        ["blockquote", "code-block"], // Includes the code-block tool
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ script: "sub" }, { script: "super" }],
+        [{ indent: "-1" }, { indent: "+1" }],
+        [{ direction: "rtl" }],
+        [{ align: [] }],
+        ["link", "image", "video"],
+        ["clean"],
+      ],
+      handlers: {
+        image: imageHandler,
+      },
+    },
+  };
 
-      <div
-        contentEditable
-        className="min-h-[200px] p-4 focus:outline-none prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: text }}
-        onInput={(e) => {
-          setText(e.currentTarget.innerHTML);
-          onChange && onChange(e.currentTarget.innerHTML);
-        }}
-        onKeyDown={handleKeyDown}
-        onPaste={handlePaste}
+  const quillRef = React.useRef(null);
+
+  useEffect(() => {
+    const setTooltips = () => {
+      const toolbar = quillRef.current.getEditor().getModule("toolbar");
+      const toolbarButtons = toolbar.container.querySelectorAll("button");
+
+      const tooltips = {
+        bold: "Bold text",
+        italic: "Italic text",
+        underline: "Underline text",
+        strike: "Strikethrough text",
+        list: "List",
+        script: "Subscript/Superscript",
+        indent: "Indent",
+        direction: "Text direction",
+        align: "Text alignment",
+        link: "Insert link",
+        image: "Insert image",
+        video: "Insert video",
+        clean: "Remove formatting",
+        "code-block": "Insert code block", // Code-Block tooltip
+      };
+
+      toolbarButtons.forEach((button) => {
+        const format = button.className.split("-").pop();
+        if (tooltips[format]) {
+          button.title = tooltips[format];
+        }
+      });
+    };
+
+    if (quillRef.current) {
+      setTooltips();
+    }
+  }, []);
+
+  return (
+    <div className="relative">
+      {isUploading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-center mt-2">{uploadProgress.toFixed(0)}%</p>
+          </div>
+        </div>
+      )}
+
+      <ReactQuill
+        ref={quillRef}
+        theme="snow"
+        placeholder="Create a story..."
+        className="h-72 mb-12 border-greenEx dark:text-white"
+        required
+        value={value}
+        onChange={onChange}
+        modules={modules}
       />
     </div>
   );
 };
 
-export default CustomRichEditor;
+export default CustomReactQuill;
