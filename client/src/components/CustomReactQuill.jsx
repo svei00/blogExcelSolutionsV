@@ -53,13 +53,67 @@ const CustomReactQuill = ({ value, onChange }) => {
     };
   }, []);
 
+  // Custom clipboard handling
+  const handlePaste = (e) => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+        // Strip all formatting from pasted content
+        delta.ops = delta.ops.map((op) => {
+          if (op.insert) {
+            return { insert: op.insert };
+          }
+          return op;
+        });
+        return delta;
+      });
+    }
+  };
+
+  // Custom formats for bullet points
+  const bulletStyles = {
+    whiteDot: "○",
+    blackDot: "•",
+    square: "■",
+    check: "✓",
+  };
+
+  // Register custom formats
+  useEffect(() => {
+    if (quillRef.current) {
+      const Quill = quillRef.current.getEditor().constructor;
+      const Block = Quill.import("blots/block");
+
+      // Register custom bullet classes
+      Object.entries(bulletStyles).forEach(([name, symbol]) => {
+        class CustomBullet extends Block {
+          static create(value) {
+            const node = super.create(value);
+            node.setAttribute("data-bullet", symbol);
+            return node;
+          }
+        }
+        CustomBullet.blotName = `bullet-${name}`;
+        CustomBullet.tagName = "div";
+        Quill.register(CustomBullet);
+      });
+    }
+  }, []);
+
   const modules = {
     toolbar: {
       container: [
         [{ header: [1, 2, 3, 4, false] }],
         ["bold", "italic", "underline", "strike"],
-        ["blockquote", "code-block"], // Includes the code-block tool
-        [{ list: "ordered" }, { list: "bullet" }],
+        ["blockquote", "code-block"],
+        [
+          { list: "bullet" },
+          { list: "ordered" },
+          { list: "check" },
+          { "bullet-whiteDot": bulletStyles.whiteDot },
+          { "bullet-blackDot": bulletStyles.blackDot },
+          { "bullet-square": bulletStyles.square },
+        ],
         [{ script: "sub" }, { script: "super" }],
         [{ indent: "-1" }, { indent: "+1" }],
         [{ direction: "rtl" }],
@@ -70,6 +124,9 @@ const CustomReactQuill = ({ value, onChange }) => {
       handlers: {
         image: imageHandler,
       },
+    },
+    clipboard: {
+      matchVisual: false,
     },
   };
 
@@ -86,6 +143,10 @@ const CustomReactQuill = ({ value, onChange }) => {
         underline: "Underline text",
         strike: "Strikethrough text",
         list: "List",
+        "bullet-whiteDot": "White dot bullet",
+        "bullet-blackDot": "Black dot bullet",
+        "bullet-square": "Square bullet",
+        "bullet-check": "Check bullet",
         script: "Subscript/Superscript",
         indent: "Indent",
         direction: "Text direction",
@@ -94,7 +155,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         image: "Insert image",
         video: "Insert video",
         clean: "Remove formatting",
-        "code-block": "Insert code block", // Code-Block tooltip
+        "code-block": "Insert code block",
       };
 
       toolbarButtons.forEach((button) => {
@@ -107,7 +168,17 @@ const CustomReactQuill = ({ value, onChange }) => {
 
     if (quillRef.current) {
       setTooltips();
+      // Add paste event listener
+      quillRef.current.getEditor().root.addEventListener("paste", handlePaste);
     }
+
+    return () => {
+      if (quillRef.current) {
+        quillRef.current
+          .getEditor()
+          .root.removeEventListener("paste", handlePaste);
+      }
+    };
   }, []);
 
   return (
