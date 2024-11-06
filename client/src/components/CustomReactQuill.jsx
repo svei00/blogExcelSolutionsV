@@ -59,20 +59,17 @@ const CustomReactQuill = ({ value, onChange }) => {
         [{ header: [1, 2, 3, 4, false] }],
         ["bold", "italic", "underline", "strike"],
         ["blockquote", "code-block"],
+        // Bullet list styles as separate buttons
         [
-          {
-            list: [
-              "ordered", // 1.
-              "bullet", // •
-              "circle", // ○
-              "square", // ■
-              "check", // ✓
-              "decimal", // 1)
-              "lower-alpha", // a.
-              "lower-roman", // i.
-              "upper-alpha", // A.
-            ],
-          },
+          { list: "bullet" }, // Black dot •
+          { list: "circle" }, // White circle ○
+          { list: "check" }, // Check mark ✓
+        ],
+        // Number list styles as separate buttons
+        [
+          { list: "ordered" }, // Numbers (1.)
+          { list: "lower-alpha" }, // Letters (a.)
+          { list: "lower-roman" }, // Roman (i.)
         ],
         [{ script: "sub" }, { script: "super" }],
         [{ indent: "-1" }, { indent: "+1" }],
@@ -99,7 +96,12 @@ const CustomReactQuill = ({ value, onChange }) => {
         italic: "Italic text",
         underline: "Underline text",
         strike: "Strikethrough text",
-        list: "List",
+        bullet: "Bullet list",
+        circle: "Circle bullet list",
+        check: "Check list",
+        ordered: "Numbered list",
+        "lower-alpha": "Letter list",
+        "lower-roman": "Roman numeral list",
         script: "Subscript/Superscript",
         indent: "Indent",
         direction: "Text direction",
