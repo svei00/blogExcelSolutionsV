@@ -53,50 +53,38 @@ const CustomReactQuill = ({ value, onChange }) => {
     };
   }, []);
 
-  // Custom clipboard handling
-  const handlePaste = (e) => {
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-        // Strip all formatting from pasted content
-        delta.ops = delta.ops.map((op) => {
-          if (op.insert) {
-            return { insert: op.insert };
-          }
-          return op;
-        });
-        return delta;
-      });
+  // Enhanced format cleaner
+  const formatCleaner = useCallback(() => {
+    const editor = quillRef.current.getEditor();
+    const range = editor.getSelection();
+    if (range) {
+      if (range.length === 0) {
+        // Clean entire document if no selection
+        editor.removeFormat(0, editor.getLength());
+      } else {
+        // Clean only selected text
+        editor.removeFormat(range.index, range.length);
+      }
     }
-  };
+  }, []);
 
-  // Custom formats for bullet points
-  const bulletStyles = {
-    whiteDot: "○",
-    blackDot: "•",
-    square: "■",
-    check: "✓",
-  };
-
-  // Register custom formats
+  // Custom list styles
   useEffect(() => {
     if (quillRef.current) {
       const Quill = quillRef.current.getEditor().constructor;
-      const Block = Quill.import("blots/block");
 
-      // Register custom bullet classes
-      Object.entries(bulletStyles).forEach(([name, symbol]) => {
-        class CustomBullet extends Block {
-          static create(value) {
-            const node = super.create(value);
-            node.setAttribute("data-bullet", symbol);
-            return node;
-          }
+      // Register custom list styles
+      const List = Quill.import("formats/list");
+
+      class CustomList extends List {
+        static create(value) {
+          const node = super.create(value);
+          node.setAttribute("data-list-type", value);
+          return node;
         }
-        CustomBullet.blotName = `bullet-${name}`;
-        CustomBullet.tagName = "div";
-        Quill.register(CustomBullet);
-      });
+      }
+
+      Quill.register("formats/list", CustomList, true);
     }
   }, []);
 
@@ -107,12 +95,16 @@ const CustomReactQuill = ({ value, onChange }) => {
         ["bold", "italic", "underline", "strike"],
         ["blockquote", "code-block"],
         [
-          { list: "bullet" },
-          { list: "ordered" },
-          { list: "check" },
-          { "bullet-whiteDot": bulletStyles.whiteDot },
-          { "bullet-blackDot": bulletStyles.blackDot },
-          { "bullet-square": bulletStyles.square },
+          { list: "bullet" }, // Default bullet (•)
+          { list: "ordered" }, // Default numbers (1.)
+          { list: "ordered-paren" }, // Numbers with parenthesis (1))
+          { list: "lower-alpha" }, // Lowercase letters (a.)
+          { list: "lower-alpha-paren" }, // Lowercase letters with parenthesis (a))
+          { list: "lower-roman" }, // Lowercase Roman numerals (i.)
+          { list: "upper-alpha" }, // Uppercase letters (A.)
+          { list: "circle" }, // White circle (○)
+          { list: "square" }, // Square (■)
+          { list: "check" }, // Check (✓)
         ],
         [{ script: "sub" }, { script: "super" }],
         [{ indent: "-1" }, { indent: "+1" }],
@@ -123,14 +115,84 @@ const CustomReactQuill = ({ value, onChange }) => {
       ],
       handlers: {
         image: imageHandler,
+        clean: formatCleaner,
       },
-    },
-    clipboard: {
-      matchVisual: false,
     },
   };
 
   const quillRef = React.useRef(null);
+
+  // Custom CSS for list styles
+  useEffect(() => {
+    if (quillRef.current) {
+      const style = document.createElement("style");
+      style.innerHTML = `
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="circle"]::before {
+          content: "○";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="square"]::before {
+          content: "■";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="check"]::before {
+          content: "✓";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="ordered-paren"]::before {
+          content: "1)";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="lower-alpha"]::before {
+          content: "a.";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="lower-alpha-paren"]::before {
+          content: "a)";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="lower-roman"]::before {
+          content: "i.";
+        }
+        .ql-snow .ql-picker.ql-list .ql-picker-item[data-value="upper-alpha"]::before {
+          content: "A.";
+        }
+        ul[data-list-type="circle"] {
+          list-style-type: circle;
+        }
+        ul[data-list-type="square"] {
+          list-style-type: square;
+        }
+        ul[data-list-type="check"] {
+          list-style-type: none;
+        }
+        ul[data-list-type="check"] li::before {
+          content: "✓";
+          margin-right: 0.5em;
+        }
+        ol[data-list-type="ordered-paren"] {
+          list-style-type: decimal;
+        }
+        ol[data-list-type="ordered-paren"] li::marker {
+          content: counter(list-item) ") ";
+        }
+        ol[data-list-type="lower-alpha"] {
+          list-style-type: lower-alpha;
+        }
+        ol[data-list-type="lower-alpha-paren"] {
+          list-style-type: lower-alpha;
+        }
+        ol[data-list-type="lower-alpha-paren"] li::marker {
+          content: counter(list-item, lower-alpha) ") ";
+        }
+        ol[data-list-type="lower-roman"] {
+          list-style-type: lower-roman;
+        }
+        ol[data-list-type="upper-alpha"] {
+          list-style-type: upper-alpha;
+        }
+      `;
+      document.head.appendChild(style);
+
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     const setTooltips = () => {
@@ -143,10 +205,6 @@ const CustomReactQuill = ({ value, onChange }) => {
         underline: "Underline text",
         strike: "Strikethrough text",
         list: "List",
-        "bullet-whiteDot": "White dot bullet",
-        "bullet-blackDot": "Black dot bullet",
-        "bullet-square": "Square bullet",
-        "bullet-check": "Check bullet",
         script: "Subscript/Superscript",
         indent: "Indent",
         direction: "Text direction",
@@ -168,17 +226,7 @@ const CustomReactQuill = ({ value, onChange }) => {
 
     if (quillRef.current) {
       setTooltips();
-      // Add paste event listener
-      quillRef.current.getEditor().root.addEventListener("paste", handlePaste);
     }
-
-    return () => {
-      if (quillRef.current) {
-        quillRef.current
-          .getEditor()
-          .root.removeEventListener("paste", handlePaste);
-      }
-    };
   }, []);
 
   return (
