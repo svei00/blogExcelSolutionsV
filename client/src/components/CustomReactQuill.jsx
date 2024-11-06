@@ -58,19 +58,8 @@ const CustomReactQuill = ({ value, onChange }) => {
       container: [
         [{ header: [1, 2, 3, 4, false] }],
         ["bold", "italic", "underline", "strike"],
-        ["blockquote", "code-block"],
-        // Bullet list styles as separate buttons
-        [
-          { list: "bullet" }, // Black dot •
-          { list: "circle" }, // White circle ○
-          { list: "check" }, // Check mark ✓
-        ],
-        // Number list styles as separate buttons
-        [
-          { list: "ordered" }, // Numbers (1.)
-          { list: "lower-alpha" }, // Letters (a.)
-          { list: "lower-roman" }, // Roman (i.)
-        ],
+        ["blockquote", "code-block"], // Includes the code-block tool
+        [{ list: "ordered" }, { list: "bullet" }],
         [{ script: "sub" }, { script: "super" }],
         [{ indent: "-1" }, { indent: "+1" }],
         [{ direction: "rtl" }],
@@ -96,12 +85,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         italic: "Italic text",
         underline: "Underline text",
         strike: "Strikethrough text",
-        bullet: "Bullet list",
-        circle: "Circle bullet list",
-        check: "Check list",
-        ordered: "Numbered list",
-        "lower-alpha": "Letter list",
-        "lower-roman": "Roman numeral list",
+        list: "List",
         script: "Subscript/Superscript",
         indent: "Indent",
         direction: "Text direction",
@@ -110,7 +94,7 @@ const CustomReactQuill = ({ value, onChange }) => {
         image: "Insert image",
         video: "Insert video",
         clean: "Remove formatting",
-        "code-block": "Insert code block",
+        "code-block": "Insert code block", // Code-Block tooltip
       };
 
       toolbarButtons.forEach((button) => {
