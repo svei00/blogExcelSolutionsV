@@ -130,7 +130,7 @@ const CustomReactQuill = ({ value, onChange, placeholder }) => {
         ref={quillRef}
         theme="snow"
         placeholder={placeholder}
-        className="h-72 mb-12 "
+        className="h-72 mb-12 dark:placeholder-white"
         required
         value={value}
         onChange={onChange}
