@@ -9,7 +9,7 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 
-const CustomReactQuill = ({ value, onChange }) => {
+const CustomReactQuill = ({ value, onChange, placeholder }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
