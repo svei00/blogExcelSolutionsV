@@ -129,8 +129,7 @@ const CustomReactQuill = ({ value, onChange }) => {
       <ReactQuill
         ref={quillRef}
         theme="snow"
-        placeholder="Create a Story..."
-        className="h-72 mb-12 border-greenEx dark:text-white"
+        className="h-72 mb-12 "
         required
         value={value}
         onChange={onChange}
