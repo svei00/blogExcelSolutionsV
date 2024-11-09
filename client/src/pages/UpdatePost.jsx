@@ -102,7 +102,9 @@ export default function UpdatePost() {
       const fileName = new Date().getTime() + "-" + file.name;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
+
       uploadTask.on(
+        "state_changed",
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -112,18 +114,25 @@ export default function UpdatePost() {
           setImageUploadError("Image Upload Failed");
           setImageUploadProgress(null);
         },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              image: downloadURL,
+            }));
             setImageUploadProgress(null);
             setImageUploadError(null);
-            setFormData({ ...formData, image: downloadURL });
-          });
+          } catch (error) {
+            console.error("Error getting download URL:", error);
+            setImageUploadError("Failed to get download URL");
+          }
         }
       );
     } catch (error) {
       setImageUploadError("Image Upload Failed");
       setImageUploadProgress(null);
-      console.log(error); // Provisional code
+      console.log("Error in handleUploadImage:", error); // Provisional code?
     }
   };
 
