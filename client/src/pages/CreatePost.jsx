@@ -184,6 +184,7 @@ export default function CreatePost() {
         /> */}
 
         <CustomReactQuill
+          dark:placeholder-white
           value={formData.content || ""}
           onChange={(value) => {
             setFormData({ ...formData, content: value });
