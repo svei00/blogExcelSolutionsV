@@ -45,3 +45,8 @@ body {
     @apply text-white !important; 
     @apply bg-black !important;
   }
+
+  .dark .ql-editor::before {
+    color: #ffffff; /* White color for dark mode */
+    opacity: 0.6; /* Adjust opacity as needed */
+  }
