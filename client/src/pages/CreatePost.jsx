@@ -189,7 +189,7 @@ export default function CreatePost() {
           onChange={(value) => {
             setFormData({ ...formData, content: value });
           }}
-          placeholder="Create a Story..."
+          placeholder="Create a Tu puta madre..."
         />
         {errors.content && (
           <span className="text-red-500">{errors.content}</span>
