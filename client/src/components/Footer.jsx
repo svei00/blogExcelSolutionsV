@@ -77,6 +77,13 @@ export default function FooterComponent() {
                 >
                   <FaYoutube className="hover:text-red-600" />
                 </Footer.Link>
+                <Footer.Link
+                  href="https://www.instagram.com/excelsolutionsv/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaInstagram className="bg-instagram-gradient text-transparent bg-clip-text hover:opacity-90 transition duration-300" />
+                </Footer.Link>
               </Footer.LinkGroup>
             </div>
             <div>
