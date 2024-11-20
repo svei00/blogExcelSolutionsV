@@ -82,7 +82,7 @@ export default function FooterComponent() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaInstagram className="bg-instagram-gradient text-transparent bg-clip-text hover:opacity-90 transition duration-300" />
+                  <FaInstagram className="hover:text-instagram" />
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
