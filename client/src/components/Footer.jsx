@@ -77,13 +77,6 @@ export default function FooterComponent() {
                 >
                   <FaYoutube className="hover:text-red-600" />
                 </Footer.Link>
-                <Footer.Link
-                  href="https://www.instagram.com/excelsolutionsv/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaInstagram className="hover:text-instagram" />
-                </Footer.Link>
               </Footer.LinkGroup>
             </div>
             <div>
@@ -111,17 +104,17 @@ export default function FooterComponent() {
           <div className="flex gap-6 sm-mt-0 mt-4 sm:justify-center">
             <Footer.Icon
               className="hover:text-instagram"
-              href="https://Instragram.com/svei00"
+              href="https://www.instagram.com/excelsolutionsv"
               icon={FaInstagram}
             />
             <Footer.Icon
               className="hover:text-facebook"
-              href="#"
+              href="https://www.facebook.com/profile.php?id=61551997675646"
               icon={FaFacebook}
             />
             <Footer.Icon
               className="hover:text-tiktok"
-              href="#"
+              href="https://www.tiktok.com/@excel.solutionsv"
               icon={FaTiktok}
             />
             <Footer.Icon
