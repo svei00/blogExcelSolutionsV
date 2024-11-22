@@ -102,41 +102,46 @@ export default function FooterComponent() {
             </span>
           />
           <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
-            <Footer.Icon
-              className="text-gray-500 hover:text-instagram transition-colors duration-300 ease-in-out"
+            <a
               href="https://www.instagram.com/excelsolutionsv"
-              icon={FaInstagram}
               target="_blank"
               rel="noopener noreferrer"
-            />
-            <Footer.Icon
-              className="text-gray-500 hover:text-facebook transition-colors duration-300 ease-in-out"
+              className="text-gray-500 hover:text-instagram transition-colors duration-300 ease-in-out"
+            >
+              <FaInstagram />
+            </a>
+            <a
               href="https://www.facebook.com/profile.php?id=61551997675646"
-              icon={FaFacebook}
               target="_blank"
               rel="noopener noreferrer"
-            />
-            <Footer.Icon
-              className="text-gray-500 hover:text-tiktok transition-colors duration-300 ease-in-out"
+              className="text-gray-500 hover:text-facebook transition-colors duration-300 ease-in-out"
+            >
+              <FaFacebook />
+            </a>
+            <a
               href="https://www.tiktok.com/@excel.solutionsv"
-              icon={FaTiktok}
               target="_blank"
               rel="noopener noreferrer"
-            />
-            <Footer.Icon
-              className="text-gray-500 hover:text-xTwitter transition-colors duration-300 ease-in-out"
+              className="text-gray-500 hover:text-tiktok transition-colors duration-300 ease-in-out"
+            >
+              <FaTiktok />
+            </a>
+            <a
               href="https://x.com/svei00"
-              icon={FaXTwitter}
               target="_blank"
               rel="noopener noreferrer"
-            />
-            <Footer.Icon
-              className="text-gray-500 hover:text-dribbble transition-colors duration-300 ease-in-out"
+              className="text-gray-500 hover:text-xTwitter transition-colors duration-300 ease-in-out"
+            >
+              <FaXTwitter />
+            </a>
+            <a
               href="#"
-              icon={FaDribbble}
               target="_blank"
               rel="noopener noreferrer"
-            />
+              className="text-gray-500 hover:text-dribbble transition-colors duration-300 ease-in-out"
+            >
+              <FaDribbble />
+            </a>
           </div>
         </div>
       </div>
