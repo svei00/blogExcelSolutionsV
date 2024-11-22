@@ -15,7 +15,7 @@ export default {
         greenEx: "#21B868",
         github: "#6cc644",
         linkedin: "#0a66c2",
-        xTwitter: "#14171a",
+        xTwitter: "#1DA1F2", // "#14171a",
         instagram: "#E4405F",
         facebook: "#1877F2",
         tiktok: "#ff0050",

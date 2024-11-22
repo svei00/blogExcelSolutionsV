@@ -50,24 +50,3 @@ body {
   color: #ffffff; /* White color for dark mode */
   opacity: 0.6; /* Adjust opacity as needed */
 }
-
-/* Custom Hover Gradient for Instagram */
-.hover-instagram-gradient {
-  background: linear-gradient(
-    90deg,
-    #ffd700,
-    #e4405f,
-    #833ab4
-  ); /* Yellow, pink, purple */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transition: background 0.3s ease-in-out;
-}
-
-/* Custom Hover Gradient for TikTok */
-.hover-tiktok-gradient {
-  background: linear-gradient(90deg, #69c9d0, #ee1d52); /* Cyan to pink */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transition: background 0.3s ease-in-out;
-}
