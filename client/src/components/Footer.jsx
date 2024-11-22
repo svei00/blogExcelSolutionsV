@@ -101,31 +101,41 @@ export default function FooterComponent() {
               Ivan E. Villanueva
             </span>
           />
-          <div className="flex gap-6 sm-mt-0 mt-4 sm:justify-center">
+          <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
             <Footer.Icon
-              className="hover:text-instagram"
+              className="text-gray-500 hover:text-instagram transition-colors duration-300 ease-in-out"
               href="https://www.instagram.com/excelsolutionsv"
               icon={FaInstagram}
+              target="_blank"
+              rel="noopener noreferrer"
             />
             <Footer.Icon
-              className="hover:text-facebook"
+              className="text-gray-500 hover:text-facebook transition-colors duration-300 ease-in-out"
               href="https://www.facebook.com/profile.php?id=61551997675646"
               icon={FaFacebook}
+              target="_blank"
+              rel="noopener noreferrer"
             />
             <Footer.Icon
-              className="hover:text-tiktok"
+              className="text-gray-500 hover:text-tiktok transition-colors duration-300 ease-in-out"
               href="https://www.tiktok.com/@excel.solutionsv"
               icon={FaTiktok}
+              target="_blank"
+              rel="noopener noreferrer"
             />
             <Footer.Icon
-              className="hover:text-xTwitter"
+              className="text-gray-500 hover:text-xTwitter transition-colors duration-300 ease-in-out"
               href="https://x.com/svei00"
               icon={FaXTwitter}
+              target="_blank"
+              rel="noopener noreferrer"
             />
             <Footer.Icon
-              className="hover:text-dribbble"
+              className="text-gray-500 hover:text-dribbble transition-colors duration-300 ease-in-out"
               href="#"
               icon={FaDribbble}
+              target="_blank"
+              rel="noopener noreferrer"
             />
           </div>
         </div>
