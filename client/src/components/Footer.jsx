@@ -11,8 +11,18 @@ import {
   FaFacebook,
   FaDribbble,
 } from "react-icons/fa6";
+import { useState } from "react";
 
-export default function FooterComponent() {
+const InstagramIcon = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const gradientStyle = {
+    background: "linear-gradient(45deg, #ffd700, #e4405f, #833ab4)",
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  };
+
   return (
     <Footer container className="border border-t-8 border-blueEx">
       <div className="w-full max-w-7xl mx-auto">
@@ -106,9 +116,11 @@ export default function FooterComponent() {
               href="https://www.instagram.com/excelsolutionsv"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 transition-colors duration-300 ease-in-out hover-text-instagram-gradient"
+              className="text-gray-500 transition-all duration-300 ease-in-out"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
-              <FaInstagram />
+              <FaInstagram style={isHovered ? gradientStyle : {}} />
             </a>
             <a
               href="https://www.facebook.com/profile.php?id=61551997675646"
@@ -147,4 +159,4 @@ export default function FooterComponent() {
       </div>
     </Footer>
   );
-}
+};
