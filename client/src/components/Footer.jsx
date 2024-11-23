@@ -1,5 +1,6 @@
 import { Footer } from "flowbite-react";
 import { Link } from "react-router-dom";
+import { useState } from "react"; // Add this import
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
 import {
   FaGithub,
@@ -11,12 +12,13 @@ import {
   FaFacebook,
   FaDribbble,
 } from "react-icons/fa6";
-import { useState } from "react";
 
-const InstagramIcon = () => {
-  const [isHovered, setIsHovered] = useState(false);
+export default function FooterComponent() {
+  // Add state for Instagram hover
+  const [isInstagramHovered, setIsInstagramHovered] = useState(false);
 
-  const gradientStyle = {
+  // Define the gradient style
+  const instagramGradientStyle = {
     background: "linear-gradient(45deg, #ffd700, #e4405f, #833ab4)",
     WebkitBackgroundClip: "text",
     backgroundClip: "text",
@@ -34,12 +36,8 @@ const InstagramIcon = () => {
             >
               <span className="flex items-end justify-center ">
                 <img src={logo} alt="Logo Excel Solutions" className="h-10" />
-                <span className="text-greenEx"> Blog</span>
+                <span className="text-greenEx"> Blog</span>
               </span>
-              {/* <span className="px-2 py-1 bg-gradient-to-r from-blueEx to-greenEx rounded-lg text-white">
-          Excel Solutions®
-        </span>
-        Blog */}
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-4 sm:grid-cols-3 sm:gap-6">
@@ -65,7 +63,6 @@ const InstagramIcon = () => {
             <div>
               <Footer.Title title="Follow Us" />
               <Footer.LinkGroup className="text-xl">
-                {/* was <Footer.LinkGroup row className="text-xl"> */}
                 <Footer.Link
                   href="https://www.github.com/svei00"
                   target="_blank"
@@ -107,21 +104,29 @@ const InstagramIcon = () => {
           <Footer.Copyright
             href="excelsolucionesv@gmail.com"
             year={new Date().getFullYear()}
-            by=<span className="px-2 py-1 bg-gradient-to-r from-greenEx to-blueEx font-semi-bold font-serif rounded-lg text-white hover:from-blueEx hover:to-greenEx transition-colors duration-300 ease-in-out">
-              Ivan E. Villanueva
-            </span>
+            by={
+              <span className="px-2 py-1 bg-gradient-to-r from-greenEx to-blueEx font-semi-bold font-serif rounded-lg text-white hover:from-blueEx hover:to-greenEx transition-colors duration-300 ease-in-out">
+                Ivan E. Villanueva
+              </span>
+            }
           />
           <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
-            <a
-              href="https://www.instagram.com/excelsolutionsv"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 transition-all duration-300 ease-in-out"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
+            <div
+              onMouseEnter={() => setIsInstagramHovered(true)}
+              onMouseLeave={() => setIsInstagramHovered(false)}
+              className="text-2xl" // Add size class here
             >
-              <FaInstagram style={isHovered ? gradientStyle : {}} />
-            </a>
+              <a
+                href="https://www.instagram.com/excelsolutionsv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 transition-all duration-300 ease-in-out"
+              >
+                <FaInstagram
+                  style={isInstagramHovered ? instagramGradientStyle : {}}
+                />
+              </a>
+            </div>
             <a
               href="https://www.facebook.com/profile.php?id=61551997675646"
               target="_blank"
@@ -159,5 +164,4 @@ const InstagramIcon = () => {
       </div>
     </Footer>
   );
-};
-export default InstagramIcon;
+}
