@@ -106,7 +106,7 @@ export default function FooterComponent() {
               href="https://www.instagram.com/excelsolutionsv"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 hover:text-instagram transition-colors duration-300 ease-in-out"
+              className="text-gray-500 transition-colors duration-300 ease-in-out hover-text-instagram-gradient"
             >
               <FaInstagram />
             </a>

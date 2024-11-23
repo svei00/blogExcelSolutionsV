@@ -50,3 +50,11 @@ body {
   color: #ffffff; /* White color for dark mode */
   opacity: 0.6; /* Adjust opacity as needed */
 }
+
+/* Custom Instagram Gradient Hover */
+.hover-text-instagram-gradient {
+  background: linear-gradient(90deg, #ffd700, #e4405f, #833ab4); /* Yellow, pink, purple */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: background-color 0.3s ease-in-out;
+}
