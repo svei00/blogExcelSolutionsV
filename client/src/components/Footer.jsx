@@ -160,3 +160,4 @@ const InstagramIcon = () => {
     </Footer>
   );
 };
+export default InstagramIcon;
