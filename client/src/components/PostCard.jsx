@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 
-export default function PostCard({ post }) {
+function PostCard({ post }) {
   return (
-    <div className="group relative w-full border border-blueEx hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[430px] transition-all">
+    <div className="group relative w-full max-w-[400px] border border-blueEx hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[430px] transition-all">
       <Link to={`/post/${post.slug}`}>
         <img
           src={post.image}
           alt="Post Cover"
-          className="h-[260px] w-full  object-cover group-hover:h-[200px] transition-all duration-300 z-20"
+          className="h-[260px] w-full object-cover group-hover:h-[200px] transition-all duration-300 z-20"
         />
       </Link>
       <div className="p-3 flex flex-col gap-2">
@@ -20,6 +20,16 @@ export default function PostCard({ post }) {
           Read Article
         </Link>
       </div>
+    </div>
+  );
+}
+
+export default function PostCardLayout({ posts }) {
+  return (
+    <div className="flex flex-wrap justify-center items-center gap-6 px-4">
+      {posts.map((post, index) => (
+        <PostCard key={index} post={post} />
+      ))}
     </div>
   );
 }
