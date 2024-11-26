@@ -185,7 +185,7 @@ export default function Search() {
         <h1 className="text-3xl font-semibold sm:border-b border-greenEx p-3 mt-5">
           Posts Results
         </h1>
-        <div className="p-7 flex flex-wrap gap-4">
+        <div className="p-7 flex flex-wrap justify-center items-center gap-4">
           {/* Display message for no posts */}
           {!loading && posts.length === 0 && (
             <p className="text-xl text-gray-500">No posts found.</p>
