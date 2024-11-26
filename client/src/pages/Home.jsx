@@ -1,86 +1,63 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import ButtonEx from "../components/Buttons";
+import { Link } from "react-router-dom";
+import CallToAction from "../components/CallToAction";
+import { useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
 
 export default function Home() {
-  const [posts, setPosts] = useState([]); // State for storing posts
-  const [loading, setLoading] = useState(false); // Loading state for API calls
-  const [showMore, setShowMore] = useState(false); // Show More button toggle
-  const navigate = useNavigate(); // Allows programmatic navigation
+  const [posts, setPosts] = useState([]);
 
-  // Fetch initial posts when the component mounts
   useEffect(() => {
     const fetchPosts = async () => {
-      setLoading(true); // Start the loading indicator
       const res = await fetch("/api/post/getposts");
-      if (!res.ok) {
-        setLoading(false); // Stop loading if the fetch fails
-        return;
-      }
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data.posts); // Update posts state with fetched data
-        setLoading(false); // Stop loading once the data is retrieved
-        setShowMore(data.posts.length === 9); // Show More button if results are exactly 9
-      }
-    };
-
-    fetchPosts();
-  }, []); // Dependency array empty, runs only once on mount
-
-  // Navigate to the search page
-  const handleSearchClick = () => {
-    navigate("/search"); // Redirect to the Search page
-  };
-
-  // Fetch additional posts for "Show More" functionality
-  const handleShowMore = async () => {
-    const numberOfPosts = posts.length;
-    const startIndex = numberOfPosts; // Determine starting index for next fetch
-    const res = await fetch(`/api/post/getposts?startIndex=${startIndex}`);
-    if (!res.ok) {
-      return; // Exit if the request fails
-    }
-    if (res.ok) {
       const data = await res.json();
-      setPosts([...posts, ...data.posts]); // Append new posts to existing ones
-      setShowMore(data.posts.length === 9); // Update Show More button state
-    }
-  };
+      setPosts(data.posts);
+    };
+    fetchPosts();
+  }, []);
 
   return (
-    <div className="p-7">
-      {/* Header */}
-      <h1 className="text-3xl font-semibold sm:border-b border-greenEx p-3 mt-5">
-        Welcome to Our Blog
-      </h1>
-
-      {/* Search button */}
-      <div className="p-5 flex justify-center">
-        <ButtonEx title="Search" onClick={handleSearchClick} outline />
+    <div>
+      {/* Header Section */}
+      <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold lg:text-6xl">
+          Welcome to Excel Solutions Blog
+        </h1>
+        <p className="text-gray-500 text-xs sm:text-sm">
+          Here you can find a variety of Excel topics from general to more
+          specific ones like accounting, data analysis, and much more!
+        </p>
+        <Link
+          to="/search"
+          className="text-xs sm:text-sm text-blueEx font-bold hover:text-greenEx"
+        >
+          View all Posts
+        </Link>
       </div>
 
-      {/* Posts Section */}
-      <div className="p-7 flex flex-wrap gap-4">
-        {/* Message for no posts */}
-        {!loading && posts.length === 0 && (
-          <p className="text-xl text-gray-500">No posts available.</p>
-        )}
-        {/* Loading indicator */}
-        {loading && <p className="text-xl text-gray-500">Loading...</p>}
-        {/* Display posts */}
-        {!loading &&
-          posts &&
-          posts.map((post) => <PostCard key={post._id} post={post} />)}
-        {/* Show More button */}
-        {showMore && (
-          <button
-            onClick={handleShowMore}
-            className="text-greenEx text-lg hover:text-blueEx p-7 w-full"
-          >
-            Show More
-          </button>
+      {/* Call-to-Action Section */}
+      <div className="p-3 bg-gray-100 dark:bg-slate-700">
+        <CallToAction />
+      </div>
+
+      {/* Recent Posts Section */}
+      <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7">
+        {posts && posts.length > 0 && (
+          <div className="flex flex-col gap-6">
+            <h2 className="text-2xl font-semibold text-center">Recent Posts</h2>
+            {/* Center the posts */}
+            <div className="flex flex-wrap justify-center gap-4">
+              {posts.map((post) => (
+                <PostCard key={post._id} post={post} />
+              ))}
+            </div>
+            {/* View All Posts Link */}
+            <Link
+              to="/search"
+              className="text-lg font-semibold text-greenEx hover:text-blueEx text-center"
+            >
+              View all Posts
+            </Link>
+          </div>
         )}
       </div>
     </div>
