@@ -5611,14 +5611,37 @@ To:
      ` 
 
 ## Upload to Hostinger VPS
-1. Setup NodeJS.
+1. Enter to your web server: `ssh root@your_server_ip`
+2. Update your System
+   - `apt update && apt upgrade -y`   # For Ubuntu/Debian
+   - `yum update -y`                  # For AlmaLinux/CentOS
+3. Setup NodeJS.
    - First of all check if you have via `node -v` and `npm -v`
    - Then `curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -`
    - Install it `yum install -y nodejs`
-2. Create the files
+4. Create the files
    - Create the web page directory ex. `mkdir /var/www/my-webpage`
    - Navigate to your web page ex. `cd /var/www/my-webpage`
-2. After that compile the site with `npm run build`
+5. Instal Ngimx Server.
+   - On Alma Linux `yum install nginx -y`
+   - Configure the server ex. `nano /etc/nginx/conf.d/my-webpage.conf`
+   - Script Configuration:
+      `
+      server {
+    listen 80;
+    server_name your_domain_or_ip;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+      `
+6. After that compile the site with `npm run build`
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
