@@ -5610,6 +5610,16 @@ To:
       </Helmet>
      ` 
 
+## Upload to Hostinger VPS
+1. Setup NodeJS.
+   - First of all check if you have via `node -v` and `npm -v`
+   - Then `curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -`
+   - Install it `yum install -y nodejs`
+2. Create the files
+   - Create the web page directory ex. `mkdir /var/www/my-webpage`
+   - Navigate to your web page ex. `cd /var/www/my-webpage`
+2. After that compile the site with `npm run build`
+
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
 * https://github.com/sahandghavidel/mern-blog - "Github Source Code"
