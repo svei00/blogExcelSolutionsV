@@ -5649,9 +5649,20 @@ To:
   - Once you have it copy and paste on your server. Go to VPS -> Settings SSH Keys
   - Once you have it you can see it on overview -> SSh Access.
   - Otherwise in Unix bases systems: `ssh-keygen -t rsa`
-7. Keep the nodejs app runing.
+7. Install Git if you don't have it. On Alma Linux: `sudo yum install git -y`
+8. Clone the repository:
+   - Navigate to the folder where you want to clone the repository: `cd /var/www/`
+   - Clone your repository: `git clone https://github.com/your_username/your_repository.git`
+   - Go the repository
+9. With the created ssh key on Github go to your repository. 
+   - Hit CODE, then SSH and "add a new public key"
+   - On the SSH and GPG Key add the public key you have created on your server.
+   - Add SSH key.
+   - Test the key with ssh -T git@github.com
+
+10. Keep the nodejs app runing.
    - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
-8. After that compile the site with `npm run build`
+11. After that compile the site with `npm run build`
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
