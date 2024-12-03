@@ -5641,7 +5641,17 @@ To:
     }
 }
       `
-6. After that compile the site with `npm run build`
+  - Test nginx configuration: `nginx -t`
+  - If test run successfully restart nginx: `systemctl restart nginx`
+6. Generate the ssh key in Windows
+  - Open putty.exe if you don't have it download it from [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
+  - Then hit key -> generate key pair. Move your mouse in the designed area.
+  - Once you have it copy and paste on your server. Go to VPS -> Settings SSH Keys
+  - Once you have it you can see it on overview -> SSh Access.
+  - Otherwise in Unix bases systems: `ssh-keygen -t rsa`
+7. Keep the nodejs app runing.
+   - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
+8. After that compile the site with `npm run build`
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
