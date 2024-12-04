@@ -5714,25 +5714,28 @@ To:
       * Secret: Can leave in blank for now, after you can add some security 
    - Under which events whould you like to thrigger this webhook? Just the push event.
    - Add/Save the webhook. 
-12. Keep the nodejs app runing with pm2.
-   - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
-   - Start the webhook listener: `pm2 start webhook.js --name "webhook-listener`
-   - Ensure that it starts on reboot: `pm2 startup` then `pm2 save`
-13. After that compile the site with `npm install` then `npm run build` to get the node_modules folder.
+12. After that compile the site with `npm install` then `npm run build` to get the node_modules folder.
    - Ensure that the build folder is in the root of your project. ex. `/the-web`
    - In the back end folder /client be sure you have the node_modules folder and the package.json file.
    - If not run `npm install` in the client folder. Then `npm run build`
    - Once doing that run the site into production mode to best optimize the site, server resources and security. 
      it also minifies the site with vite: `NODE_ENV=production npm run build`
-14. Now upload the .env files into the server, remember one for the back end and one for the front end.
+13. Now upload the .env files into the server, remember one for the back end and one for the front end.
    - To upload a file through Putty on Windows on CMD run: `pscp C:\path\to\local\file username@your-server-ip:/path/to/remote/destination/`
    ex. `pscp C:\Users\YourName\Documents\example.txt root@192.168.1.1:/home/root/`
-15. If problem with port, default 3000 and you are sure it is not in use:
+14. If problem with port, default 3000 and you are sure it is not in use:
     - Type: `sudo ss -tuln | grep :3000` To check if por is in use
     - `sudo netstat -tulnp | grep :3000` This check which process it is using the port.
     - With `ps -p 1234 -o pid,cmd` where 1234 is the process id you can see what process is using the port.
     - If you want to kill the process: `sudo kill -9 1234`
-16. Or you can change the port.
+15. Or you can change the port. In this case I changed the `webhook.js`
+16. Keep the nodejs app runing with pm2.
+   - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
+   - Be sure to navigate through the folder where you app is.
+   - Start the webpage listener: `pm2 start api/index.js --name "mern-blog" --watch -- --port=3000` the --port part can be removed if you want to use the default port. It is mosly to bypass the  port.
+   - Start the webhook listener: `pm2 start webhook.js --name "webhook-listener" --watch`
+   - Ensure that it starts on reboot: `pm2 startup` (if want to delete `pm2 unstartup systemd`) then `pm2 save`
+ 
 
 
 ## Biblography
