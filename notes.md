@@ -5643,26 +5643,77 @@ To:
       `
   - Test nginx configuration: `nginx -t`
   - If test run successfully restart nginx: `systemctl restart nginx`
-6. Generate the ssh key in Windows
-  - Open putty.exe if you don't have it download it from [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
-  - Then hit key -> generate key pair. Move your mouse in the designed area.
+6. Generate the ssh key in the VPS Server.
+  - Open a terminal and run `ssh-keygen -t ed25519 -C "your_email@example.com"`
+  - File id_ed25519.pub will be created in /root/.ssh/
+  - Open puttygen.exe in Windows. If you don't have it download it from [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
+  - Then open a command line and run `pscp username@your-server-ip:/path/to/remote/file C:\path\to\local\destination`
+    ex.`pscp root@192.168.1.1:/var/www/myfile.txt C:\Users\YourName\Downloads`
   - Once you have it copy and paste on your server. Go to VPS -> Settings SSH Keys
-  - Once you have it you can see it on overview -> SSh Access.
-  - Otherwise in Unix bases systems: `ssh-keygen -t rsa`
+  - After uploading you can see it on overview -> SSh Access.
 7. Install Git if you don't have it. On Alma Linux: `sudo yum install git -y`
 8. Clone the repository:
    - Navigate to the folder where you want to clone the repository: `cd /var/www/`
    - Clone your repository: `git clone https://github.com/your_username/your_repository.git`
    - Go the repository
-9. With the created ssh key on Github go to your repository. 
+9. With the created ssh key on Github go to your repository on Github. 
    - Hit CODE, then SSH and "add a new public key"
    - On the SSH and GPG Key add the public key you have created on your server.
    - Add SSH key.
    - Test the key with ssh -T git@github.com
+10. Automatize the deployment every time it is pushed to Github.
+    - Go to the folder: `cd /var/www`
+    - create webhook folder: `mkdir webhook`
+    - Go to the webhook folder: `cd webhook`
+    - Initialice node.js project: `npm init -y` then `npm install express body-parser child_process`
+    - Create a file: `nano webhook.js`
+    - Add the following code:
+      `
+      const express = require('express');
+      const bodyParser = require('body-parser');
+      const { exec } = require('child_process');
 
-10. Keep the nodejs app runing.
+      const app = express();
+      app.use(bodyParser.json());
+
+      const PORT = 3000; // Or another port of your choice
+
+      app.post('/webhook', (req, res) => {
+          if (req.body.ref === 'refs/heads/main') { // Change 'main' to your branch name if needed
+              console.log('Pulling changes...');
+              exec('cd /var/www/your-repo && git pull origin main && npm install && npm run build', (err, stdout, stderr) => {
+                  if (err) {
+                      console.error(`Error: ${err.message}`);
+                      res.status(500).send('Error pulling changes');
+                      return;
+                  }
+                  if (stderr) {
+                      console.error(`stderr: ${stderr}`);
+                      res.status(500).send('Error pulling changes');
+                      return;
+                  }
+                  console.log(`stdout: ${stdout}`);
+                  res.status(200).send('Changes pulled successfully');
+              });
+          } else {
+              res.status(400).send('Not the main branch');
+          }
+      });
+
+      app.listen(PORT, () => {
+          console.log(`Webhook listener running on port ${PORT}`);
+      });
+      `
+    - Run the webhook listener: `node webhook.js`
+
+11. Keep the nodejs app runing.
    - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
-11. After that compile the site with `npm run build`
+12. After that compile the site with `npm run build`
+
+
+7. To upload a file through Putty on Windows on CMD run: `pscp C:\path\to\local\file username@your-server-ip:/path/to/remote/destination`
+   ex. `pscp C:\Users\YourName\Documents\example.txt root@192.168.1.1:/home/root/`  
+
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
