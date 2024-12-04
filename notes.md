@@ -5627,19 +5627,19 @@ To:
    - Configure the server ex. `nano /etc/nginx/conf.d/my-webpage.conf`
    - Script Configuration:
       `
-      server {
-    listen 80;
-    server_name your_domain_or_ip;
+          server {
+          listen 80;
+          server_name your_domain_or_ip;
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
+          location / {
+              proxy_pass http://localhost:3000;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection 'upgrade';
+              proxy_set_header Host $host;
+              proxy_cache_bypass $http_upgrade;
+          }
+      }
       `
   - Test nginx configuration: `nginx -t`
   - If test run successfully restart nginx: `systemctl restart nginx`
@@ -5657,7 +5657,7 @@ To:
    - Clone your repository: `git clone https://github.com/your_username/your_repository.git`
    - Go the repository
 9. With the created ssh key on Github go to your repository on Github. 
-   - Hit CODE, then SSH and "add a new public key"
+   - Hit CODE, then SSH and "add a new public key" or hit your profile picture and go to Settings
    - On the SSH and GPG Key add the public key you have created on your server.
    - Add SSH key.
    - Test the key with ssh -T git@github.com
@@ -5705,10 +5705,19 @@ To:
       });
       `
     - Run the webhook listener: `node webhook.js`
+11. Configure GitHub webhooks.
+   - Go to your repository.
+   - Navigate to settings of the repository -> webhooks -> Add webhook
+   - Enter the folowing details:
+      * Payload URL: http://your-server-ip:3000/webhook
+      * Content Type: application/json
+      * Secret: Can leave in blank for now, after you can add some security 
+   - Under which events whould you like to thrigger this webhook? Just the push event.
+   - Add/Save the webhook. 
 
-11. Keep the nodejs app runing.
+12. Keep the nodejs app runing.
    - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
-12. After that compile the site with `npm run build`
+13. After that compile the site with `npm run build`
 
 
 7. To upload a file through Putty on Windows on CMD run: `pscp C:\path\to\local\file username@your-server-ip:/path/to/remote/destination`
