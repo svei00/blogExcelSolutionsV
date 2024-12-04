@@ -5714,14 +5714,25 @@ To:
       * Secret: Can leave in blank for now, after you can add some security 
    - Under which events whould you like to thrigger this webhook? Just the push event.
    - Add/Save the webhook. 
-
-12. Keep the nodejs app runing.
+12. Keep the nodejs app runing with pm2.
    - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
-13. After that compile the site with `npm run build`
-
-
-7. To upload a file through Putty on Windows on CMD run: `pscp C:\path\to\local\file username@your-server-ip:/path/to/remote/destination`
-   ex. `pscp C:\Users\YourName\Documents\example.txt root@192.168.1.1:/home/root/`  
+   - Start the webhook listener: `pm2 start webhook.js --name "webhook-listener`
+   - Ensure that it starts on reboot: `pm2 startup` then `pm2 save`
+13. After that compile the site with `npm install` then `npm run build` to get the node_modules folder.
+   - Ensure that the build folder is in the root of your project. ex. `/the-web`
+   - In the back end folder /client be sure you have the node_modules folder and the package.json file.
+   - If not run `npm install` in the client folder. Then `npm run build`
+   - Once doing that run the site into production mode to best optimize the site, server resources and security. 
+     it also minifies the site with vite: `NODE_ENV=production npm run build`
+14. Now upload the .env files into the server, remember one for the back end and one for the front end.
+   - To upload a file through Putty on Windows on CMD run: `pscp C:\path\to\local\file username@your-server-ip:/path/to/remote/destination/`
+   ex. `pscp C:\Users\YourName\Documents\example.txt root@192.168.1.1:/home/root/`
+15. If problem with port, default 3000 and you are sure it is not in use:
+    - Type: `sudo ss -tuln | grep :3000` To check if por is in use
+    - `sudo netstat -tulnp | grep :3000` This check which process it is using the port.
+    - With `ps -p 1234 -o pid,cmd` where 1234 is the process id you can see what process is using the port.
+    - If you want to kill the process: `sudo kill -9 1234`
+16. Or you can change the port.
 
 
 ## Biblography
