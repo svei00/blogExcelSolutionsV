@@ -5735,6 +5735,23 @@ To:
    - Start the webpage listener: `pm2 start api/index.js --name "mern-blog" --watch -- --port=3000` the --port part can be removed if you want to use the default port. It is mosly to bypass the  port.
    - Start the webhook listener: `pm2 start webhook.js --name "webhook-listener" --watch`
    - Ensure that it starts on reboot: `pm2 startup` (if want to delete `pm2 unstartup systemd`) then `pm2 save`
+  Considerations.
+  - View status of the apps: `pm2 list`
+  - Restart the application: `pm2 restart my-app`
+  - Stop the application: `pm2 stop my-app`
+  - Delete the application: `pm2 delete my-app`
+  - Save the pm2 process list (Useful when reboots): `pm2 save`
+17. Adding the SSL certificate to the server (Configuration for Alma Linux).
+  - Install the Certbot: `sudo dnf install epel-release -y`
+  - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
+  - Make sure you already have a domain name and it is pointing to your server IP. Ex.
+    - Type: A, Name/host: @, Value(Ip Address): 123.45.67.89 TTL 300 (When setting up te server 300, when stable 14400).
+    - Type: A, Name/host: www, Value(Ip Address): 123.45.67.89 TTL 300
+    - [DNS Checker](https://dnschecker.org/) To confirm the propagation of the server.
+  - Generate the SSL Certificate: `sudo certbot --nginx -d example.com -d www.example.com`
+  - Verify the SSL Setup on nginx: `sudo nginx -t`
+  - If everything its ok reload the nginx server: `sudo systemctl reload nginx`
+  - Since certificades expires every 90 days setup the auto renewal: `sudo certbot renew --dry-run`
  
 
 
