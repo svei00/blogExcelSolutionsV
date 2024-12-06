@@ -5751,7 +5751,7 @@ To:
   - Generate the SSL Certificate: `sudo certbot --nginx -d example.com -d www.example.com`
   - Verify the SSL Setup on nginx: `sudo nginx -t`
   - If everything its ok reload the nginx server: `sudo systemctl reload nginx`
-  - Since certificades expires every 90 days setup the auto renewal: `sudo certbot renew --dry-run`
+  - Since certificades expires every 90 days setup the auto renewal: `sudo certbot renew --dry-rungit a`
  
 
 
