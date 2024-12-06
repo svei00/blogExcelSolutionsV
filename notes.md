@@ -982,7 +982,7 @@
    - Add an Asyncronus functions before the return:
      * First go to [Firebase](https://firebase.google.com/).
      * Go to **Console** (Top Right).
-     * **+ Add Project/Create Project** Add a name of your project ex. mern-blog. If it is your first time accept the terms and conditions and usage confirmation.
+     * **Add Project/Create Project** Add a name of your project ex. mern-blog. If it is your first time accept the terms and conditions and usage confirmation.
      * At this time do not Enable Google Analytics and hit in create project.
      * Create a new **Web** Project.
      * Add an **App Nick Name** you can leave the same name of the project, do not check the Firebase Hosting and **Register the App**
@@ -5751,7 +5751,7 @@ To:
   - Generate the SSL Certificate: `sudo certbot --nginx -d example.com -d www.example.com`
   - Verify the SSL Setup on nginx: `sudo nginx -t`
   - If everything its ok reload the nginx server: `sudo systemctl reload nginx`
-  - Since certificades expires every 90 days setup the auto renewal: `sudo certbot renew --dry-rungit a`
+  - Since certificades expires every 90 days setup the auto renewal: `sudo certbot renew --dry-run`
  
 
 
