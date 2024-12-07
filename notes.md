@@ -5662,6 +5662,11 @@ To:
    - Add SSH key.
    - Test the key with ssh -T git@github.com
 10. Automatize the deployment every time it is pushed to Github.
+    - Check if the port you will use is open: `sudo netstat -tuln | grep 3500`
+    - If it is not open check if firewald is installed `sudo systemctl status firewalld`
+    - If not installed run: `sudo dnf install firewalld`
+    - After installed run: `sudo systemctl start firewalld`and then `sudo systemctl enable firewalld`
+    - Open the port: `sudo firewall-cmd --zone=public --add-port=3500/tcp --permanent`With perment we ensure it won't turn off when restarting the server
     - Go to the folder: `cd /var/www`
     - create webhook folder: `mkdir webhook`
     - Go to the webhook folder: `cd webhook`
@@ -5672,16 +5677,26 @@ To:
       const express = require('express');
       const bodyParser = require('body-parser');
       const { exec } = require('child_process');
+      const https = require('https');
+      const fs = require('fs');
 
       const app = express();
       app.use(bodyParser.json());
 
-      const PORT = 3000; // Or another port of your choice
+      // HTTPS Options - Replace with your actual domain and paths
+      const options = {
+          key: fs.readFileSync('/etc/letsencrypt/live/your-domain/privkey.pem'),
+          cert: fs.readFileSync('/etc/letsencrypt/live/your-domain/cert.pem'),
+      };
 
+      // Define the port for the HTTPS server
+      const PORT = 3500; // Ensure this port is open in your firewall
+
+      // Webhook endpoint
       app.post('/webhook', (req, res) => {
           if (req.body.ref === 'refs/heads/main') { // Change 'main' to your branch name if needed
               console.log('Pulling changes...');
-              exec('cd /var/www/your-repo && git pull origin main && npm install && npm run build', (err, stdout, stderr) => {
+              exec('cd /var/www/blogExcelSolutionsV && git pull origin main && npm install && NODE_ENV=production npm run build', (err, stdout, stderr) => {
                   if (err) {
                       console.error(`Error: ${err.message}`);
                       res.status(500).send('Error pulling changes');
@@ -5693,15 +5708,18 @@ To:
                       return;
                   }
                   console.log(`stdout: ${stdout}`);
-                  res.status(200).send('Changes pulled successfully');
+                  res.status(200).send('Changes pulled and built successfully');
               });
           } else {
               res.status(400).send('Not the main branch');
           }
       });
 
-      app.listen(PORT, () => {
-          console.log(`Webhook listener running on port ${PORT}`);
+      // Start the HTTPS server
+      const server = https.createServer(options, app);
+
+      server.listen(PORT, () => {
+          console.log(`Webhook listener running securely on port ${PORT}`);
       });
       `
     - Run the webhook listener: `node webhook.js`
@@ -5741,13 +5759,14 @@ To:
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17. Adding the SSL certificate to the server (Configuration for Alma Linux).
+17.  Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
     - Type: A, Name/host: @, Value(Ip Address): 123.45.67.89 TTL 300 (When setting up te server 300, when stable 14400).
     - Type: A, Name/host: www, Value(Ip Address): 123.45.67.89 TTL 300
     - [DNS Checker](https://dnschecker.org/) To confirm the propagation of the server.
+    - [SSL Labs](https://www.ssllabs.com/ssltest/) For test if the server too (IPv4 and IPv6)
   - Generate the SSL Certificate: `sudo certbot --nginx -d example.com -d www.example.com`
   - Verify the SSL Setup on nginx: `sudo nginx -t`
   - If everything its ok reload the nginx server: `sudo systemctl reload nginx`

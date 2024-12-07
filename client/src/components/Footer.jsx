@@ -114,7 +114,7 @@ export default function FooterComponent() {
               href="https://www.facebook.com/profile.php?id=61551997675646"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 hover:text-pink-600 transition-colors duration-300 ease-in-out"
+              className="text-gray-500 hover:text-green-600 transition-colors duration-300 ease-in-out"
             >
               <FaFacebook />
             </a>
