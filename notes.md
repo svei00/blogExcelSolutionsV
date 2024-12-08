@@ -5752,14 +5752,14 @@ To:
    - Be sure to navigate through the folder where you app is.
    - Start the webpage listener: `pm2 start api/index.js --name "mern-blog" --watch -- --port=3000` the --port part can be removed if you want to use the default port. It is mosly to bypass the  port.
    - Start the webhook listener: `pm2 start webhook.js --name "webhook-listener" --watch`
-   - Ensure that it starts on reboot: `pm2 startup` (if want to delete `pm2 unstartup systemd`) then `pm2 save`
+     - Ensure that it starts on reboot: `pm2 startup` (if want to delete `pm2 unstartup systemd`) then `pm2 save`
   Considerations.
   - View status of the apps: `pm2 list`
   - Restart the application: `pm2 restart my-app`
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17.  Adding the SSL certificate to the server (Configuration for Alma Linux).
+17.   Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
