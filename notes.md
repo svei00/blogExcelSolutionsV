@@ -5612,12 +5612,13 @@ To:
 
 ## Upload to Hostinger VPS
 1. Enter to your web server: `ssh root@your_server_ip`
+   - If you reinstall the server and it doesn't allow to log in use: `ssh-keygen -R 46.202.92.39`
 2. Update your System
    - `apt update && apt upgrade -y`   # For Ubuntu/Debian
    - `yum update -y`                  # For AlmaLinux/CentOS
 3. Setup NodeJS.
    - First of all check if you have via `node -v` and `npm -v`
-   - Then `curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -`
+   - Then `curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -`
    - Install it `yum install -y nodejs`
 4. Create the files
    - Create the web page directory ex. `mkdir /var/www/my-webpage`
@@ -5656,7 +5657,7 @@ To:
    - Navigate to the folder where you want to clone the repository: `cd /var/www/`
    - Clone your repository: `git clone https://github.com/your_username/your_repository.git`
    - Go the repository
-9. With the created ssh key on Github go to your repository on Github. 
+9.  With the created ssh key on Github go to your repository on Github. 
    - Hit CODE, then SSH and "add a new public key" or hit your profile picture and go to Settings
    - On the SSH and GPG Key add the public key you have created on your server.
    - Add SSH key.
@@ -5759,7 +5760,7 @@ To:
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17.   Adding the SSL certificate to the server (Configuration for Alma Linux).
+1.    Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
