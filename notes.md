@@ -5613,6 +5613,8 @@ To:
 ## Upload to Hostinger VPS
 1. Enter to your web server: `ssh root@your_server_ip`
    - If you reinstall the server and it doesn't allow to log in use: `ssh-keygen -R 46.202.92.39`
+   - Add new user: `adduser your_new_user`
+   - Grant SUDO Privilegies: `usermod -aG sudo your_new_user`
 2. Update your System
    - `apt update && apt upgrade -y`   # For Ubuntu/Debian
    - `yum update -y`                  # For AlmaLinux/CentOS
@@ -5760,7 +5762,7 @@ To:
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17.    Adding the SSL certificate to the server (Configuration for Alma Linux).
+17. Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
