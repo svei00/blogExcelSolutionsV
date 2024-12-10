@@ -5760,7 +5760,7 @@ To:
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-1.    Adding the SSL certificate to the server (Configuration for Alma Linux).
+17.    Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
