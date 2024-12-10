@@ -5615,6 +5615,16 @@ To:
    - If you reinstall the server and it doesn't allow to log in use: `ssh-keygen -R 46.202.92.39`
    - Add new user: `adduser your_new_user`
    - Grant SUDO Privilegies: `usermod -aG sudo your_new_user`
+   - Set up  UFW Firewall `sudo dnf install ufw -y`
+     Then:
+     - `sudo ufw allow OpenSSH`
+     - `sudo ufw allow 'Nginx Full'`
+     - `sudo ufw enable`
+     - Check Status: `sudo ufw status`
+     - If Neccesary: `sudo ufw allow 3000`
+     - If Neccesary: `sudo ufw allow 80`
+     - If Neccesary: `sudo ufw allow 443`
+     - Enable it: `sudo ufw enable` and restart it `sudo ufw reload`
 2. Update your System
    - `apt update && apt upgrade -y`   # For Ubuntu/Debian
    - `yum update -y`                  # For AlmaLinux/CentOS
@@ -5762,7 +5772,7 @@ To:
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17. Adding the SSL certificate to the server (Configuration for Alma Linux).
+17.  Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
@@ -5773,8 +5783,10 @@ To:
   - Generate the SSL Certificate: `sudo certbot --nginx -d example.com -d www.example.com`
   - Verify the SSL Setup on nginx: `sudo nginx -t`
   - If everything its ok reload the nginx server: `sudo systemctl reload nginx`
-  - Since certificades expires every 90 days setup the auto renewal: `sudo certbot renew --dry-run`
- 
+  - Since certificades expires every 90 days setup the auto renewal test: `sudo certbot renew --dry-run`
+  - If the test is successful add a cron job: `sudo contrab -e` to open the editor.
+  - Then add the following line: `0 0,12 * * * certbot renew --quiet && systemctl reload nginx` the firs 0 means noon and the second midgnit that way it runs twuce and ensures that the certificate will work.
+  - If Open in Nano CTRL + 0, then enter to confirm and CTRL to exit.
 
 
 ## Biblography
