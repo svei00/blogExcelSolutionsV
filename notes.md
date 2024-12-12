@@ -5765,14 +5765,14 @@ To:
    - Be sure to navigate through the folder where you app is.
    - Start the webpage listener: `pm2 start api/index.js --name "mern-blog" --watch -- --port=3000` the --port part can be removed if you want to use the default port. It is mosly to bypass the  port.
    - Start the webhook listener: `pm2 start webhook.js --name "webhook-listener" --watch`
-     - Ensure that it starts on reboot: `pm2 startup` (if want to delete `pm2 unstartup systemd`) then `pm2 save`
+       - Ensure that it starts on reboot: `pm2 startup` (if want to delete `pm2 unstartup systemd`) then `pm2 save`
   Considerations.
   - View status of the apps: `pm2 list`
   - Restart the application: `pm2 restart my-app`
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17.  Adding the SSL certificate to the server (Configuration for Alma Linux).
+17. Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
@@ -5786,7 +5786,54 @@ To:
   - Since certificades expires every 90 days setup the auto renewal test: `sudo certbot renew --dry-run`
   - If the test is successful add a cron job: `sudo contrab -e` to open the editor.
   - Then add the following line: `0 0,12 * * * certbot renew --quiet && systemctl reload nginx` the firs 0 means noon and the second midgnit that way it runs twuce and ensures that the certificate will work.
-  - If Open in Nano CTRL + 0, then enter to confirm and CTRL to exit.
+  - If Open in Nano CTRL + 0, then enter to confirm and CTRL to exit. If VIM CTRL + C  then !wq to write and quit.
+  - Check if the cron job was succesfully created: `sudo grep certbot /var/log/cron`
+  - You can manually run the command `sudo certbot renew --quiet && sudo systemctl reload nginx` to see if it works.
+18. Backup! Backup!! Backup!!!
+    - Create the file with nano: `sudo nano /usr/local/bin/backup_server.sh`
+    - Create the following script:
+      `#!/bin/bash
+
+        # Backup Directories
+        DAILY_BACKUP_DIR="/backups/daily"
+        FULL_BACKUP_DIR="/backups/full/$(date +%F)"
+        mkdir -p $DAILY_BACKUP_DIR $FULL_BACKUP_DIR
+
+        # Determine if Full Backup is Needed (Sunday)
+        if [ "$(date +%u)" -eq 7 ]; then
+            echo "Performing Full Backup..."
+            BACKUP_DIR=$FULL_BACKUP_DIR
+        else
+            echo "Performing Daily Incremental Backup..."
+            BACKUP_DIR=$DAILY_BACKUP_DIR
+        fi
+
+        # Nginx Configurations
+        tar --listed-incremental=$BACKUP_DIR/nginx.snar -cvpzf $BACKUP_DIR/nginx_backup.tar.gz /etc/nginx /etc/letsencrypt
+
+        # Web Application Files
+        tar --listed-incremental=$BACKUP_DIR/web.snar -cvpzf $BACKUP_DIR/web_files_backup.tar.gz /var/www/blogExcelSolutionsV
+
+        # PM2 Configurations
+        tar --listed-incremental=$BACKUP_DIR/pm2.snar -cvpzf $BACKUP_DIR/pm2_backup.tar.gz ~/.pm2
+
+        # Firewall Rules
+        iptables-save > $BACKUP_DIR/iptables_backup.rules
+
+        # Logs (Optional)
+        tar --listed-incremental=$BACKUP_DIR/logs.snar -cvpzf $BACKUP_DIR/logs_backup.tar.gz /var/log/nginx /var/www/blogExcelSolutionsV/backend/logs
+
+        echo "Backup completed and saved in $BACKUP_DIR"
+
+      `
+      Then Save and exit the file (CTRL+O, Enter, then CTRL+X).
+    - Make the script executable: `sudo chmod +x /usr/local/bin/backup_server.sh`
+    - Test the script: `sudo /usr/local/bin/backup_server.sh` 
+    - Verify if the bacjyo was setting up correctly: `ls -l /backups`
+    - Create the Cronjob for backing up: `sudo crontab -e`
+    - Then write the line of code to execute dayly at 2am: `0 2 * * * /usr/local/bin/backup_server.sh >> /var/log/backup.log 2>&1` In VIM editor you have to type `i` to insert, the go to the last line if any press enter, type the code, then to save it press ESC then :wq and Enter.
+    - If for reason yow want to exit the editor without saving press ESC then :q! and Enter.
+    - Now verify if the cron job has been save by: `sudo crontab -l` if it shows the lines of code it has been saved.
 
 
 ## Biblography
