@@ -5792,48 +5792,110 @@ To:
 18. Backup! Backup!! Backup!!!
     - Create the file with nano: `sudo nano /usr/local/bin/backup_server.sh`
     - Create the following script:
-      `#!/bin/bash
+      `
+      #!/bin/bash
 
-        # Backup Directories
-        DAILY_BACKUP_DIR="/backups/daily"
-        FULL_BACKUP_DIR="/backups/full/$(date +%F)"
-        mkdir -p $DAILY_BACKUP_DIR $FULL_BACKUP_DIR
+      # Define backup directories
+      BACKUP_ROOT="/backups"
+      DAILY_BACKUP_DIR="$BACKUP_ROOT/daily"
+      WEEKLY_BACKUP_DIR="$BACKUP_ROOT/weekly"
+      INCREMENTAL_FILE="$BACKUP_ROOT/incremental.snar"
+      TODAY=$(date +%F)
 
-        # Determine if Full Backup is Needed (Sunday)
-        if [ "$(date +%u)" -eq 7 ]; then
-            echo "Performing Full Backup..."
-            BACKUP_DIR=$FULL_BACKUP_DIR
-        else
-            echo "Performing Daily Incremental Backup..."
-            BACKUP_DIR=$DAILY_BACKUP_DIR
-        fi
+      # Ensure backup directories exist
+      mkdir -p $DAILY_BACKUP_DIR $WEEKLY_BACKUP_DIR
 
-        # Nginx Configurations
-        tar --listed-incremental=$BACKUP_DIR/nginx.snar -cvpzf $BACKUP_DIR/nginx_backup.tar.gz /etc/nginx /etc/letsencrypt
+      # Determine if a full server backup is needed (Sunday)
+      if [ "$(date +%u)" -eq 7 ]; then
+          echo "Performing Full Server Backup..."
+          BACKUP_TYPE="Full"
+          BACKUP_DIR="$WEEKLY_BACKUP_DIR/$TODAY"
+          mkdir -p $BACKUP_DIR
 
-        # Web Application Files
-        tar --listed-incremental=$BACKUP_DIR/web.snar -cvpzf $BACKUP_DIR/web_files_backup.tar.gz /var/www/blogExcelSolutionsV
+          # Full Server Backup
+          tar --create --gzip --file=$BACKUP_DIR/full_server_backup.tar.gz \
+              --exclude=/backups \
+              --exclude=/proc \
+              --exclude=/tmp \
+              --exclude=/sys \
+              --exclude=/run \
+              --exclude=/mnt \
+              --exclude=/dev \
+              /
 
-        # PM2 Configurations
-        tar --listed-incremental=$BACKUP_DIR/pm2.snar -cvpzf $BACKUP_DIR/pm2_backup.tar.gz ~/.pm2
+          # Name the script as weekly_backup.log
+          SCRIPT_NAME="weekly_backup.log"
+      else
+          echo "Performing Daily Incremental Backup..."
+          BACKUP_TYPE="Incremental"
+          BACKUP_DIR="$DAILY_BACKUP_DIR"
 
-        # Firewall Rules
-        iptables-save > $BACKUP_DIR/iptables_backup.rules
+          # Incremental Backups for specific directories
+          tar --listed-incremental=$INCREMENTAL_FILE --create --gzip --file=$BACKUP_DIR/nginx_backup_$TODAY.tar.gz /etc/nginx /etc/letsencrypt
+          tar --listed-incremental=$INCREMENTAL_FILE --create --gzip --file=$BACKUP_DIR/web_files_backup_$TODAY.tar.gz /var/www/blogExcelSolutionsV
+          tar --listed-incremental=$INCREMENTAL_FILE --create --gzip --file=$BACKUP_DIR/pm2_backup_$TODAY.tar.gz ~/.pm2
+          tar --listed-incremental=$INCREMENTAL_FILE --create --gzip --file=$BACKUP_DIR/logs_backup_$TODAY.tar.gz /var/log/nginx /var/www/blogExcelSolutionsV/backend/logs
 
-        # Logs (Optional)
-        tar --listed-incremental=$BACKUP_DIR/logs.snar -cvpzf $BACKUP_DIR/logs_backup.tar.gz /var/log/nginx /var/www/blogExcelSolutionsV/backend/logs
+          # Save iptables rules (for both daily and weekly backups)
+          iptables-save > $BACKUP_DIR/iptables_backup_$TODAY.rules
 
-        echo "Backup completed and saved in $BACKUP_DIR"
+          # Name the script as daily_backup.log
+          SCRIPT_NAME="daily_backup.log"
+      fi
 
+      # Log the completion of the backup
+      echo "$BACKUP_TYPE Backup completed on $TODAY and saved in $BACKUP_DIR"
+
+      # Write to the appropriate log file
+      echo "Backup completed successfully on $TODAY" >> $BACKUP_ROOT/$SCRIPT_NAME
       `
       Then Save and exit the file (CTRL+O, Enter, then CTRL+X).
     - Make the script executable: `sudo chmod +x /usr/local/bin/backup_server.sh`
     - Test the script: `sudo /usr/local/bin/backup_server.sh` 
     - Verify if the bacjyo was setting up correctly: `ls -l /backups`
+    - To check the logs use cat ex. `cat /backups/daily_backup.log`
+      - If file becames larger use `less /backups/daily_backup.log` to scroll over it.
+      - If want to see the last 10 entries: `less /backups/daily_backup.log`
+      - If want to edit also view: `nano /backups/daily_backup.log`
     - Create the Cronjob for backing up: `sudo crontab -e`
     - Then write the line of code to execute dayly at 2am: `0 2 * * * /usr/local/bin/backup_server.sh >> /var/log/backup.log 2>&1` In VIM editor you have to type `i` to insert, the go to the last line if any press enter, type the code, then to save it press ESC then :wq and Enter.
     - If for reason yow want to exit the editor without saving press ESC then :q! and Enter.
     - Now verify if the cron job has been save by: `sudo crontab -l` if it shows the lines of code it has been saved.
+19. Recovee Backup.
+    - Locate the backup file on: `/backups` it could be daily or weekly.
+      You can:
+      - Full backup from the desired week.
+      - Incremental Backup for the specific days. Take note that you have to do every single day if any change.
+    - Ensure that the snar file for incremental backup is avalieble.
+    - Restore the full (weekly backup) `sudo tar --extract --gzip --listed-incremental=/dev/null --file=full_server_backup_YYYY-MM-DD.tar.gz -C /target/directory`
+      - `--listed-incremental=/dev/null:` Tells tar to ignore incremental data.
+      - `-C /target/directory` Specifies the directory where the backup is.
+    - Restoring incremental backups (daily): `sudo tar --extract --gzip --listed-incremental=/dev/null --file=incremental_backup_YYYY-MM-DD.tar.gz -C /target/directory`
+      - Repeat this command each incremental backup in chronolical order. If any. If there is a lot of the you can use the script:
+        `
+        #!/bin/bash
+
+        # Define backup directories
+        BACKUP_ROOT="/backups"
+        WEEKLY_BACKUP_DIR="$BACKUP_ROOT/weekly"
+        DAILY_BACKUP_DIR="$BACKUP_ROOT/daily"
+
+        # Restore the full backup
+        echo "Restoring Full Backup..."
+        FULL_BACKUP_FILE=$(find $WEEKLY_BACKUP_DIR -name "full_server_backup.tar.gz" | sort | tail -n 1)
+        tar --extract --gzip --file=$FULL_BACKUP_FILE -C /
+
+        # Restore incremental backups in order
+        echo "Restoring Incremental Backups..."
+        for INCREMENTAL_FILE in $(find $DAILY_BACKUP_DIR -name "*.tar.gz" | sort); do
+            echo "Restoring $INCREMENTAL_FILE..."
+            tar --extract --gzip --listed-incremental=/dev/null --file=$INCREMENTAL_FILE -C /
+        done
+
+        echo "Restoration complete!"
+        `
+        Remember to make it executable with `chmod +x restore_backup.sh`
+      - To run it: `sudo ./restore_backup.sh`
 
 
 ## Biblography
