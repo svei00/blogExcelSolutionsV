@@ -5930,7 +5930,7 @@ To:
     20.8. Run the script with `./local_auto_deploy.sh`
     20.9. Now create the pm2 task: `pm2 start /usr/local/bin/local_auto_deploy.sh`
     20.10. Finaly create the pm2 startup script: `pm2 startup` and `pm2 save`
-21. Create the webhook to auto deploy when changes on github are detected.
+21. Create the webhook to auto deploy when changes on github are detected. Check the last configuration
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
