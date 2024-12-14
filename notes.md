@@ -5613,8 +5613,12 @@ To:
 ## Upload to Hostinger VPS
 1. Enter to your web server: `ssh root@your_server_ip`
    - If you reinstall the server and it doesn't allow to log in use: `ssh-keygen -R 46.202.92.39`
-   - Add new user: `adduser your_new_user`
-   - Grant SUDO Privilegies: `usermod -aG sudo your_new_user`
+   - Add new user: `sudo adduser your_new_user`
+   - Grant SUDO Privilegies: `sudo usermod -aG wheel your_new_user`
+   - Set the password" `sudo passwd your_new_user`
+   - Change the user: `su - your_new_user`.
+   - For grant access to files if don't have use: `sudo chmod u+w /path/to/directory/file.txt` of to file: `sudo chmod -R 777 /path/to/directory` 777 is not recommendd so use 755.
+   - Other way to grant persmision is: `sudo chown your_user:your_user /path/to/github_webhook.sh`
    - Set up  UFW Firewall `sudo dnf install ufw -y`
      Then:
      - `sudo ufw allow OpenSSH`
@@ -5896,7 +5900,37 @@ To:
         `
         Remember to make it executable with `chmod +x restore_backup.sh`
       - To run it: `sudo ./restore_backup.sh`
+20. Sincronice the dist folder to the static web page with Rsync. In order to keep it dinamic
+    20.1. Check if rsync is already installed `rsync --version` is stalled will show you the version.
+    20.2. If not type: `sudo apt update` then `sudo apt install rsync`
+    20.3. Thes if the code works: `rsync -avz --delete /var/www/blogExcelSolutionsV/client/dist/ /var/www/excelsolutionsv.com` the flag --delete ensures that files removed in the source are removed in the destination.
+    20.4. Create the Scrip to monitor the changes:
+    `
+    #!/bin/bash
 
+      SOURCE_DIR="/var/www/blogExcelSolutionsV/client/dist/"
+      DEST_DIR="/var/www/excelsolutionsv.com/"
+
+      # Monitor and sync changes
+      inotifywait -m -r -e modify,create,delete,move "$SOURCE_DIR" --format '%w%f' |
+      while read FILE; do
+          echo "Detected change in $FILE. Syncing..."
+          rsync -avz --delete "$SOURCE_DIR" "$DEST_DIR"
+          if [ $? -eq 0 ]; then
+              echo "Sync completed successfully at $(date)"
+          else
+              echo "Sync failed at $(date)"
+          fi
+      done
+    `
+    Remember to CTRL + O and Enter to save changes and CTRL + X to exit.
+    20.5. Make the script executable with `chmod +x local_auto_deploy.sh` tip if not autoexecutable in Linux will show white text, if auto excecutable shows text green.
+    20.6. Check if inotifywait is installed: `inotifywait --help`
+    20.7. If not installed: `sudo dnf update` then `sudo dnf install inotify-tools`
+    20.8. Run the script with `./local_auto_deploy.sh`
+    20.9. Now create the pm2 task: `pm2 start /usr/local/bin/local_auto_deploy.sh`
+    20.10. Finaly create the pm2 startup script: `pm2 startup` and `pm2 save`
+21. Create the webhook to auto deploy when changes on github are detected.
 
 ## Biblography
 * https://www.youtube.com/watch?v=Kkht2mwSL_I&t=117s - "Source Code - Video"
