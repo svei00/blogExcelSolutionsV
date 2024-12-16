@@ -29,7 +29,7 @@ jobs:
           VPS_IP: ${{ secrets.VPS_IP }}
         run: |
           ssh -o StrictHostKeyChecking=no -i $DEPLOY_SSH_KEY user@$VPS_IP << 'EOF'
-            cd /path/to/your/project  # Go to the directory where your app is deployed
+            cd /var/www/blogExcelSolutionsV  # Go to the directory where your app is deployed
             git pull origin main  # Pull the latest code from GitHub
             npm install  # Install new dependencies if any
             npm run build  # Build the React app (if not already done)
