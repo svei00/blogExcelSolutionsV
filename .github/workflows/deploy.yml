@@ -1,0 +1,37 @@
+name: Deploy Node.js app
+
+on:
+  push:
+    branches:
+      - main # You can change this if you use a different branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16" # Adjust based on your Node.js version
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm run build  # For React/Vite build
+
+      - name: Deploy to VPS
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          VPS_IP: ${{ secrets.VPS_IP }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i $DEPLOY_SSH_KEY user@$VPS_IP << 'EOF'
+            cd /path/to/your/project  # Go to the directory where your app is deployed
+            git pull origin main  # Pull the latest code from GitHub
+            npm install  # Install new dependencies if any
+            npm run build  # Build the React app (if not already done)
+            pm2 restart your-app-name  # Restart the app with PM2
+          EOF
