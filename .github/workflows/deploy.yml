@@ -16,22 +16,22 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "22" # Match this with the Node.js version on your server
+          node-version: "22" # Adjust based on your server's Node.js version
 
-      - name: Deploy to AlmaLinux
+      - name: Deploy to VPS
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           VPS_IP: ${{ secrets.VPS_IP }}
         run: |
-          # Save ed25519 private key to the runner
+          mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          # Add the host to known_hosts to prevent SSH prompt
+          # Add VPS to known_hosts
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
-          # Connect and deploy
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 user@${{ secrets.VPS_IP }} << 'EOF'
+          # SSH into VPS and deploy
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 vefrmeistari@${{ secrets.VPS_IP }} << 'EOF'
             cd /var/www/blogExcelSolutionsV
             git pull origin main
             npm install
