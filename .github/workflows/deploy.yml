@@ -1,9 +1,9 @@
-name: Deploy Node.js app
+name: Deploy Node.js app to AlmaLinux
 
 on:
   push:
     branches:
-      - main # You can change this if you use a different branch
+      - main
 
 jobs:
   deploy:
@@ -16,22 +16,25 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16" # Adjust based on your Node.js version
+          node-version: "22" # Match this with the Node.js version on your server
 
-      - name: Install dependencies
-        run: |
-          npm install
-          npm run build  # For React/Vite build
-
-      - name: Deploy to VPS
+      - name: Deploy to AlmaLinux
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           VPS_IP: ${{ secrets.VPS_IP }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i $DEPLOY_SSH_KEY user@$VPS_IP << 'EOF'
-            cd /var/www/blogExcelSolutionsV  # Go to the directory where your app is deployed
-            git pull origin main  # Pull the latest code from GitHub
-            npm install  # Install new dependencies if any
-            npm run build  # Build the React app (if not already done)
-            pm2 restart your-app-name  # Restart the app with PM2
+          # Save ed25519 private key to the runner
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          # Add the host to known_hosts to prevent SSH prompt
+          ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
+          # Connect and deploy
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 user@${{ secrets.VPS_IP }} << 'EOF'
+            cd /var/www/blogExcelSolutionsV
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart your-app-name
           EOF
