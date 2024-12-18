@@ -1,4 +1,4 @@
-name: Deploy Full-Stack App to AlmaLinux
+name: Deploy Node.js app to AlmaLinux
 
 on:
   push:
@@ -16,38 +16,38 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "22" # Recommended stable LTS version for most apps
+          node-version: "22" # Using Node.js 22 as per your environment
 
       - name: Deploy to VPS
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           VPS_IP: ${{ secrets.VPS_IP }}
         run: |
-          # Set up SSH
+          # Set up SSH for secure connection
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
-          # Deploy code and build the app
+          # Connect to the VPS and deploy
           ssh -i ~/.ssh/id_ed25519 vefrmeistari@${{ secrets.VPS_IP }} << 'EOF'
             set -e
             
-            # Navigate to project directory
+            # Navigate to the project directory
             cd /var/www/blogExcelSolutionsV
-            
-            # Pull latest code
+
+            # Pull the latest code from the repository
             git pull origin main
-            
+
             # Install backend dependencies
             npm install
-            
-            # Build frontend
+
+            # Build the frontend with production environment
             cd client
             npm install
-            npm run build
+            NODE_ENV=production npm run build
             cd ..
 
-            # Ensure PM2 restarts the app
-            pm2 restart mern-blog || pm2 start server.js --name mern-blog
+            # Start or restart the backend using PM2
+            pm2 start /var/www/blogExcelSolutionsV/api/index.js --name mern-blog || pm2 restart mern-blog
           EOF
