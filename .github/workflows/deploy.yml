@@ -27,11 +27,9 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          # Add VPS to known_hosts
+          ls -la ~/.ssh
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-
-          # SSH into VPS and deploy
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 vefrmeistari@${{ secrets.VPS_IP }} << 'EOF'
+          ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 vefrmeistari@${{ secrets.VPS_IP }} << 'EOF'
             cd /var/www/blogExcelSolutionsV
             git pull origin main
             npm install
