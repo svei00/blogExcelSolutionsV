@@ -5678,93 +5678,21 @@ To:
    - On the SSH and GPG Key add the public key you have created on your server.
    - Add SSH key.
    - Test the key with ssh -T git@github.com
-10. Automatize the deployment every time it is pushed to Github.
-    - Check if the port you will use is open: `sudo netstat -tuln | grep 3500`
-    - If it is not open check if firewald is installed `sudo systemctl status firewalld`
-    - If not installed run: `sudo dnf install firewalld`
-    - After installed run: `sudo systemctl start firewalld`and then `sudo systemctl enable firewalld`
-    - Open the port: `sudo firewall-cmd --zone=public --add-port=3500/tcp --permanent`With perment we ensure it won't turn off when restarting the server
-    - Go to the folder: `cd /var/www`
-    - create webhook folder: `mkdir webhook`
-    - Go to the webhook folder: `cd webhook`
-    - Initialice node.js project: `npm init -y` then `npm install express body-parser child_process`
-    - Create a file: `nano webhook.js`
-    - Add the following code:
-      `
-      const express = require('express');
-      const bodyParser = require('body-parser');
-      const { exec } = require('child_process');
-      const https = require('https');
-      const fs = require('fs');
-
-      const app = express();
-      app.use(bodyParser.json());
-
-      // HTTPS Options - Replace with your actual domain and paths
-      const options = {
-          key: fs.readFileSync('/etc/letsencrypt/live/your-domain/privkey.pem'),
-          cert: fs.readFileSync('/etc/letsencrypt/live/your-domain/cert.pem'),
-      };
-
-      // Define the port for the HTTPS server
-      const PORT = 3500; // Ensure this port is open in your firewall
-
-      // Webhook endpoint
-      app.post('/webhook', (req, res) => {
-          if (req.body.ref === 'refs/heads/main') { // Change 'main' to your branch name if needed
-              console.log('Pulling changes...');
-              exec('cd /var/www/blogExcelSolutionsV && git pull origin main && npm install && NODE_ENV=production npm run build', (err, stdout, stderr) => {
-                  if (err) {
-                      console.error(`Error: ${err.message}`);
-                      res.status(500).send('Error pulling changes');
-                      return;
-                  }
-                  if (stderr) {
-                      console.error(`stderr: ${stderr}`);
-                      res.status(500).send('Error pulling changes');
-                      return;
-                  }
-                  console.log(`stdout: ${stdout}`);
-                  res.status(200).send('Changes pulled and built successfully');
-              });
-          } else {
-              res.status(400).send('Not the main branch');
-          }
-      });
-
-      // Start the HTTPS server
-      const server = https.createServer(options, app);
-
-      server.listen(PORT, () => {
-          console.log(`Webhook listener running securely on port ${PORT}`);
-      });
-      `
-    - Run the webhook listener: `node webhook.js`
-11. Configure GitHub webhooks.
-   - Go to your repository.
-   - Navigate to settings of the repository -> webhooks -> Add webhook
-   - Enter the folowing details:
-      * Payload URL: http://your-server-ip:3000/webhook
-      * Content Type: application/json
-      * Secret: Can leave in blank for now, after you can add some security 
-   - Under which events whould you like to thrigger this webhook? Just the push event.
-   - Add/Save the webhook. 
-12. After that compile the site with `npm install` then `npm run build` to get the node_modules folder.
+10. After that compile the site with `npm install` then `npm run build` to get the node_modules folder.
    - Ensure that the build folder is in the root of your project. ex. `/the-web`
    - In the back end folder /client be sure you have the node_modules folder and the package.json file.
    - If not run `npm install` in the client folder. Then `npm run build`
    - Once doing that run the site into production mode to best optimize the site, server resources and security. 
      it also minifies the site with vite: `NODE_ENV=production npm run build`
-13. Now upload the .env files into the server, remember one for the back end and one for the front end.
+11. Now upload the .env files into the server, remember one for the back end and one for the front end.
    - To upload a file through Putty on Windows on CMD run: `pscp C:\path\to\local\file username@your-server-ip:/path/to/remote/destination/`
    ex. `pscp C:\Users\YourName\Documents\example.txt root@192.168.1.1:/home/root/`
-14. If problem with port, default 3000 and you are sure it is not in use:
+12. If problem with port, default 3000 and you are sure it is not in use:
     - Type: `sudo ss -tuln | grep :3000` To check if por is in use
     - `sudo netstat -tulnp | grep :3000` This check which process it is using the port.
     - With `ps -p 1234 -o pid,cmd` where 1234 is the process id you can see what process is using the port.
     - If you want to kill the process: `sudo kill -9 1234`
-15. Or you can change the port. In this case I changed the `webhook.js`
-16. Keep the nodejs app runing with pm2.
+13. Keep the nodejs app runing with pm2.
    - Install a process manager PM2 for node to keep the app running: `npm install pm2 -g`
    - Be sure to navigate through the folder where you app is.
    - Start the webpage listener: `pm2 start api/index.js --name "mern-blog" --watch -- --port=3000` the --port part can be removed if you want to use the default port. It is mosly to bypass the  port.
@@ -5776,7 +5704,7 @@ To:
   - Stop the application: `pm2 stop my-app`
   - Delete the application: `pm2 delete my-app`
   - Save the pm2 process list (Useful when reboots): `pm2 save`
-17. Adding the SSL certificate to the server (Configuration for Alma Linux).
+14.  Adding the SSL certificate to the server (Configuration for Alma Linux).
   - Install the Certbot: `sudo dnf install epel-release -y`
   - Install the Required Dependencies: `sudo dnf install certbot python3-certbot-nginx -y`
   - Make sure you already have a domain name and it is pointing to your server IP. Ex.
@@ -5793,7 +5721,78 @@ To:
   - If Open in Nano CTRL + 0, then enter to confirm and CTRL to exit. If VIM CTRL + C  then !wq to write and quit.
   - Check if the cron job was succesfully created: `sudo grep certbot /var/log/cron`
   - You can manually run the command `sudo certbot renew --quiet && sudo systemctl reload nginx` to see if it works.
-18. Backup! Backup!! Backup!!!
+15. Automatice the deployment with Github Actions.
+  - Go to your repository -> Settings -> Secrets and Variables -> Actions.
+    - DEPLOY_SSH_KEY: Paste the private Key if the server.
+    - VPS_IP: Paste the IP of the server.
+  - Create the file `github/workflows/deploy.yml` with the following code:
+    `
+    name: Deploy Node.js app to AlmaLinux
+
+    on:
+      push:
+        branches:
+          - main
+
+    jobs:
+      deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2
+
+          - name: Set up Node.js
+            uses: actions/setup-node@v2
+            with:
+              node-version: "22" # Using Node.js in this case version 22
+
+          - name: Deploy to VPS
+            env:
+              DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+              VPS_IP: ${{ secrets.VPS_IP }}
+            run: |
+              # Set up SSH for secure connection
+              mkdir -p ~/.ssh
+              echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+              chmod 600 ~/.ssh/id_ed25519
+              ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
+              # Connect to the VPS and deploy
+              ssh -i ~/.ssh/id_ed25519 user@${{ secrets.VPS_IP }} << 'EOF'
+                set -e
+                
+                # Navigate to the project directory
+                cd /var/www/your-page
+
+                # Pull the latest code from the repository
+                git pull origin main
+
+                # Install backend dependencies
+                npm install
+
+                # Build the frontend with production environment
+                cd client
+                npm install
+                NODE_ENV=production npm run build
+                cd ..
+
+                # Start or restart the backend using PM2
+                pm2 start /var/www/yourpage/api/index.js --name your-page || pm2 restart your-page
+              EOF
+    `
+  - Deploy to Github:
+    - `git add .`
+    - `git commit -m "Add GitHub Actions deployment script"`
+    - `git push origin main`
+  - Go to Github actions and check if the deployment was succesful (Also you can receibe deploy failed email if any error)
+  - Troubleshooting and Tips.
+    - Verify if you have the right permisions: `chmod 600 ~/.ssh/id_ed25519`
+    - Test manually by SSH-into the VPS: `ssh -i ~/.ssh/id_ed25519 user@VPS_IP`
+    - Confirm that the app managed is it pm2 `pm2 list`
+    - Check logs of any error: `pm2 logs your-web` 
+
+16.  Backup! Backup!! Backup!!!
     - Create the file with nano: `sudo nano /usr/local/bin/backup_server.sh`
     - Create the following script:
       `
@@ -5865,7 +5864,7 @@ To:
     - Then write the line of code to execute dayly at 2am: `0 2 * * * /usr/local/bin/backup_server.sh >> /var/log/backup.log 2>&1` In VIM editor you have to type `i` to insert, the go to the last line if any press enter, type the code, then to save it press ESC then :wq and Enter.
     - If for reason yow want to exit the editor without saving press ESC then :q! and Enter.
     - Now verify if the cron job has been save by: `sudo crontab -l` if it shows the lines of code it has been saved.
-19. Recovee Backup.
+17. Recovee Backup.
     - Locate the backup file on: `/backups` it could be daily or weekly.
       You can:
       - Full backup from the desired week.
@@ -5900,7 +5899,7 @@ To:
         `
         Remember to make it executable with `chmod +x restore_backup.sh`
       - To run it: `sudo ./restore_backup.sh`
-20. Sincronice the dist folder to the static web page with Rsync. In order to keep it dinamic
+18. Sincronice the dist folder to the static web page with Rsync. In order to keep it dinamic
     20.1. Check if rsync is already installed `rsync --version` is stalled will show you the version.
     20.2. If not type: `sudo apt update` then `sudo apt install rsync`
     20.3. Thes if the code works: `rsync -avz --delete /var/www/blogExcelSolutionsV/client/dist/ /var/www/excelsolutionsv.com` the flag --delete ensures that files removed in the source are removed in the destination.
