@@ -50,3 +50,21 @@ body {
   color: #ffffff; /* White color for dark mode */
   opacity: 0.6; /* Adjust opacity as needed */
 }
+
+/* Make Quill toolbar icons/text visible in dark mode */
+.dark .ql-toolbar .ql-stroke {
+  stroke: #f3f4f6; /* light gray/white */
+}
+
+.dark .ql-toolbar .ql-fill {
+  fill: #f3f4f6; /* same for filled icons */
+}
+
+.dark .ql-toolbar .ql-picker {
+  color: #f3f4f6; /* text like font family/size dropdowns */
+}
+
+.dark .ql-toolbar .ql-picker-options {
+  background-color: #1f2937; /* dark gray background for dropdown */
+  color: #f3f4f6;
+}
