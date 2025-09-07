@@ -16,6 +16,7 @@ import Search from "./pages/Search";
 import HeaderLayout from "./components/HeaderLayout";
 import Analytics from "./components/Analytics";
 import { HelmetProvider, Helmet } from "react-helmet-async";
+import ToastSpike from "./pages/ToastSpike"; // THROWAWAY — task 2.1 spike, remove before merging
 
 export default function App() {
   return (
@@ -42,6 +43,8 @@ export default function App() {
               <Route path="/update-post/:postId" element={<UpdatePost />} />
             </Route>
             <Route path="/projects" element={<Projects />} />
+            <Route path="/toast-spike" element={<ToastSpike />} />{" "}
+            {/* THROWAWAY — remove before merging */}
             <Route path="/post/:postSlug" element={<PostPage />} />
           </Routes>
         </HeaderLayout>
