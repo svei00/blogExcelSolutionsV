@@ -10,6 +10,11 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    contentFormat: {
+      type: String,
+      enum: ["html", "md"],
+      default: "html",
+    },
     title: {
       type: String,
       required: true,

@@ -6,6 +6,7 @@ import CommentSection from "../components/CommentSection.jsx";
 import PostCard from "../components/PostCard.jsx";
 import { Helmet } from "react-helmet-async";
 import { SITE_URL } from "../config/site";
+import renderPostContent from "../lib/renderPostContent";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -117,7 +118,9 @@ export default function PostPage() {
       </div>
       <div
         className="p-3 max-w-2xl mx-auto w-full post-content text-justify [&>img]:mx-auto [&>img]:block" // The  [&>img]:mx-auto [&>img]:block is for center the images
-        dangerouslySetInnerHTML={{ __html: post && post.content }}
+        dangerouslySetInnerHTML={{
+          __html: post && renderPostContent(post.content, post.contentFormat),
+        }}
       ></div>
       <div className="max-w-4xl mx-auto w-full">
         <CallToAction />
