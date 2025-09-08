@@ -8,8 +8,10 @@ import {
 import { useSelector } from "react-redux";
 import ButtonEx from "./Buttons";
 import { Table } from "flowbite-react";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 export default function DashboardComp() {
+  const authFetch = useAuthFetch();
   const [users, setUsers] = useState([]);
   const [comments, setComments] = useState([]);
   const [posts, setPost] = useState([]);
@@ -24,7 +26,7 @@ export default function DashboardComp() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("/api/user/getusers?limit=5");
+        const res = await authFetch("/api/user/getusers?limit=5");
         const data = await res.json();
         if (res.ok) {
           setUsers(data.users);
@@ -50,7 +52,7 @@ export default function DashboardComp() {
     };
     const fetchComments = async () => {
       try {
-        const res = await fetch("/api/comment/getcomments?limit=5");
+        const res = await authFetch("/api/comment/getcomments?limit=5");
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);

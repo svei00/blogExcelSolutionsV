@@ -2,16 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PostForm from "../components/PostForm";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 const emptyPost = { title: "", category: "", content: "" };
 
 export default function CreatePost() {
   const [publishError, setPublishError] = useState(null);
   const navigate = useNavigate();
+  const authFetch = useAuthFetch();
 
   const handleSubmit = async (formData) => {
     try {
-      const res = await fetch("/api/post/create", {
+      const res = await authFetch("/api/post/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

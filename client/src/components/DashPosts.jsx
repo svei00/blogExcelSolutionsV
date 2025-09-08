@@ -4,6 +4,7 @@ import { Button, Modal, Table } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { CiEdit, CiCircleRemove } from "react-icons/ci";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
@@ -11,6 +12,7 @@ export default function DashPosts() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState("");
+  const authFetch = useAuthFetch();
   // console.log(userPosts); // For testing purposes.
   useEffect(() => {
     const fetchPosts = async () => {
@@ -52,7 +54,7 @@ export default function DashPosts() {
   const handleDeletePost = async () => {
     setShowModal(false);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
         {
           method: "DELETE",

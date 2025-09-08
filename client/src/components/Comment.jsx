@@ -4,12 +4,14 @@ import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Textarea } from "flowbite-react";
 import ButtonEx from "./Buttons";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
   const { currentUser } = useSelector((state) => state.user);
+  const authFetch = useAuthFetch();
   console.log(user); // For testing purposes
   useEffect(() => {
     const getUser = async () => {
@@ -33,7 +35,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/api/comment/editComment/${comment._id}`, {
+      const res = await authFetch(`/api/comment/editComment/${comment._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

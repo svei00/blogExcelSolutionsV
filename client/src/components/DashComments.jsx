@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Button, Table, Modal } from "flowbite-react";
 import { CiCircleRemove } from "react-icons/ci";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 export default function DashComments() {
   const { currentUser } = useSelector((state) => state.user);
@@ -10,11 +11,12 @@ export default function DashComments() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [commentIdToDelete, setCommentIdToDelete] = useState("");
+  const authFetch = useAuthFetch();
   // console.log(comments); // For testing purposes.
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/comment/getcomments`);
+        const res = await authFetch(`/api/comment/getcomments`);
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);
@@ -33,7 +35,7 @@ export default function DashComments() {
   const handleShowMore = async () => {
     const startIndex = comments.length;
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `/api/comment/getcomments?startIndex=${startIndex}`
       );
       const data = await res.json();
@@ -51,7 +53,7 @@ export default function DashComments() {
   const handleDeleteComment = async () => {
     setShowModal(false);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `/api/comment/deleteComment/${commentIdToDelete}`,
         {
           method: "DELETE",

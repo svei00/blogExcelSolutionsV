@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Helmet } from "react-helmet-async";
 import PostForm from "../components/PostForm";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 export default function UpdatePost() {
   const [initialData, setInitialData] = useState(null);
@@ -11,6 +12,7 @@ export default function UpdatePost() {
   const { postId } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
+  const authFetch = useAuthFetch();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -39,7 +41,7 @@ export default function UpdatePost() {
 
   const handleSubmit = async (formData) => {
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `/api/post/updatepost/${postId}/${currentUser._id}`,
         {
           method: "PUT",

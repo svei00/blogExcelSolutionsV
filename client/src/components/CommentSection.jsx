@@ -5,6 +5,7 @@ import ButtonOutline from "./Buttons";
 import { useEffect, useState } from "react";
 import Comment from "./Comment";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import useAuthFetch from "../hooks/useAuthFetch";
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -14,6 +15,7 @@ export default function CommentSection({ postId }) {
   const [showModal, setShowModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const navigate = useNavigate();
+  const authFetch = useAuthFetch();
   // console.log(comments); // For testing purposes
 
   const handleSubmit = async (e) => {
@@ -23,7 +25,7 @@ export default function CommentSection({ postId }) {
     }
 
     try {
-      const res = await fetch("/api/comment/create", {
+      const res = await authFetch("/api/comment/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +69,7 @@ export default function CommentSection({ postId }) {
         navigate("/sign-in");
         return;
       }
-      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+      const res = await authFetch(`/api/comment/likeComment/${commentId}`, {
         method: "PUT",
       });
       if (res.ok) {
@@ -104,7 +106,7 @@ export default function CommentSection({ postId }) {
         navigate("/sign-in");
         return;
       }
-      const res = await fetch(`/api/comment/deleteComment/${commentId}`, {
+      const res = await authFetch(`/api/comment/deleteComment/${commentId}`, {
         method: "DELETE",
       });
       if (res.ok) {

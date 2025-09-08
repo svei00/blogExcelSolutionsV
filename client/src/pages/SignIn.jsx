@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
@@ -15,6 +15,8 @@ const SignIn = () => {
   const { loading, error: errorMessage } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionExpired = searchParams.get("expired") === "1";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
@@ -72,6 +74,11 @@ const SignIn = () => {
         </div>
         {/* rigth */}
         <div className="flex-1">
+          {sessionExpired && (
+            <Alert color="warning" className="mb-5">
+              Your session expired. Please sign in again.
+            </Alert>
+          )}
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="">
               <Label value="Type your Email: " />
