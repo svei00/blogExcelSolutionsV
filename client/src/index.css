@@ -1,7 +1,29 @@
 @import "normalize.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Toast UI's toolbar icons are a background-image sprite on
+   `.toastui-editor-toolbar-icons` (class selector, specificity 0,1,0).
+   Tailwind's preflight resets background-image on every `<button>` via
+   `button, [type="button"], ...` — our toolbar buttons carry
+   type="button", so they match through the `[type="button"]` branch,
+   which is an ATTRIBUTE selector and therefore ALSO specificity 0,1,0.
+   That's a dead tie, and Tailwind was winning it (verified in-browser:
+   getComputedStyle showed backgroundImage: "none" on every toolbar
+   button, in both themes). @import must stay at the top of the file
+   (CSS spec — Vite enforces this and silently drops out-of-order
+   imports), so we can't just reorder our way out of the tie. Instead,
+   these two imports stay UNLAYERED while @tailwind's output below is
+   wrapped in `@layer tailwind` — per the CSS cascade layers spec,
+   unlayered rules always beat layered rules regardless of specificity,
+   so Toast UI wins outright, tie or no tie. Do not import these from
+   PostEditor.jsx instead: importing from a component leaves bundle
+   order up to Vite's module graph, which is how this broke originally. */
+@import "@toast-ui/editor/dist/toastui-editor.css";
+@import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
+
+@layer tailwind {
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+}
 
 body {
   height: 100vh;

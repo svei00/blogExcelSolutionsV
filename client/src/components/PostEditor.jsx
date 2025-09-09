@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import Editor from "@toast-ui/editor";
-import "@toast-ui/editor/dist/toastui-editor.css";
-import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
+// Toast UI's CSS is imported from index.css, not here — see the comment
+// there for why bundle order matters (Tailwind/toolbar-icon conflict).
 import useImageUpload from "../hooks/useImageUpload";
 
 // Toast UI wrapper, markdown in/out, nothing else (REBUILD_PLAN 2.4).
