@@ -27,3 +27,6 @@ dist-ssr
 
 # Personal build-log notes, not project documentation
 notes.md
+
+# Local debugging screenshots, not project documentation
+screenshots/
