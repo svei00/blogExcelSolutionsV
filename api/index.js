@@ -1,10 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import helmet from "helmet";
 import userRoutes from "./routes/user.route.js"; // Important to add file extension on backend!!
 import authRoutes from "./routes/auth.route.js";
 import postRouters from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
+import { authLimiter, commentLimiter, globalLimiter } from "./middleware/rateLimits.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 
@@ -23,6 +25,12 @@ const __dirname = path.resolve(); // This is for getting the current directory n
 
 const app = express();
 
+// CSP is deliberately NOT set here (helmet.contentSecurityPolicy: false) -
+// it needs to allowlist AdSense/GA4/Firebase domains and is easier to
+// tune and roll out via nginx's Content-Security-Policy-Report-Only mode
+// (REBUILD_PLAN 3.6) than to redeploy the API for every adjustment.
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(globalLimiter);
 app.use(express.json());
 app.use(cookieParser());
 

@@ -1,5 +1,19 @@
+import DOMPurify from "isomorphic-dompurify";
 import Comment from "../models/comment.model.js";
 import { errorHandler } from "../utils/error.util.js";
+
+// React already renders comment.content as escaped text client-side, so
+// this isn't closing an active XSS hole - it's defense in depth in case
+// that ever changes, plus a hard length cap the client's maxLength=1000
+// alone can't enforce (a direct API call bypasses the input entirely).
+const MAX_COMMENT_LENGTH = 500;
+
+function sanitizeCommentContent(content) {
+  return DOMPurify.sanitize(content, { ALLOWED_TAGS: [] }).slice(
+    0,
+    MAX_COMMENT_LENGTH
+  );
+}
 
 export const createComment = async (req, res, next) => {
   try {
@@ -10,7 +24,7 @@ export const createComment = async (req, res, next) => {
     }
 
     const newComment = new Comment({
-      content,
+      content: sanitizeCommentContent(content),
       postId,
       userId,
     });
@@ -66,7 +80,7 @@ export const editComment = async (req, res, next) => {
     const editComment = await Comment.findByIdAndUpdate(
       req.params.commentId,
       {
-        content: req.body.content,
+        content: sanitizeCommentContent(req.body.content),
       },
       {
         new: true,

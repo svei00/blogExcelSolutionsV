@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # Root package.json - the API server's dependencies.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # client/package.json - the frontend's dependencies (separate lockfile).
+  - package-ecosystem: "npm"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+
+  # The deploy workflow itself (actions/checkout, actions/setup-node, etc).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

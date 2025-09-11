@@ -1,4 +1,6 @@
+import DOMPurify from "isomorphic-dompurify";
 import { errorHandler } from "../utils/error.util.js";
+import escapeRegex from "../utils/escapeRegex.util.js";
 import Post from "../models/post.model.js";
 
 export const create = async (req, res, next) => {
@@ -14,8 +16,19 @@ export const create = async (req, res, next) => {
     .toLowerCase()
     .replace(/[^a-zA-Z0-9-]/g, "");
 
+  // Only "html" posts are sanitized here (legacy Quill format). "md"
+  // content is Markdown source text, not HTML - it gets sanitized after
+  // marked.parse() turns it into HTML, at render time in
+  // renderPostContent.js. Sanitizing raw Markdown source here would just
+  // mangle characters like `<3` that are plain text, not markup.
+  const content =
+    req.body.contentFormat === "html"
+      ? DOMPurify.sanitize(req.body.content)
+      : req.body.content;
+
   const newPost = new Post({
     ...req.body,
+    content,
     slug,
     userId: req.user.id,
   });
@@ -39,9 +52,18 @@ export const getposts = async (req, res, next) => {
       ...(req.query.postId && { _id: req.query.postId }),
       ...(req.query.searchTerm && {
         $or: [
-          // It allow us to use multiple criteria
-          { title: { $regex: req.query.searchTerm, $options: "i" } }, // "i" stands for that upper case or lower case text doesn't matter
-          { content: { $regex: req.query.searchTerm, $options: "i" } },
+          // It allow us to use multiple criteria. escapeRegex prevents a
+          // crafted searchTerm from being interpreted as a regex pattern
+          // (ReDoS - see REBUILD_PLAN H7).
+          {
+            title: { $regex: escapeRegex(req.query.searchTerm), $options: "i" },
+          }, // "i" stands for that upper case or lower case text doesn't matter
+          {
+            content: {
+              $regex: escapeRegex(req.query.searchTerm),
+              $options: "i",
+            },
+          },
         ],
       }),
     })
@@ -89,6 +111,13 @@ export const updatepost = async (req, res, next) => {
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to update this post."));
   }
+  // Same reasoning as create(): only sanitize actual HTML. "md" content
+  // is Markdown source, sanitized at render time after marked.parse().
+  const content =
+    req.body.contentFormat === "html"
+      ? DOMPurify.sanitize(req.body.content)
+      : req.body.content;
+
   try {
     const updatepost = await Post.findByIdAndUpdate(
       req.params.postId,
@@ -96,7 +125,7 @@ export const updatepost = async (req, res, next) => {
         // $set: req.body, this is not secure thats whay we use like this:
         $set: {
           title: req.body.title,
-          content: req.body.content,
+          content,
           contentFormat: req.body.contentFormat,
           category: req.body.category,
           image: req.body.image,
