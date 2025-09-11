@@ -128,7 +128,7 @@ Every library named below is free for this use: MIT unless noted.
 | **2.3 Render pipeline** | New file `client/src/lib/renderPostContent.js` — *single responsibility:* `(content, format) → sanitized HTML`. `md` → `marked` (MIT) → DOMPurify; `html` (legacy) → DOMPurify directly. `PostPage.jsx` imports it and stops knowing formats exist. ⚠️ **Heavy-comment zone** — document both branches and why sanitization is non-negotiable. |
 | **2.4 Editor component** | `client/src/components/PostEditor.jsx` wraps Toast UI: props in (`value`, `onChange`), markdown out. Image upload moves to its own hook `client/src/hooks/useImageUpload.js` (Firebase logic extracted from `CustomReactQuill.jsx` + `CreatePost.jsx` — one copy instead of two). Toast UI's `addImageBlobHook` connects the two. |
 | **2.5 Unify Create/Update** | Extract shared `client/src/components/PostForm.jsx`; `CreatePost.jsx` and `UpdatePost.jsx` shrink to thin pages (fetch/submit + render PostForm). Kills the 80% duplication (M6). |
-| **2.6 Optional legacy conversion** | If you want old posts editable in the new editor: one-off **local** script with `turndown` (MIT, HTML→MD) run against a DB dump, review each post manually, update `contentFormat`. Do this per-post as needed, not as a big-bang batch. |
+| **2.6 Legacy conversion** ✅ **DONE (2026-07) — automatic, per-post, at edit time** | Implemented differently than originally sketched: instead of a one-off local script against a DB dump, `UpdatePost.jsx` runs `turndown` on the fly whenever an admin opens a post with `contentFormat: "html"` — the editor always shows real Markdown, never raw HTML tags as literal text. Saving persists `contentFormat: "md"`. Untouched legacy posts are unaffected; conversion only happens the moment a specific post is actually edited — same "per-post as needed, not a big-bang batch" principle, just driven by the edit action itself instead of a manual script. **Also fixed a real bug found along the way:** `updatepost` in `post.controller.js` used an explicit `$set` whitelist that omitted `contentFormat` — the field could never persist on update no matter what the client sent, meaning any edited post silently kept its old format label. Fixed by adding `contentFormat` to that whitelist. |
 | **2.7 Remove Quill** | Uninstall `react-quill`, delete `CustomReactQuill.jsx`, and delete every `ql-*` / Quill dark-mode hack from `index.css` (this deletes your recent pain commits — satisfying). |
 
 **Done when:** you paste a Markdown draft into a new post and publish with zero reformatting; old posts still render identically; `react-quill` is gone from `package.json`; the Quill XSS advisory disappears from `npm audit`.
@@ -286,7 +286,7 @@ Current worst offenders this dissolves: `CreatePost`/`UpdatePost` duplication, `
 |---|---|---|
 | @toast-ui/editor, @toast-ui/react-editor | MIT | Phase 2 |
 | marked | MIT | Phase 2 |
-| turndown (optional, local script only) | MIT | Phase 2 |
+| turndown | MIT | Phase 2 |
 | DOMPurify / isomorphic-dompurify | Apache-2.0 OR MPL-2.0 | Phases 2–3 |
 | helmet, express-rate-limit, zod, slugify | MIT | Phases 3, 5 |
 | browser-image-compression, rollup-plugin-visualizer | MIT | Phase 4 |

@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Helmet } from "react-helmet-async";
+import TurndownService from "turndown";
 import PostForm from "../components/PostForm";
 import useAuthFetch from "../hooks/useAuthFetch";
+
+const turndownService = new TurndownService();
 
 export default function UpdatePost() {
   const [initialData, setInitialData] = useState(null);
@@ -24,11 +27,24 @@ export default function UpdatePost() {
           throw new Error(data.message || "Failed to fetch post");
         }
         const post = data.posts[0];
+        // The editor is markdown-only (REBUILD_PLAN 2.4). Legacy posts
+        // (contentFormat "html", written with the old Quill editor) would
+        // otherwise show up as raw HTML tags as literal text in the new
+        // editor. Converting once, right here at edit-time, is the
+        // per-post approach 2.6 called for — no batch migration script.
+        // From this point on the post is "md": PostForm always saves
+        // contentFormat "md" once the editor has content, and the server
+        // now persists that field on update (post.controller.js).
+        const content =
+          post.contentFormat === "html"
+            ? turndownService.turndown(post.content)
+            : post.content;
         setInitialData({
           title: post.title,
           category: post.category,
           image: post.image,
-          content: post.content,
+          content,
+          contentFormat: "md",
         });
       } catch (error) {
         console.error("Error fetching post:", error);
