@@ -68,6 +68,23 @@ export default function PostPage() {
     return content.replace(/<[^>]*>?/gm, "").substring(0, 160);
   };
 
+  // Word count from the RENDERED html (post-marked.parse for "md" posts),
+  // not the raw content length - the old version divided raw HTML string
+  // length by 1000, which counted markup and Markdown syntax characters
+  // as reading time. 200 wpm is the standard estimate.
+  const getReadingMinutes = (html) => {
+    const words = html
+      .replace(/<[^>]*>?/gm, " ")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  };
+
+  const renderedContent = post
+    ? renderPostContent(post.content, post.contentFormat)
+    : "";
+
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
       {post && (
@@ -112,14 +129,14 @@ export default function PostPage() {
       <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
         <span>
-          {post && "about " + (post.content.length / 1000).toFixed(0)} minutes
-          to read
+          {post && "about " + getReadingMinutes(renderedContent)} minutes to
+          read
         </span>
       </div>
       <div
         className="p-3 max-w-2xl mx-auto w-full post-content text-justify [&>img]:mx-auto [&>img]:block" // The  [&>img]:mx-auto [&>img]:block is for center the images
         dangerouslySetInnerHTML={{
-          __html: post && renderPostContent(post.content, post.contentFormat),
+          __html: renderedContent,
         }}
       ></div>
       <div className="max-w-4xl mx-auto w-full">
