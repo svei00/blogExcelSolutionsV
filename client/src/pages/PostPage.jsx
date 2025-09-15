@@ -124,7 +124,10 @@ export default function PostPage() {
       <img
         src={post && post.image}
         alt={post && post.title}
-        className="mt-10 p-3 max-h-[600px] w-full object-cover"
+        // aspect-video reserves layout space at a fixed ratio before the
+        // image loads - max-h alone is a cap, not a reservation, so the
+        // page used to jump as each cover image finished loading (CLS).
+        className="mt-10 p-3 aspect-video max-h-[600px] w-full object-cover"
       />
       <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>

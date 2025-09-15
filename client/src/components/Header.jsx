@@ -92,9 +92,9 @@ export default function Header() {
       >
         <span className="flex items-end justify-center">
           <img src={logo} alt="Logo Excel Solutions" className="h-10" />
-          <span className="text-greenEx"> Blog</span>
+          <span className="text-secondary"> Blog</span>
         </span>
-        {/* <span className="px-2 py-1 bg-gradient-to-r from-blueEx to-greenEx rounded-lg text-white">
+        {/* <span className="px-2 py-1 bg-gradient-to-r from-primary to-secondary rounded-lg text-white">
           Excel Solutions®
         </span>
         Blog */}
@@ -158,7 +158,7 @@ export default function Header() {
           </Dropdown>
         ) : (
           <Link to={"/sign-in"}>
-            <Button className="bg-gradient-to-r from-blueEx to-greenEx" outline>
+            <Button className="bg-gradient-to-r from-primary to-secondary" outline>
               Sign In
             </Button>
           </Link>

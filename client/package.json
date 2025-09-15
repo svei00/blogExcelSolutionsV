@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.1",
     "@toast-ui/editor": "^3.2.2",
+    "browser-image-compression": "^2.0.2",
     "dompurify": "^3.4.12",
     "firebase": "^10.8.1",
     "flowbite-react": "^0.7.2",

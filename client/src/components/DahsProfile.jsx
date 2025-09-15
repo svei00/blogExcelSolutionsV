@@ -257,7 +257,7 @@ export default function DashProfile() {
         />
         <Button
           type="submit"
-          className="bg-gradient-to-r from-blueEx to-greenEx"
+          className="bg-gradient-to-r from-primary to-secondary"
           outline
           disabled={loading || imageFileUploading}
         >
@@ -267,7 +267,7 @@ export default function DashProfile() {
           <Link to={"/create-post"}>
             <Button
               type="button"
-              className=" w-full bg-gradient-to-r from-greenEx to-blueEx"
+              className=" w-full bg-gradient-to-r from-secondary to-primary"
               //outline
             >
               Create a Post
@@ -278,13 +278,13 @@ export default function DashProfile() {
       <div className="text-red-500 flex justify-between mt-5 font-semibold">
         <span
           onClick={() => setShowModal(true)}
-          className="cursor-pointer hover:text-blueEx"
+          className="cursor-pointer hover:text-primary"
         >
           Delete Account
         </span>
         <span
           onClick={handleSignout}
-          className="cursor-pointer  hover:text-greenEx"
+          className="cursor-pointer  hover:text-secondary"
         >
           Sign Out
         </span>

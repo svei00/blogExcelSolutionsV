@@ -54,7 +54,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
   };
 
   return (
-    <div className="flex p-4 border-b dark:border-greenEx text-sm">
+    <div className="flex p-4 border-b dark:border-secondary text-sm">
       <div className="flex-shrink-0 mr-3">
         <img
           className="w-10 h-10 rounded-full bg-gray-200"
@@ -121,7 +121,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
                     <button
                       type="button"
                       onClick={handleEdit}
-                      className="text-gray-400 hover:text-greenEx font-semibold"
+                      className="text-gray-400 hover:text-secondary font-semibold"
                     >
                       Edit
                     </button>

@@ -28,7 +28,7 @@ export default function Home() {
         </p>
         <Link
           to="/search"
-          className="text-xs sm:text-sm text-blueEx font-bold hover:text-greenEx"
+          className="text-xs sm:text-sm text-primary font-bold hover:text-secondary"
         >
           View all Posts
         </Link>
@@ -53,7 +53,7 @@ export default function Home() {
             {/* View All Posts Link */}
             <Link
               to="/search"
-              className="text-lg font-semibold text-greenEx hover:text-blueEx text-center"
+              className="text-lg font-semibold text-secondary hover:text-primary text-center"
             >
               View all Posts
             </Link>

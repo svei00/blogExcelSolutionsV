@@ -2,11 +2,6 @@
 // Change a value here to re-theme the whole site through Tailwind classes
 // (bg-primary, text-secondary, etc.) generated from these tokens.
 //
-// `blueEx` / `greenEx` below are kept as aliases of primary/secondary so
-// existing Tailwind classes (bg-blueEx, from-greenEx, ...) keep working
-// during the gradual migration. Delete the aliases once every usage has
-// been switched to the semantic names (tracked in Phase 4, task 4.8).
-//
 // Contrast notes (WCAG AA = 4.5:1 for normal text, 3:1 for large text):
 // the *-vivid values below are the original brand colors and currently
 // FAIL AA for normal-size text/links on white (~2.5:1 / ~3.9:1). Darker,
@@ -36,10 +31,3 @@ const theme = {
 };
 
 export default theme;
-
-// Transition aliases — remove in Phase 4 (task 4.8) once every
-// `blueEx`/`greenEx` Tailwind class has been migrated to `primary`/`secondary`.
-export const legacyAliases = {
-  blueEx: theme.colors.primary,
-  greenEx: theme.colors.secondary,
-};

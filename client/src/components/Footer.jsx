@@ -14,7 +14,7 @@ import {
 
 export default function FooterComponent() {
   return (
-    <Footer container className="border border-t-8 border-blueEx">
+    <Footer container className="border border-t-8 border-primary">
       <div className="w-full max-w-7xl mx-auto">
         <div className="grid w-full justify-between sm:flex md:grid-cols-1">
           <div className="mt-5">
@@ -24,9 +24,9 @@ export default function FooterComponent() {
             >
               <span className="flex items-end justify-center ">
                 <img src={logo} alt="Logo Excel Solutions" className="h-10" />
-                <span className="text-greenEx"> Blog</span>
+                <span className="text-secondary"> Blog</span>
               </span>
-              {/* <span className="px-2 py-1 bg-gradient-to-r from-blueEx to-greenEx rounded-lg text-white">
+              {/* <span className="px-2 py-1 bg-gradient-to-r from-primary to-secondary rounded-lg text-white">
           Excel Solutions®
         </span>
         Blog */}
@@ -97,7 +97,7 @@ export default function FooterComponent() {
           <Footer.Copyright
             href="excelsolucionesv@gmail.com"
             year={new Date().getFullYear()}
-            by=<span className="px-2 py-1 bg-gradient-to-r from-greenEx to-blueEx font-semi-bold font-serif rounded-lg text-white hover:from-blueEx hover:to-greenEx transition-colors duration-300 ease-in-out">
+            by=<span className="px-2 py-1 bg-gradient-to-r from-secondary to-primary font-semi-bold font-serif rounded-lg text-white hover:from-primary hover:to-secondary transition-colors duration-300 ease-in-out">
               Ivan E. Villanueva
             </span>
           />

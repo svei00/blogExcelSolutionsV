@@ -5,6 +5,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import imageCompression from "browser-image-compression";
 import { app } from "../firebase";
 
 // The ONLY Firebase upload code (extracted from CustomReactQuill.jsx and
@@ -14,16 +15,33 @@ export default function useImageUpload() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
 
-  const uploadImage = useCallback((file) => {
-    return new Promise((resolve, reject) => {
-      setUploading(true);
-      setProgress(0);
-      setError(null);
+  const uploadImage = useCallback(async (file) => {
+    setUploading(true);
+    setProgress(0);
+    setError(null);
 
+    // Resize/compress before it ever reaches Firebase (REBUILD_PLAN 4.3)
+    // - cover images and in-editor screenshots were being uploaded at
+    // whatever size the phone/screenshot tool produced, sometimes several
+    // MB at full resolution the page never displays. If compression fails
+    // for any reason, fall back to the original file rather than blocking
+    // the upload entirely.
+    let fileToUpload = file;
+    try {
+      fileToUpload = await imageCompression(file, {
+        maxWidthOrHeight: 1600,
+        maxSizeMB: 2,
+        useWebWorker: true,
+      });
+    } catch {
+      fileToUpload = file;
+    }
+
+    return new Promise((resolve, reject) => {
       const storage = getStorage(app);
-      const fileName = new Date().getTime() + "-" + file.name;
+      const fileName = new Date().getTime() + "-" + fileToUpload.name;
       const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
 
       uploadTask.on(
         "state_changed",

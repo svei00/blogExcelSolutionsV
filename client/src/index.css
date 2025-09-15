@@ -47,16 +47,12 @@ body {
 }
 
 .post-content a {
-  color: rgb(73, 149, 199); /* Change to blueEx */
+  @apply text-primary dark:text-secondary;
   text-decoration: none;
 }
 
 .post-content a:hover {
   text-decoration: underline;
-}
-
-.dark .post-content a {
-  color: red; /* Change to greenEx */
 }
 
 .navbar-link.active {

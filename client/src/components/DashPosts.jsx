@@ -125,7 +125,7 @@ export default function DashPosts() {
                   </Table.Cell>
                   <Table.Cell>
                     <Link
-                      className="text-greenEx text-2xl hover:text-3xl cursor-pointer"
+                      className="text-secondary text-2xl hover:text-3xl cursor-pointer"
                       to={`/update-post/${post._id}`}
                     >
                       <span>
@@ -140,7 +140,7 @@ export default function DashPosts() {
           {showMore && (
             <button
               onClick={handleShowMore}
-              className="w-full text-blueEx font-semibold self-center text-sm py-7 hover:text-greenEx"
+              className="w-full text-primary font-semibold self-center text-sm py-7 hover:text-secondary"
             >
               Show More
             </button>

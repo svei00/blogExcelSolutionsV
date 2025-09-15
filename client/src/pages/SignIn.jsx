@@ -58,9 +58,9 @@ const SignIn = () => {
           >
             <span className="flex items-end">
               <img src={logo} alt="Logo Excel Solutions" className="h-20" />
-              <span className="text-greenEx"> Blog</span>
+              <span className="text-secondary"> Blog</span>
             </span>
-            {/* <span className="px-2 py-1 bg-gradient-to-r from-blueEx to-greenEx rounded-lg text-white">
+            {/* <span className="px-2 py-1 bg-gradient-to-r from-primary to-secondary rounded-lg text-white">
           Excel Solutions®
         </span>
         Blog */}
@@ -99,7 +99,7 @@ const SignIn = () => {
               />
             </div>
             <Button
-              className="bg-gradient-to-r from-blueEx to-greenEx"
+              className="bg-gradient-to-r from-primary to-secondary"
               type="submit"
               disabled={loading}
             >
@@ -118,7 +118,7 @@ const SignIn = () => {
             <span>Don't have an account?</span>
             <Link
               to="/sign-up"
-              className="text-bold text-greenEx font-bold hover:text-blueEx"
+              className="text-bold text-secondary font-bold hover:text-primary"
             >
               Sign Up
             </Link>

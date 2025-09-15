@@ -130,15 +130,15 @@ export default function CommentSection({ postId }) {
           />
           <Link
             to={"/dasboard?tab=profile"}
-            className="text-xs text-blueEx hover:text-greenEx"
+            className="text-xs text-primary hover:text-secondary"
           >
             @{currentUser.username}
           </Link>
         </div>
       ) : (
-        <div className="text-sm text-blueEx my-5 flex gap-1">
+        <div className="text-sm text-primary my-5 flex gap-1">
           You must be Signed In to comment.
-          <Link to={"/signin"} className="text-greenEx hover:font-bold">
+          <Link to={"/signin"} className="text-secondary hover:font-bold">
             {" "}
             Sign In
           </Link>
@@ -147,7 +147,7 @@ export default function CommentSection({ postId }) {
       {currentUser && (
         <form
           onSubmit={handleSubmit}
-          className="border border-blueEx rounded-md p-3"
+          className="border border-primary rounded-md p-3"
         >
           <Textarea
             placeholder="Write a comment..."
@@ -175,7 +175,7 @@ export default function CommentSection({ postId }) {
         <>
           <div className="text-sm my-5 flex items-center gap-1">
             <p>Comments: </p>
-            <div className="border border-greenEx py-1 px-2 rounded-sm">
+            <div className="border border-secondary py-1 px-2 rounded-sm">
               <p>{comments.length}</p>
             </div>
           </div>

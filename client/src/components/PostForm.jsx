@@ -66,11 +66,11 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
         {errors.category && <span className="text-red-500">{errors.category}</span>}
       </div>
 
-      <div className="flex gap-4 items-center justify-between border-2 border-blueEx p-3">
+      <div className="flex gap-4 items-center justify-between border-2 border-primary p-3">
         <FileInput type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
         <Button
           type="button"
-          className="bg-gradient-to-r from-greenEx to-blueEx "
+          className="bg-gradient-to-r from-secondary to-primary "
           outline
           size="sm"
           onClick={handleUploadImage}
@@ -101,7 +101,7 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
 
       <Button
         type="submit"
-        className="bg-gradient-to-r from-greenEx to-blueEx hover:from-blueEx hover:to-greenEx"
+        className="bg-gradient-to-r from-secondary to-primary hover:from-primary hover:to-secondary"
       >
         {submitLabel}
       </Button>

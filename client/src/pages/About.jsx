@@ -37,7 +37,7 @@ const socials = [
     icon: <FaBriefcase size={20} />,
     href: "#",
     label: "Upwork",
-    className: "text-greenEx hover:opacity-75",
+    className: "text-secondary hover:opacity-75",
   },
   {
     icon: <FaGithub size={22} />,
@@ -49,7 +49,7 @@ const socials = [
     icon: <FaEnvelope size={22} />,
     href: "mailto:#",
     label: "Email",
-    className: "text-blueEx hover:opacity-75",
+    className: "text-primary hover:opacity-75",
   },
 ];
 
@@ -63,7 +63,7 @@ export default function About() {
 
           {/* Avatar placeholder */}
           <div className="flex-shrink-0">
-            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-blueEx to-greenEx flex items-center justify-center text-white text-4xl font-bold shadow-lg select-none">
+            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-4xl font-bold shadow-lg select-none">
               SV
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function About() {
                   (Svei)
                 </span>
               </h1>
-              <p className="text-blueEx font-semibold mt-1">
+              <p className="text-primary font-semibold mt-1">
                 Founder, Excel Solutions V — Especialista en Excel y automatización fiscal
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function About() {
             {skills.map((skill) => (
               <span
                 key={skill}
-                className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blueEx dark:bg-blue-900 dark:text-blue-200"
+                className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-primary dark:bg-blue-900 dark:text-blue-200"
               >
                 {skill}
               </span>

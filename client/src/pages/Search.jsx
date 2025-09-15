@@ -131,7 +131,7 @@ export default function Search() {
   return (
     <div className="flex flex-col md:flex-row">
       {/* Sidebar */}
-      <div className="p-7 border-b md:border-r md:min-h-screen border-blueEx">
+      <div className="p-7 border-b md:border-r md:min-h-screen border-primary">
         <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
           {/* Search Term */}
           <div className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export default function Search() {
 
       {/* Main Content */}
       <div className="w-full">
-        <h1 className="text-3xl font-semibold sm:border-b border-greenEx p-3 mt-5">
+        <h1 className="text-3xl font-semibold sm:border-b border-secondary p-3 mt-5">
           Posts Results
         </h1>
         <div className="p-7 flex flex-wrap justify-center items-center gap-4">
@@ -200,7 +200,7 @@ export default function Search() {
           {showMore && (
             <button
               onClick={handleShowMore}
-              className="text-greenEx text-lg hover:text-blueEx p-7 w-full"
+              className="text-secondary text-lg hover:text-primary p-7 w-full"
             >
               Show More
             </button>
