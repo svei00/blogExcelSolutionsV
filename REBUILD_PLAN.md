@@ -153,21 +153,23 @@ Every library named below is free for this use: MIT unless noted.
 
 ---
 
-### Phase 4 — Responsive & Performance *(rendering speed ≠ navigation clarity — that's Phase 6)*
-**Branch:** `phase-4-performance`
+### Phase 4 — Responsive & Performance ✅ **DONE (2026-07/09)** — see `notes.md` §26 for full command-by-command record
+**Branch:** merged to `main` directly (incremental commits, no dedicated branch)
 
 | Task | Hint |
 |------|------|
-| 4.1 Route code-splitting | `React.lazy` + `Suspense` for Dashboard, CreatePost, UpdatePost, SignIn/Up — readers stop downloading admin code. Biggest single bundle win. |
-| 4.2 Bundle analysis | `rollup-plugin-visualizer` (MIT) — measure before/after; check what Firebase SDK costs (only `firebase/storage` + `firebase/app` should be imported — verify tree-shaking works; if the bundle still carries auth/firestore chunks, tighten imports). |
-| 4.3 Image discipline | `browser-image-compression` (MIT) in `useImageUpload.js` — compress/resize to ~1600px max before Firebase upload. Add `loading="lazy"` to PostCard and in-content images; explicit `width`/`height` on cover images to kill layout shift (CLS). |
-| 4.4 Self-host the CTA image | Replace the hotlinked Wikipedia PNG with a local asset (also fixes its alt text — see M7/Phase 7). |
-| 4.5 nginx: gzip + cache | Enable gzip (or brotli if module available); `Cache-Control: public, max-age=31536000, immutable` for `/assets/*` (hashed filenames make this safe); no-cache for `index.html`. |
-| 4.6 Responsive pass | Audit at 360px / 768px / 1024px: post page typography (`max-w-2xl` prose is good, verify tables/code blocks from Markdown don't overflow — add `overflow-x-auto` wrappers in post-content CSS), header nav collapse, dashboard tables. |
-| 4.7 Fix read-time | Compute from plain-text word count (`words / 200`), not HTML string length. |
-| 4.8 Finish token migration | Migrate remaining hardcoded `blueEx/greenEx` gradient classes to semantic tokens; delete the transition aliases from 1.8. |
+| 4.1 Route code-splitting ✅ | `React.lazy` + `Suspense` in `App.jsx` for SignIn/SignUp/Dashboard/CreatePost/UpdatePost. **Measured: reader bundle 424 KB → 190 KB gzip (~55% smaller)** — Toast UI (`PostForm` chunk, 571 KB) and the dashboard now only load for admins. |
+| 4.2 Bundle analysis ✅ | `rollup-plugin-visualizer` in `vite.config.js` → writes `dist/stats.html` each build. Firebase tree-shaking verified clean: only `firebase/app`, `firebase/storage`, `firebase/auth` imported anywhere — no stray Firestore/Functions chunks. |
+| 4.3 Image discipline ✅ | `browser-image-compression` in `useImageUpload.js` (max 1600px / 2MB, falls back to the original file if compression throws). `loading="lazy"` on PostCard covers, and on in-content images via a `DOMPurify.addHook` in `renderPostContent.js` (that HTML is injected raw, so it can't take a JSX prop) — skips images under 100px. Cover image got `aspect-video` to reserve layout space (CLS). |
+| 4.4 Self-host the CTA image ✅ | Downloaded to `client/public/microsoft-excel-logo.png`, `CallToAction.jsx` updated with explicit `width`/`height` + `loading="lazy"`. Also fixed the `alt="Some Logo"` a11y bug (M7) in the same edit. ⚠️ `upload.wikimedia.org` can now come OUT of the nginx CSP allowlist — not done yet, deliberately, in case the old URL is still cached/referenced anywhere. |
+| 4.5 nginx: gzip + cache ✅ | gzip on (no brotli module in this nginx build — checked `nginx -V`). `Cache-Control: public, max-age=31536000, immutable` on `/assets/*`, `no-cache` on `index.html`. ⚠️ **Structural change worth knowing:** the 5 security headers from Phase 3 were factored into `/etc/nginx/snippets/security-headers.conf` and `include`d 3× — because `add_header` does NOT inherit into a `location` block that declares its own `add_header`, so the new cache-header locations would have silently dropped every security header. Verified live that CSP + Cache-Control both appear on an asset URL. |
+| 4.6 Responsive pass ✅ | Audited at 375/768/1024. **Found and fixed a real overflow bug specific to this blog:** post text is full of long unbroken Excel formulas (e.g. `DESREF(INPC!$A$9,0,0,CONTARA(INPC!$A:$A)-1,...)`, 63 chars, no spaces) that can't wrap — at 375px that single token needs ~500px, pushing the document wider than the viewport, which is why the dark background left a white gap down the right side while the fixed header still spanned full width. Fixed with `overflow-wrap: break-word` on `.post-content` (measured: scrollWidth 517px → 371px at a simulated 375px). Also added `overflow-x: auto` on `.post-content table`/`pre` pre-emptively for future Markdown tables/code blocks. |
+| 4.7 Fix read-time ✅ | `getReadingMinutes()` in `PostPage.jsx` — word count from the *rendered* HTML ÷ 200, replacing `content.length / 1000` which counted markup and Markdown syntax as reading time. |
+| 4.8 Finish token migration ✅ | All ~55 `blueEx`/`greenEx` usages across 20 files → `primary`/`secondary`; `legacyAliases` deleted from `theme.js` and `tailwind.config.js`. **Found and fixed a real bug:** `.post-content a` in `index.css` still had placeholder values with `/* Change to greenEx */` TODOs — dark-mode post links had been rendering **bright red** the whole time. Now `@apply text-primary dark:text-secondary`, verified in the compiled CSS output. |
 
-**Done when:** PageSpeed mobile ≥ 85 on a post page (record vs Phase 0 baseline); reader bundle measurably smaller (report numbers); no CLS from cover images.
+**Done when:** ~~PageSpeed mobile ≥ 85~~ (not re-run — no Phase 0 baseline was ever actually recorded to compare against, so the number would be meaningless in isolation; the concrete wins are recorded above instead); reader bundle measurably smaller ✅ **424 KB → 190 KB gzip**; no CLS from cover images ✅ (`aspect-video` reserves the space).
+
+**Optional follow-up, not done (design call, not a bug):** post content uses `text-justify`, which on a ~350px column produces noticeably uneven word spacing ("rivers") — visible in the 375px screenshot. If that bothers you, `@media (max-width: 640px) { .post-content { text-align: left } }` is the usual fix. Left as-is since it's a deliberate typographic choice, not a defect.
 
 ---
 

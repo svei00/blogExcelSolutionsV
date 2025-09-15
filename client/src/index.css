@@ -29,6 +29,21 @@ body {
   height: 100vh;
 }
 
+/* This is an Excel blog, so post text is full of long unbroken formula
+   strings like DESREF(INPC!$A$9,0,0,CONTARA(INPC!$A:$A)-1,...) - 60+
+   characters with no spaces, which cannot wrap. On a 375px phone that
+   single "word" needs ~500px, so it pushed the whole document wider
+   than the viewport: the page scrolled sideways and the dark-mode
+   background (painted only to viewport width) left a white gap down
+   the right side, while the fixed header still spanned full width.
+   Measured before the fix at a simulated 375px: content scrollWidth
+   517px vs clientWidth 371px. `break-word` only breaks a token when it
+   would otherwise overflow, so normal prose is unaffected
+   (REBUILD_PLAN 4.6). */
+.post-content {
+  overflow-wrap: break-word;
+}
+
 .post-content p {
   margin-bottom: 0.5rem;
 }
@@ -53,6 +68,24 @@ body {
 
 .post-content a:hover {
   text-decoration: underline;
+}
+
+/* Markdown tables and fenced code blocks render as plain <table>/<pre>
+   with no width limit of their own - on a narrow screen (audited at
+   360px, REBUILD_PLAN 4.6) a wide table or a long unbroken code line
+   would overflow the post-content column with no way to see the rest
+   of it. display:block + overflow-x:auto on the table itself (rather
+   than a wrapper div, since this HTML comes from marked.parse() and we
+   don't control adding one) turns it into its own horizontal-scroll
+   region instead of breaking the page layout. */
+.post-content table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.post-content pre {
+  overflow-x: auto;
 }
 
 .navbar-link.active {
