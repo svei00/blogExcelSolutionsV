@@ -6,6 +6,7 @@ export const createPostSchema = z.object({
   category: z.string().optional(),
   image: z.string().optional(),
   contentFormat: z.enum(["html", "md"]).optional(),
+  metaDescription: z.string().max(160).optional(),
 });
 
 // Update allows partial edits (a client might only change the title),
@@ -17,4 +18,5 @@ export const updatePostSchema = z.object({
   category: z.string().optional(),
   image: z.string().optional(),
   contentFormat: z.enum(["html", "md"]).optional(),
+  metaDescription: z.string().max(160).optional(),
 });

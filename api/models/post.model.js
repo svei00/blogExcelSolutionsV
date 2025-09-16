@@ -15,6 +15,14 @@ const postSchema = new mongoose.Schema(
       enum: ["html", "md"],
       default: "html",
     },
+    // Optional - falls back to the first 160 chars of the post's plain
+    // text (HTML tags/Markdown syntax stripped) when empty. Used for
+    // the <meta name="description"> and OG description injected by
+    // api/middleware/injectMeta.js (REBUILD_PLAN 5.1/5.3).
+    metaDescription: {
+      type: String,
+      default: "",
+    },
     title: {
       type: String,
       required: true,

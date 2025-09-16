@@ -1,4 +1,4 @@
-import { Alert, Button, FileInput, TextInput } from "flowbite-react";
+import { Alert, Button, FileInput, TextInput, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -64,6 +64,21 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
         />
         {errors.category && <span className="text-red-500">{errors.category}</span>}
+      </div>
+
+      <div>
+        <Textarea
+          placeholder="Meta description (optional - shown in search results and social shares. Falls back to the first 160 characters of the post if left blank.)"
+          rows={2}
+          maxLength={160}
+          value={formData.metaDescription || ""}
+          onChange={(e) =>
+            setFormData({ ...formData, metaDescription: e.target.value })
+          }
+        />
+        <p className="text-gray-500 text-xs mt-1">
+          {(formData.metaDescription || "").length}/160
+        </p>
       </div>
 
       <div className="flex gap-4 items-center justify-between border-2 border-primary p-3">

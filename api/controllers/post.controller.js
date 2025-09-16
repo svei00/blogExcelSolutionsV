@@ -129,6 +129,7 @@ export const updatepost = async (req, res, next) => {
           contentFormat: req.body.contentFormat,
           category: req.body.category,
           image: req.body.image,
+          metaDescription: req.body.metaDescription,
         },
       },
       { new: true }

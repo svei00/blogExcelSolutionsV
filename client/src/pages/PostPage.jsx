@@ -63,9 +63,32 @@ export default function PostPage() {
       </div>
     );
 
-  const getMetaDescription = (content) => {
-    // Strip HTML tagas and get first 160 characters
-    return content.replace(/<[^>]*>?/gm, "").substring(0, 160);
+  // post.metaDescription (REBUILD_PLAN 5.3) wins if the author set one;
+  // otherwise strip the content down to plain text and take the first
+  // 160 chars. Mirrors api/utils/stripToPlainText.util.js's heuristic
+  // (duplicated deliberately, not imported - same reasoning as
+  // api/config/site.js: client and server are independent bundles).
+  const getMetaDescription = (post) => {
+    if (post.metaDescription) return post.metaDescription.slice(0, 160);
+
+    let text = post.content;
+    if (post.contentFormat === "md") {
+      text = text
+        .replace(/```[\s\S]*?```/g, " ")
+        .replace(/`[^`]*`/g, " ")
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+        .replace(/^#{1,6}\s+/gm, "")
+        .replace(/[*_~]{1,3}/g, "")
+        .replace(/^>\s?/gm, "")
+        .replace(/^[-*+]\s+/gm, "")
+        .replace(/^\d+\.\s+/gm, "");
+    }
+    return text
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 160);
   };
 
   // Word count from the RENDERED html (post-marked.parse for "md" posts),
@@ -90,11 +113,11 @@ export default function PostPage() {
       {post && (
         <Helmet>
           <title>{post.title} | Excel SolutionsV Blog</title>
-          <meta name="description" content={getMetaDescription(post.content)} />
+          <meta name="description" content={getMetaDescription(post)} />
           <meta property="og:title" content={post.title} />
           <meta
             property="og:description"
-            content={getMetaDescription(post.content)}
+            content={getMetaDescription(post)}
           />
           <meta property="og:image" content={post.image} />
           <meta
@@ -105,9 +128,15 @@ export default function PostPage() {
           <meta name="twitter:title" content={post.title} />
           <meta
             name="twitter:description"
-            content={getMetaDescription(post.content)}
+            content={getMetaDescription(post)}
           />
           <meta name="twitter:image" content={post.image} />
+          {/* Without this, SPA navigation between posts (client-side
+              routing, no full page reload) would leave whatever canonical
+              URL the server injected for the FIRST post loaded stale on
+              every post visited after it - injectMeta.js only runs once,
+              on the initial HTML response. */}
+          <link rel="canonical" href={`${SITE_URL}/post/${post.slug}`} />
         </Helmet>
       )}
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">

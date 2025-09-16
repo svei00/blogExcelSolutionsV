@@ -1,10 +1,70 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/LogoExcelWindowSmall.png" /> <!--  Can be deleted -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      THE PLACEHOLDER CONTRACT (REBUILD_PLAN 5.1) - read this before
+      touching anything between META-START and META-END.
+
+      Social crawlers (Facebook, WhatsApp, LinkedIn) and most link-preview
+      bots do NOT execute JavaScript. This is a client-side React SPA, so
+      without this block, every one of those crawlers sees only whatever
+      is written here in the raw HTML - react-helmet-async's tags (in
+      PostPage.jsx etc.) exist only after JS runs, which crawlers never
+      trigger.
+
+      This file (client/dist/index.html after build) is served TWO ways:
+        1. Directly by nginx, as a static file, for every route EXCEPT
+           /post/* - what you see below is exactly what those crawlers get.
+           These are the SITE-WIDE DEFAULTS: sensible, generic, always
+           correct even though they're not page-specific.
+        2. Via api/middleware/injectMeta.js, for GET /post/:slug ONLY
+           (nginx routes that one path prefix to Express instead of
+           serving the static file - see the nginx location block).
+           injectMeta reads this exact file from disk and does a plain
+           string replace of everything between the META-START and
+           META-END comments (inclusive) with post-specific tags: real
+           title, real description, real og:image, canonical URL, and an
+           Article JSON-LD block. Nothing outside these two markers is
+           ever touched.
+
+      If you rename/move/reformat these two HTML comments, injectMeta.js
+      breaks silently (its regex stops matching, and it falls back to
+      serving the page with these defaults untouched - not a crash, but
+      posts silently stop getting real meta tags). If you change this
+      block's structure, update the matching regex in injectMeta.js in
+      the same commit.
+
+      react-helmet-async tags (PostPage.jsx, App.jsx) still run and take
+      over AFTER hydration - they don't conflict with what's injected
+      here since Helmet matches by tag name/attribute and replaces
+      in-place. This block exists purely for the pre-JS crawler moment.
+    -->
+    <!--META-START-->
     <title>Excel SolutionsV Blog</title>
+    <meta
+      name="description"
+      content="Excel tips, tutorials, and resources for accountants and professionals - formulas, data analysis, automation, and more."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Excel SolutionsV Blog" />
+    <meta property="og:title" content="Excel SolutionsV Blog" />
+    <meta
+      property="og:description"
+      content="Excel tips, tutorials, and resources for accountants and professionals - formulas, data analysis, automation, and more."
+    />
+    <meta
+      property="og:image"
+      content="https://excelsolutionsv.com/LogoExcelWindowSmall.png"
+    />
+    <meta property="og:url" content="https://excelsolutionsv.com/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://excelsolutionsv.com/" />
+    <!--META-END-->
+
     <!-- AdSense Script -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5050087617356218"
     crossorigin="anonymous"></script>

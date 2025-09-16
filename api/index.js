@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.route.js";
 import postRouters from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import { authLimiter, commentLimiter, globalLimiter } from "./middleware/rateLimits.js";
+import injectMeta from "./middleware/injectMeta.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 
@@ -43,6 +44,12 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRouters);
 app.use("/api/comment", commentRoutes);
+
+// Server-side meta injection for social crawlers (REBUILD_PLAN 5.1).
+// nginx routes only /post/* here in production - every other route is
+// served as a plain static file straight from client/dist, no Node
+// round-trip. Mounted before express.static so it wins regardless.
+app.get("/post/:slug", injectMeta);
 
 // Static pages of the FrontEnd
 app.use(express.static(path.join(__dirname, "/client/dist"))); // Use build for React. Use dist for Vite
