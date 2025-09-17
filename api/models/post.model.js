@@ -33,6 +33,14 @@ const postSchema = new mongoose.Schema(
       default:
         "https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2021/09/how-to-write-a-blog-post.png",
     },
+    // Optional - falls back to the post title when empty (PostPage.jsx,
+    // injectMeta.js). In-content Markdown images already get alt text
+    // naturally via ![alt](url) syntax - this field is only for the
+    // single cover image, which isn't Markdown (REBUILD_PLAN 5.6).
+    imageAlt: {
+      type: String,
+      default: "",
+    },
     category: {
       type: String,
       default: "uncategorized",

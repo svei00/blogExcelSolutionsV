@@ -1,4 +1,5 @@
 import DOMPurify from "isomorphic-dompurify";
+import slugify from "slugify";
 import { errorHandler } from "../utils/error.util.js";
 import escapeRegex from "../utils/escapeRegex.util.js";
 import Post from "../models/post.model.js";
@@ -10,11 +11,14 @@ export const create = async (req, res, next) => {
   if (!req.body.title || !req.body.content) {
     return next(errorHandler(400, "Please fill all the fields"));
   }
-  const slug = req.body.title
-    .split(" ")
-    .join("-")
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9-]/g, "");
+  // Was: strip everything outside [a-zA-Z0-9-], which just DELETES
+  // accented characters (dinámico -> dinmico, método -> mtodo - see the
+  // real slugs already live from before this fix, e.g.
+  // actualizador-dinmico-de-impuestos). slugify TRANSLITERATES instead
+  // (á -> a, é -> e, ñ -> n), so future titles get readable slugs.
+  // REBUILD_PLAN 5.7 is explicit: never touch old slugs without 301s -
+  // this only affects create(), updatepost() never regenerates a slug.
+  const slug = slugify(req.body.title, { lower: true, strict: true });
 
   // Only "html" posts are sanitized here (legacy Quill format). "md"
   // content is Markdown source text, not HTML - it gets sanitized after
@@ -129,6 +133,7 @@ export const updatepost = async (req, res, next) => {
           contentFormat: req.body.contentFormat,
           category: req.body.category,
           image: req.body.image,
+          imageAlt: req.body.imageAlt,
           metaDescription: req.body.metaDescription,
         },
       },

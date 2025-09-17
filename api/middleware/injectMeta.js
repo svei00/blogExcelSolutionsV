@@ -56,6 +56,7 @@ function buildPostMetaBlock(post) {
   const title = escapeHtml(post.title);
   const description = escapeHtml(getMetaDescription(post));
   const image = escapeHtml(post.image);
+  const imageAlt = escapeHtml(post.imageAlt || post.title);
   const url = `${SITE_URL}/post/${post.slug}`;
 
   // Article JSON-LD - the structured-data piece Google uses for rich
@@ -83,6 +84,7 @@ function buildPostMetaBlock(post) {
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:image" content="${image}" />
+    <meta property="og:image:alt" content="${imageAlt}" />
     <meta property="og:url" content="${url}" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="${url}" />

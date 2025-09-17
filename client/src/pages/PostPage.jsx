@@ -152,7 +152,7 @@ export default function PostPage() {
       </Link>
       <img
         src={post && post.image}
-        alt={post && post.title}
+        alt={post && (post.imageAlt || post.title)}
         // aspect-video reserves layout space at a fixed ratio before the
         // image loads - max-h alone is a cap, not a reservation, so the
         // page used to jump as each cover image finished loading (CLS).

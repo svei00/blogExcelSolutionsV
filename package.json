@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.0",
     "serverless-http": "^3.2.0",
+    "slugify": "^1.6.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {

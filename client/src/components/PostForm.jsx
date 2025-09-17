@@ -102,7 +102,17 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
       </div>
       {imageUploadError && <Alert color="failure">{imageUploadError}</Alert>}
       {formData.image && (
-        <img src={formData.image} alt="Uploaded Image" className="w-full h-72 object-cover" />
+        <>
+          <img src={formData.image} alt="Uploaded Image" className="w-full h-72 object-cover" />
+          <TextInput
+            type="text"
+            placeholder="Cover image alt text (optional - falls back to the post title)"
+            value={formData.imageAlt || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, imageAlt: e.target.value })
+            }
+          />
+        </>
       )}
 
       <PostEditor

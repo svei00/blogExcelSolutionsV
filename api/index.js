@@ -8,6 +8,7 @@ import postRouters from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import { authLimiter, commentLimiter, globalLimiter } from "./middleware/rateLimits.js";
 import injectMeta from "./middleware/injectMeta.js";
+import { getSitemap } from "./controllers/sitemap.controller.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 
@@ -50,6 +51,11 @@ app.use("/api/comment", commentRoutes);
 // served as a plain static file straight from client/dist, no Node
 // round-trip. Mounted before express.static so it wins regardless.
 app.get("/post/:slug", injectMeta);
+
+// Dynamic sitemap (REBUILD_PLAN 5.2) - nginx routes /sitemap.xml here
+// too, same reasoning as /post/*: this needs live DB data, a static
+// file can't do it.
+app.get("/sitemap.xml", getSitemap);
 
 // Static pages of the FrontEnd
 app.use(express.static(path.join(__dirname, "/client/dist"))); // Use build for React. Use dist for Vite
