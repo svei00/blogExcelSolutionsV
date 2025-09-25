@@ -27,6 +27,15 @@ const __dirname = path.resolve(); // This is for getting the current directory n
 
 const app = express();
 
+// nginx sits in front of this app and sets X-Forwarded-For on every
+// request - without telling Express to trust that (the app is always
+// behind exactly one proxy hop in production: nginx -> this process),
+// express-rate-limit can't reliably tell visitors apart by IP and
+// throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR on every request. Confirmed
+// this was happening in production: pm2 logs mern-blog showed the
+// ValidationError repeatedly.
+app.set("trust proxy", 1);
+
 // CSP is deliberately NOT set here (helmet.contentSecurityPolicy: false) -
 // it needs to allowlist AdSense/GA4/Firebase domains and is easier to
 // tune and roll out via nginx's Content-Security-Policy-Report-Only mode
