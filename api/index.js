@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.route.js"; // Important to add file extens
 import authRoutes from "./routes/auth.route.js";
 import postRouters from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
+import messageRoutes from "./routes/message.route.js";
 import { authLimiter, commentLimiter, globalLimiter } from "./middleware/rateLimits.js";
 import injectMeta from "./middleware/injectMeta.js";
 import { getSitemap } from "./controllers/sitemap.controller.js";
@@ -54,6 +55,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRouters);
 app.use("/api/comment", commentRoutes);
+app.use("/api/message", messageRoutes);
 
 // Server-side meta injection for social crawlers (REBUILD_PLAN 5.1).
 // nginx routes only /post/* here in production - every other route is

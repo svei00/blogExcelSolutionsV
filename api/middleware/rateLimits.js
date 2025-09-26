@@ -23,6 +23,17 @@ export const commentLimiter = rateLimit({
   message: { success: false, statusCode: 429, message: "Too many comments, please slow down." },
 });
 
+// Strict: the contact form (REBUILD_PLAN 6.3) is the only PUBLIC,
+// UNAUTHENTICATED write endpoint in the app - comments at least require
+// a signed-in user. Tighter than commentLimiter for that reason.
+export const messageLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, statusCode: 429, message: "Too many messages sent, please try again later." },
+});
+
 // Light: a floor for every other route, so nothing is completely
 // unbounded even if a specific limiter is forgotten on a new route.
 export const globalLimiter = rateLimit({
