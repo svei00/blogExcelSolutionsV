@@ -13,7 +13,8 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
-  const [recentPosts, setRecentPosts] = useState(null);
+  const [relatedPosts, setRelatedPosts] = useState(null);
+  const [relatedHeading, setRelatedHeading] = useState("Related Articles");
   // console.log(post); // To see the result of the query
 
   useEffect(() => {
@@ -41,20 +42,42 @@ export default function PostPage() {
     fetchPost();
   }, [postSlug]);
 
+  // Related, not recent: an accountant reading a CFDI post wants more CFDI
+  // content, not whatever was edited most recently. Falls back to recent
+  // posts when the current post has no real category or is the only post
+  // in its category, so the section is never empty.
   useEffect(() => {
-    try {
-      const fetchRecentPosts = async () => {
-        const res = await fetch(`/api/post/getposts?limit=3`);
+    if (!post) return;
+    const fetchRelated = async () => {
+      try {
+        if (post.category && post.category !== "uncategorized") {
+          const res = await fetch(
+            `/api/post/getposts?category=${post.category}&limit=4`
+          );
+          const data = await res.json();
+          if (res.ok) {
+            const filtered = data.posts
+              .filter((p) => p._id !== post._id)
+              .slice(0, 3);
+            if (filtered.length > 0) {
+              setRelatedPosts(filtered);
+              setRelatedHeading("Related Articles");
+              return;
+            }
+          }
+        }
+        const res = await fetch(`/api/post/getposts?limit=4`);
         const data = await res.json();
         if (res.ok) {
-          setRecentPosts(data.posts);
+          setRelatedPosts(data.posts.filter((p) => p._id !== post._id).slice(0, 3));
+          setRelatedHeading("Recent Articles");
         }
-      };
-      fetchRecentPosts();
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, []);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    fetchRelated();
+  }, [post]);
 
   if (loading)
     return (
@@ -177,10 +200,10 @@ export default function PostPage() {
       <CommentSection postId={post._id} />
 
       <div className="flex flex-col justify-center items-center mb-5">
-        <h2 className="text-xl mt-5">Recent Articles</h2>
+        <h2 className="text-xl mt-5">{relatedHeading}</h2>
         <div className="flex flex-wrap gap-5 mt-5">
-          {recentPosts &&
-            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+          {relatedPosts &&
+            relatedPosts.map((p) => <PostCard key={p._id} post={p} />)}
         </div>
       </div>
     </main>
