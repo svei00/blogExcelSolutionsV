@@ -3,6 +3,7 @@ import path from "path";
 import Post from "../models/post.model.js";
 import { getMetaDescription } from "../utils/stripToPlainText.util.js";
 import { SITE_URL, SITE_NAME } from "../config/site.js";
+import { categoryLabel } from "../config/categories.js";
 
 // See the big comment block in client/index.html (search "THE PLACEHOLDER
 // CONTRACT") before changing anything here - the two files are one
@@ -76,6 +77,33 @@ function buildPostMetaBlock(post) {
     author: { "@type": "Organization", name: SITE_NAME },
   }).replace(/</g, "\\u003c");
 
+  // BreadcrumbList JSON-LD (REBUILD_PLAN 6.4) - rides on the same
+  // injection point as the Article JSON-LD above so crawlers get both.
+  // Skips the category crumb entirely for "uncategorized" posts rather
+  // than showing a crumb that leads to a meaningless filtered search.
+  const breadcrumbItems = [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+  ];
+  if (post.category && post.category !== "uncategorized") {
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 2,
+      name: categoryLabel(post.category),
+      item: `${SITE_URL}/search?category=${post.category}`,
+    });
+  }
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    position: breadcrumbItems.length + 1,
+    name: post.title,
+    item: url,
+  });
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems,
+  }).replace(/</g, "\\u003c");
+
   return `${START_MARKER}
     <title>${title} | ${SITE_NAME}</title>
     <meta name="description" content="${description}" />
@@ -89,6 +117,7 @@ function buildPostMetaBlock(post) {
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="${url}" />
     <script type="application/ld+json">${jsonLd}</script>
+    <script type="application/ld+json">${breadcrumbJsonLd}</script>
     ${END_MARKER}`;
 }
 

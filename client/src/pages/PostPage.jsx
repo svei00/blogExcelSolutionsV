@@ -7,6 +7,7 @@ import PostCard from "../components/PostCard.jsx";
 import { Helmet } from "react-helmet-async";
 import { SITE_URL } from "../config/site";
 import renderPostContent from "../lib/renderPostContent";
+import { categoryLabel } from "../config/categories";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -161,6 +162,42 @@ export default function PostPage() {
               on the initial HTML response. */}
           <link rel="canonical" href={`${SITE_URL}/post/${post.slug}`} />
         </Helmet>
+      )}
+      {post && (
+        // Server-side counterpart (BreadcrumbList JSON-LD) lives in
+        // api/middleware/injectMeta.js (6.1's Categories dropdown feeds
+        // both). Category crumb is skipped for "uncategorized" posts -
+        // matches the server-side JSON-LD so the visible trail and the
+        // structured data never disagree.
+        <nav
+          aria-label="Breadcrumb"
+          className="max-w-2xl mx-auto w-full px-3 mt-6 text-sm text-gray-500 dark:text-gray-400"
+        >
+          <ol className="flex flex-wrap items-center gap-1">
+            <li>
+              <Link to="/" className="hover:text-primary">
+                Home
+              </Link>
+            </li>
+            {post.category && post.category !== "uncategorized" && (
+              <>
+                <li aria-hidden="true">&rsaquo;</li>
+                <li>
+                  <Link
+                    to={`/search?category=${post.category}`}
+                    className="hover:text-primary"
+                  >
+                    {categoryLabel(post.category)}
+                  </Link>
+                </li>
+              </>
+            )}
+            <li aria-hidden="true">&rsaquo;</li>
+            <li aria-current="page" className="truncate max-w-xs">
+              {post.title}
+            </li>
+          </ol>
+        </nav>
       )}
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
         {post && post.title}
