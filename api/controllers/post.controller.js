@@ -71,7 +71,11 @@ export const getposts = async (req, res, next) => {
         ],
       }),
     })
-      .sort({ updatedAt: sortDirection })
+      // createdAt, not updatedAt (REBUILD_PLAN M8/6.6): sorting by
+      // updatedAt meant fixing a typo in a 2024 post bumped it above
+      // everything published since - surprising editorial behavior for
+      // Home, Search "Latest", and related-articles alike.
+      .sort({ createdAt: sortDirection })
       .skip(startIndex)
       .limit(limit);
 

@@ -219,6 +219,11 @@ export default function Header() {
             ))}
           </Dropdown>
         )}
+        {/* Search itself was only reachable by typing into the top-right
+            box (desktop) or a bare icon button (mobile, which submits an
+            empty term and just lands on /search). Neither tells a reader
+            "you can browse everything here" - a plain nav link does. */}
+        <NavLinkEx to="/search">Search</NavLinkEx>
         <NavLinkEx to="/about">About</NavLinkEx>
         <NavLinkEx to="/projects">Projects</NavLinkEx>
       </Navbar.Collapse>
