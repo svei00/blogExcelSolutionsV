@@ -1,6 +1,8 @@
 import { Footer } from "flowbite-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
+import { categoryLabel } from "../config/categories";
 import {
   FaGithub,
   FaLinkedin,
@@ -13,6 +15,24 @@ import {
 } from "react-icons/fa6";
 
 export default function FooterComponent() {
+  // The "lost reader's" fallback (REBUILD_PLAN 6.7): a footer with real
+  // navigation, not just social links, so someone who scrolls to the
+  // bottom of any page has a way out other than the browser back button.
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/post/categories");
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <Footer container className="border border-t-8 border-primary">
       <div className="w-full max-w-7xl mx-auto">
@@ -32,7 +52,37 @@ export default function FooterComponent() {
         Blog */}
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 mt-4 sm:grid-cols-3 sm:gap-6">
+          <div className="grid grid-cols-2 gap-3 mt-4 sm:grid-cols-3 lg:grid-cols-5 sm:gap-6">
+            <div>
+              <Footer.Title title="Explore" />
+              <Footer.LinkGroup col>
+                <Footer.Link as={Link} to="/">
+                  Home
+                </Footer.Link>
+                <Footer.Link as={Link} to="/search">
+                  All Posts
+                </Footer.Link>
+                <Footer.Link as={Link} to="/contact">
+                  Services / Contact
+                </Footer.Link>
+              </Footer.LinkGroup>
+            </div>
+            {categories.length > 0 && (
+              <div>
+                <Footer.Title title="Categories" />
+                <Footer.LinkGroup col>
+                  {categories.map((category) => (
+                    <Footer.Link
+                      key={category}
+                      as={Link}
+                      to={`/search?category=${category}`}
+                    >
+                      {categoryLabel(category)}
+                    </Footer.Link>
+                  ))}
+                </Footer.LinkGroup>
+              </div>
+            )}
             <div>
               <Footer.Title title="About" />
               <Footer.LinkGroup col>
@@ -43,12 +93,8 @@ export default function FooterComponent() {
                 >
                   Portfolio
                 </Footer.Link>
-                <Footer.Link
-                  href="/about"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Excel SolutionsV® Blog
+                <Footer.Link as={Link} to="/about">
+                  About
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
