@@ -45,6 +45,19 @@ export default function Header() {
     fetchCategories();
   }, []);
 
+  // Floating pill navbar on scroll (REBUILD_PLAN 6.9, Upscayl-style).
+  // Passive listener - scroll handlers block the compositor thread if
+  // not marked passive. Fires once on mount too, so a mid-page reload
+  // (or a client-side nav landing scrolled) starts in the right visual
+  // state instead of waiting for the next scroll event.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
@@ -100,7 +113,21 @@ export default function Header() {
   };
 
   return (
-    <Navbar className=" border-b-2 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <Navbar
+      // pointer-events-auto: re-enables clicks that HeaderLayout's fixed
+      // wrapper deliberately turns off (see the comment there) - applied
+      // to the Navbar itself, not a full-width div, so the transparent
+      // margin beside a shrunk pill never blocks the content under it.
+      // w-[calc(100%-2rem)] + max-w-5xl + mx-auto: full-width bar when
+      // not scrolled (calc result exceeds max-w-5xl on any real
+      // viewport, so max-w-5xl doesn't engage); once scrolled, side
+      // margins on mobile and a centered 5xl-wide pill on larger screens.
+      className={`pointer-events-auto transition-all duration-300 ${
+        scrolled
+          ? "mt-2 w-[calc(100%-2rem)] max-w-5xl mx-auto rounded-2xl md:rounded-full border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-lg"
+          : "w-full border-b-2 bg-white dark:bg-gray-900"
+      }`}
+    >
       <Link
         to="/"
         className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
