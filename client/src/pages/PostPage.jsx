@@ -1,9 +1,10 @@
 import { Button, Spinner } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection.jsx";
 import PostCard from "../components/PostCard.jsx";
+import PostImageLightbox from "../components/PostImageLightbox.jsx";
 import { Helmet } from "react-helmet-async";
 import { SITE_URL } from "../config/site";
 import renderPostContent from "../lib/renderPostContent";
@@ -14,6 +15,7 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
+  const contentRef = useRef(null);
   const [relatedPosts, setRelatedPosts] = useState(null);
   const [relatedHeading, setRelatedHeading] = useState("Related Articles");
   // console.log(post); // To see the result of the query
@@ -226,11 +228,13 @@ export default function PostPage() {
         </span>
       </div>
       <div
+        ref={contentRef}
         className="p-3 max-w-2xl mx-auto w-full post-content text-justify [&>img]:mx-auto [&>img]:block" // The  [&>img]:mx-auto [&>img]:block is for center the images
         dangerouslySetInnerHTML={{
           __html: renderedContent,
         }}
       ></div>
+      {post && <PostImageLightbox containerRef={contentRef} slug={post.slug} />}
       <div className="max-w-4xl mx-auto w-full">
         <CallToAction />
       </div>
