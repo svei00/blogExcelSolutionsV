@@ -28,6 +28,21 @@ const theme = {
     tiktok: "#ff0050",
     dribbble: "#ea4c89",
   },
+
+  // Elevation scale (REBUILD_PLAN 6.11) — "floating" treatment for
+  // post-content images so screenshots read as objects above the page,
+  // not flush scans. Wired into tailwind.config.js's boxShadow, so
+  // classes like `shadow-elevation-md` are generated from these values
+  // — change a number here, every image using that level restyles.
+  // A box-shadow is nearly invisible against a dark background, so
+  // every level using it MUST be paired with a dark-mode ring/border
+  // companion at the point of use (search this repo for "dark:ring-1
+  // dark:ring-white/10") rather than relying on the shadow alone.
+  elevation: {
+    sm: "0 1px 2px 0 rgba(0, 0, 0, 0.08)", // barely-there lift, small UI chrome
+    md: "0 4px 10px -2px rgba(0, 0, 0, 0.18)", // post-content images (6.11)
+    lg: "0 10px 25px -5px rgba(0, 0, 0, 0.25)", // modals/popovers, reserved for future use
+  },
 };
 
 export default theme;

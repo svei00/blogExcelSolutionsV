@@ -19,6 +19,11 @@ export default {
         current: "currentColor",
         ...theme.colors,
       },
+      boxShadow: {
+        "elevation-sm": theme.elevation.sm,
+        "elevation-md": theme.elevation.md,
+        "elevation-lg": theme.elevation.lg,
+      },
     },
   },
   plugins: [flowbite, tailwindScrollbar], // Correct plugin usage

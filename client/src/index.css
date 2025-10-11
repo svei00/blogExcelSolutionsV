@@ -70,6 +70,22 @@ body {
   text-decoration: underline;
 }
 
+/* "Floating" image treatment via design tokens (REBUILD_PLAN 6.11) -
+   post-content images get rounded corners + an elevation shadow so
+   screenshots read as objects above the page, not flush scans. The
+   ONE place this is applied: Markdown-generated <img> tags (from
+   marked.parse()) can't carry a React className, so this can't live
+   as a Tailwind class on the element itself the way most styling in
+   this app does. A box-shadow is nearly invisible against a dark
+   background, so dark mode gets a subtle ring instead of relying on
+   the shadow alone. Change `elevation.md` in theme.js and every post
+   image restyles from here. Styling only - the click/expand behavior
+   this same selector's images get lives in PostImageLightbox.jsx
+   (6.10), kept separate on purpose. */
+.post-content img {
+  @apply rounded-lg shadow-elevation-md dark:ring-1 dark:ring-white/10;
+}
+
 /* Markdown tables and fenced code blocks render as plain <table>/<pre>
    with no width limit of their own - on a narrow screen (audited at
    360px, REBUILD_PLAN 4.6) a wide table or a long unbroken code line
