@@ -19,6 +19,23 @@
 @import "@toast-ui/editor/dist/toastui-editor.css";
 @import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
 
+/* normalize.css's own `h1 { margin: 0.67em 0; }` (unlayered, see the
+   comment above) preserves the browser's default vertical h1 rhythm on
+   purpose - but that shorthand also sets margin-left/right: 0, and
+   because it's unlayered it permanently beats Tailwind's `mx-auto` on
+   ANY <h1> regardless of specificity, the same layer-precedence rule
+   this file exploits for Toast UI. Confirmed live on production:
+   PostPage's title (`max-w-2xl mx-auto`) computed marginLeft/Right as
+   0px, flush-left instead of centered. Redeclare just the horizontal
+   margins back to auto here (same unlayered tier, later in source, so
+   it wins the tie) - leaves the 0.67em vertical margin alone, and is a
+   no-op for every other <h1> in the app since none of them combine a
+   width constraint with centering the way this one does. */
+h1 {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @layer tailwind {
   @tailwind base;
   @tailwind components;
