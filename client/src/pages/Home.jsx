@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom";
+import { Button } from "flowbite-react";
 import CallToAction from "../components/CallToAction";
 import { useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
+import ButtonEx from "../components/Buttons";
+import { categoryLabel } from "../config/categories";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -15,23 +19,74 @@ export default function Home() {
     fetchPosts();
   }, []);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/post/categories");
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Newest post doubles as the hero's featured panel (posts is already
+  // createdAt-descending post-6.6) - excluded from the grid below so it
+  // isn't shown twice on the same page.
+  const [featuredPost, ...restPosts] = posts;
+
   return (
     <div>
-      {/* Header Section */}
-      <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold lg:text-6xl">
-          Welcome to Excel Solutions Blog
-        </h1>
-        <p className="text-gray-500 text-xs sm:text-sm">
-          Here you can find a variety of Excel topics from general to more
-          specific ones like accounting, data analysis, and much more!
-        </p>
-        <Link
-          to="/search"
-          className="text-xs sm:text-sm text-primary font-bold hover:text-secondary"
-        >
-          View all Posts
-        </Link>
+      {/* Hero */}
+      <div className="max-w-6xl mx-auto px-3 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div className="flex flex-col gap-6">
+          <h1 className="text-3xl font-bold lg:text-5xl">
+            Excel Skills That Solve Real Work Problems
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
+            Step-by-step tutorials on formulas, automation, and data
+            analysis — including CFDI and SAT workflows for Mexican
+            accountants. No fluff, just spreadsheets that work.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <ButtonEx title="Browse Articles" to="/search" />
+            <ButtonEx title="Get Excel Help" to="/contact" outline />
+          </div>
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-1">
+              {categories.map((category) => (
+                <Link key={category} to={`/search?category=${category}`}>
+                  <Button color="gray" pill size="xs">
+                    {categoryLabel(category)}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {featuredPost && (
+          <Link
+            to={`/post/${featuredPost.slug}`}
+            className="group block rounded-xl overflow-hidden shadow-elevation-md dark:ring-1 dark:ring-white/10"
+          >
+            <img
+              src={featuredPost.image}
+              alt={featuredPost.imageAlt || featuredPost.title}
+              className="w-full aspect-video object-cover"
+            />
+            <div className="p-4 bg-gray-50 dark:bg-gray-800">
+              <span className="text-xs uppercase tracking-wide text-secondary font-semibold">
+                Latest Article
+              </span>
+              <h2 className="text-lg font-semibold mt-1 group-hover:text-primary transition-colors">
+                {featuredPost.title}
+              </h2>
+            </div>
+          </Link>
+        )}
       </div>
 
       {/* Call-to-Action Section */}
@@ -41,12 +96,12 @@ export default function Home() {
 
       {/* Recent Posts Section */}
       <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7">
-        {posts && posts.length > 0 && (
+        {restPosts.length > 0 && (
           <div className="flex flex-col gap-6">
             <h2 className="text-2xl font-semibold text-center">Recent Posts</h2>
             {/* Center the posts */}
             <div className="flex flex-wrap justify-center gap-4">
-              {posts.map((post) => (
+              {restPosts.map((post) => (
                 <PostCard key={post._id} post={post} />
               ))}
             </div>
