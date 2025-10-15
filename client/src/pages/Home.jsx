@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
 import ButtonEx from "../components/Buttons";
 import { categoryLabel } from "../config/categories";
+import trackCtaClick from "../utils/trackCtaClick";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -52,7 +53,12 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap gap-3">
             <ButtonEx title="Browse Articles" to="/search" />
-            <ButtonEx title="Get Excel Help" to="/contact" outline />
+            <ButtonEx
+              title="Get Excel Help"
+              to="/contact"
+              outline
+              onClick={() => trackCtaClick("hero")}
+            />
           </div>
           {categories.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-1">
@@ -89,11 +95,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Call-to-Action Section */}
-      <div className="p-3 bg-gray-100 dark:bg-slate-700">
-        <CallToAction />
-      </div>
-
       {/* Recent Posts Section */}
       <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7">
         {restPosts.length > 0 && (
@@ -114,6 +115,11 @@ export default function Home() {
             </Link>
           </div>
         )}
+      </div>
+
+      {/* Call-to-Action Section */}
+      <div className="p-3 bg-gray-100 dark:bg-gray-800">
+        <CallToAction ctaId="band" />
       </div>
     </div>
   );
