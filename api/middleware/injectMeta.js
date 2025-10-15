@@ -5,6 +5,7 @@ import { getMetaDescription } from "../utils/stripToPlainText.util.js";
 import { SITE_URL, SITE_NAME } from "../config/site.js";
 import { categoryLabel } from "../config/categories.js";
 
+
 // See the big comment block in client/index.html (search "THE PLACEHOLDER
 // CONTRACT") before changing anything here - the two files are one
 // contract, read together.

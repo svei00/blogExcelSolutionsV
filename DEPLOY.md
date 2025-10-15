@@ -48,4 +48,4 @@ https://github.com/svei00/blogExcelSolutionsV/actions
 
 ### Editor / bundle looks stale after deploy
 
-Hard-refresh the browser (Ctrl+Shift+R) — the old bundle hash is cached.
+Hard-refresh the browser (Ctrl+Shift+R) in order to view the new pill look — the old bundle hash is cached.
