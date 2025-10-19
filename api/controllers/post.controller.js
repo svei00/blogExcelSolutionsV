@@ -2,6 +2,7 @@ import DOMPurify from "isomorphic-dompurify";
 import slugify from "slugify";
 import { errorHandler } from "../utils/error.util.js";
 import escapeRegex from "../utils/escapeRegex.util.js";
+import stripToPlainText, { getMetaDescription } from "../utils/stripToPlainText.util.js";
 import Post from "../models/post.model.js";
 
 export const create = async (req, res, next) => {
@@ -77,7 +78,35 @@ export const getposts = async (req, res, next) => {
       // Home, Search "Latest", and related-articles alike.
       .sort({ createdAt: sortDirection })
       .skip(startIndex)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    // Full post content is only needed by single-post lookups (PostPage's
+    // ?slug= and UpdatePost's ?postId=) - every other caller (Home,
+    // Search, related posts, DashPosts, DashboardComp) only ever renders
+    // title/image/category, so shipping full content on every list
+    // request was pure wasted bandwidth: real posts run 20-47 KB each,
+    // so Home alone was downloading ~270 KB of HTML it never rendered
+    // (REBUILD_PLAN 6b.1).
+    const includeContent = Boolean(req.query.slug || req.query.postId);
+
+    // excerpt/readingMinutes are computed and returned on EVERY post,
+    // regardless of includeContent - that's what lets PostPage consume
+    // post.readingMinutes instead of computing its own (the two would
+    // otherwise be free to disagree), and lets card UIs show reading
+    // time without ever fetching full content.
+    const enrichedPosts = posts.map((post) => {
+      const words = stripToPlainText(post.content, post.contentFormat)
+        .split(/\s+/)
+        .filter(Boolean).length;
+      const enriched = {
+        ...post,
+        excerpt: getMetaDescription(post),
+        readingMinutes: Math.max(1, Math.round(words / 200)),
+      };
+      if (!includeContent) delete enriched.content;
+      return enriched;
+    });
 
     const totalPosts = await Post.countDocuments();
 
@@ -94,7 +123,7 @@ export const getposts = async (req, res, next) => {
     });
 
     res.status(200).json({
-      posts,
+      posts: enrichedPosts,
       totalPosts,
       lastMonthPosts,
     });

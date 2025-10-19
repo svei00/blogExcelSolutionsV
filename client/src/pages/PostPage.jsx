@@ -117,19 +117,6 @@ export default function PostPage() {
       .slice(0, 160);
   };
 
-  // Word count from the RENDERED html (post-marked.parse for "md" posts),
-  // not the raw content length - the old version divided raw HTML string
-  // length by 1000, which counted markup and Markdown syntax characters
-  // as reading time. 200 wpm is the standard estimate.
-  const getReadingMinutes = (html) => {
-    const words = html
-      .replace(/<[^>]*>?/gm, " ")
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean).length;
-    return Math.max(1, Math.round(words / 200));
-  };
-
   const renderedContent = post
     ? renderPostContent(post.content, post.contentFormat)
     : "";
@@ -222,10 +209,7 @@ export default function PostPage() {
       />
       <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
-        <span>
-          {post && "about " + getReadingMinutes(renderedContent)} minutes to
-          read
-        </span>
+        <span>{post && "about " + post.readingMinutes} minutes to read</span>
       </div>
       <div
         ref={contentRef}
