@@ -41,6 +41,19 @@ const postSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // Null by default - deliberately NOT auto-set from createdAt/updatedAt.
+    // svei writes content meant to age slowly (a correct formula doesn't
+    // rot the way a trend post does), so a *published* date on a card
+    // would measure exactly the thing that's irrelevant here, and
+    // updatedAt already can't be trusted for this (6.6: a typo fix bumps
+    // a 2024 post above everything newer). This is a manual "I re-checked
+    // this still works in current Excel" stamp - unset means exactly
+    // that, no card should ever fall back to createdAt/updatedAt when
+    // this is null (REBUILD_PLAN 6b.2).
+    reviewedAt: {
+      type: Date,
+      default: null,
+    },
     category: {
       type: String,
       default: "uncategorized",

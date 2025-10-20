@@ -74,7 +74,13 @@ function buildPostMetaBlock(post) {
     description: getMetaDescription(post),
     image: post.image,
     datePublished: post.createdAt,
-    dateModified: post.updatedAt,
+    // NOT post.updatedAt - that flips on ANY save, including a typo fix,
+    // which would tell Google the article was substantively revised.
+    // reviewedAt is the deliberate "still verified accurate" stamp
+    // (REBUILD_PLAN 6b.2); falls back to createdAt (not updatedAt) when
+    // unset, so an unreviewed post never claims a freshness it hasn't
+    // earned.
+    dateModified: post.reviewedAt || post.createdAt,
     author: { "@type": "Organization", name: SITE_NAME },
   }).replace(/</g, "\\u003c");
 

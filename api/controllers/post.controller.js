@@ -78,8 +78,7 @@ export const getposts = async (req, res, next) => {
       // Home, Search "Latest", and related-articles alike.
       .sort({ createdAt: sortDirection })
       .skip(startIndex)
-      .limit(limit)
-      .lean();
+      .limit(limit);
 
     // Full post content is only needed by single-post lookups (PostPage's
     // ?slug= and UpdatePost's ?postId=) - every other caller (Home,
@@ -95,7 +94,18 @@ export const getposts = async (req, res, next) => {
     // post.readingMinutes instead of computing its own (the two would
     // otherwise be free to disagree), and lets card UIs show reading
     // time without ever fetching full content.
-    const enrichedPosts = posts.map((post) => {
+    //
+    // .toObject(), NOT .lean() on the query above: .lean() skips
+    // Mongoose's default-value hydration entirely, so any OLDER document
+    // missing a field added to the schema later (imageAlt, contentFormat,
+    // metaDescription, reviewedAt - every post from before 6.11/6b.2)
+    // came back as `undefined` instead of its schema default. Caught this
+    // live: an existing 2024 post's imageAlt/metaDescription/
+    // contentFormat all vanished from the response after a .lean() pass.
+    // .toObject() runs on an already-hydrated document, so defaults are
+    // already applied - same output shape, correct defaults.
+    const enrichedPosts = posts.map((doc) => {
+      const post = doc.toObject();
       const words = stripToPlainText(post.content, post.contentFormat)
         .split(/\s+/)
         .filter(Boolean).length;
@@ -168,6 +178,12 @@ export const updatepost = async (req, res, next) => {
           image: req.body.image,
           imageAlt: req.body.imageAlt,
           metaDescription: req.body.metaDescription,
+          // 5th field added to this whitelist (contentFormat 2.6,
+          // metaDescription 5.3, imageAlt 5.6, now reviewedAt 6b.2) -
+          // forgetting to add a new post field here is this project's
+          // most-repeated bug (notes.md 27.4). $set: req.body is not used
+          // deliberately - see the comment above.
+          reviewedAt: req.body.reviewedAt || null,
         },
       },
       { new: true }

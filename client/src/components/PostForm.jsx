@@ -1,4 +1,4 @@
-import { Alert, Button, FileInput, TextInput, Textarea } from "flowbite-react";
+import { Alert, Button, FileInput, Label, TextInput, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -78,6 +78,27 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
         />
         <p className="text-gray-500 text-xs mt-1">
           {(formData.metaDescription || "").length}/160
+        </p>
+      </div>
+
+      <div>
+        <Label htmlFor="reviewedAt" value="Last reviewed (optional)" />
+        <TextInput
+          type="date"
+          id="reviewedAt"
+          // Cards never fall back to createdAt/updatedAt when this is
+          // unset (REBUILD_PLAN 6b.2) - clearing this field is a real,
+          // meaningful action (removes the "still works" stamp), not a
+          // no-op, so leave it blank rather than defaulting to today.
+          value={formData.reviewedAt ? formData.reviewedAt.slice(0, 10) : ""}
+          onChange={(e) =>
+            setFormData({ ...formData, reviewedAt: e.target.value || null })
+          }
+        />
+        <p className="text-gray-500 text-xs mt-1">
+          Stamp this when you've re-confirmed the content still works in
+          current Excel. Leave blank for content that hasn't been
+          re-verified.
         </p>
       </div>
 
