@@ -184,17 +184,21 @@ export default function Search() {
         <h1 className="text-3xl font-semibold sm:border-b border-secondary p-3 mt-5">
           Posts Results
         </h1>
-        <div className="p-7 flex flex-wrap justify-center items-center gap-4">
+        <div className="p-7 max-w-3xl mx-auto flex flex-col gap-4">
           {/* Display message for no posts */}
           {!loading && posts.length === 0 && (
-            <p className="text-xl text-gray-500">No posts found.</p>
+            <p className="text-xl text-gray-500 text-center">No posts found.</p>
           )}
           {/* Loading indicator */}
-          {loading && <p className="text-xl text-gray-500">Loading...</p>}
-          {/* Post cards */}
-          {!loading &&
-            posts &&
-            posts.map((post) => <PostCard key={post._id} post={post} />)}
+          {loading && <p className="text-xl text-gray-500 text-center">Loading...</p>}
+          {/* Post cards - hairline row list, see Home.jsx (REBUILD_PLAN 6b.3/6b.5) */}
+          {!loading && posts && posts.length > 0 && (
+            <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
+              {posts.map((post) => (
+                <PostCard key={post._id} post={post} variant="row" />
+              ))}
+            </div>
+          )}
           {/* Show More button */}
           {showMore && (
             <button

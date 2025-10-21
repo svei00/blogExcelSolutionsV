@@ -96,14 +96,17 @@ export default function Home() {
       </div>
 
       {/* Recent Posts Section */}
-      <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7">
+      <div className="max-w-3xl mx-auto p-3 flex flex-col gap-6 py-7">
         {restPosts.length > 0 && (
           <div className="flex flex-col gap-6">
             <h2 className="text-2xl font-semibold text-center">Recent Posts</h2>
-            {/* Center the posts */}
-            <div className="flex flex-wrap justify-center gap-4">
+            {/* Hairline row list (REBUILD_PLAN 6b.3/6b.5) - the
+                container owns the divider lines via divide-y so they
+                stay correct regardless of how many posts render;
+                PostCard itself carries no border. */}
+            <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
               {restPosts.map((post) => (
-                <PostCard key={post._id} post={post} />
+                <PostCard key={post._id} post={post} variant="row" />
               ))}
             </div>
             {/* View All Posts Link */}

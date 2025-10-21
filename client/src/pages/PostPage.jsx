@@ -224,11 +224,14 @@ export default function PostPage() {
       </div>
       <CommentSection postId={post._id} />
 
-      <div className="flex flex-col justify-center items-center mb-5">
+      <div className="flex flex-col items-center mb-5 max-w-2xl mx-auto w-full">
         <h2 className="text-xl mt-5">{relatedHeading}</h2>
-        <div className="flex flex-wrap gap-5 mt-5">
+        {/* Hairline row list, see Home.jsx (REBUILD_PLAN 6b.3/6b.5) */}
+        <div className="w-full mt-5 flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
           {relatedPosts &&
-            relatedPosts.map((p) => <PostCard key={p._id} post={p} />)}
+            relatedPosts.map((p) => (
+              <PostCard key={p._id} post={p} variant="row" />
+            ))}
         </div>
       </div>
     </main>
