@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ButtonEx from "../components/Buttons";
 import PostCard from "../components/PostCard";
+import PostViewToggle from "../components/PostViewToggle";
+import useViewPreference from "../hooks/useViewPreference";
 
 export default function Search() {
+  const [view, setView] = useViewPreference();
   // State for sidebar filters
   const [sidebarData, setSidebarData] = useState({
     searchTerm: "",
@@ -181,21 +184,32 @@ export default function Search() {
 
       {/* Main Content */}
       <div className="w-full">
-        <h1 className="text-3xl font-semibold sm:border-b border-secondary p-3 mt-5">
-          Posts Results
-        </h1>
-        <div className="p-7 max-w-3xl mx-auto flex flex-col gap-4">
+        <div className="flex items-center justify-between sm:border-b border-secondary p-3 mt-5">
+          <h1 className="text-3xl font-semibold">Posts Results</h1>
+          <PostViewToggle view={view} onChange={setView} />
+        </div>
+        <div
+          className={`p-7 mx-auto flex flex-col gap-4 ${
+            view === "grid" ? "max-w-6xl" : "max-w-3xl"
+          }`}
+        >
           {/* Display message for no posts */}
           {!loading && posts.length === 0 && (
             <p className="text-xl text-gray-500 text-center">No posts found.</p>
           )}
           {/* Loading indicator */}
           {loading && <p className="text-xl text-gray-500 text-center">Loading...</p>}
-          {/* Post cards - hairline row list, see Home.jsx (REBUILD_PLAN 6b.3/6b.5) */}
+          {/* Post cards - hairline row/grid list, see Home.jsx (REBUILD_PLAN 6b.3/6b.5) */}
           {!loading && posts && posts.length > 0 && (
-            <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
+            <div
+              className={
+                view === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-x divide-y divide-gray-200 dark:divide-gray-700 border-t border-l border-gray-200 dark:border-gray-700"
+                  : "flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700"
+              }
+            >
               {posts.map((post) => (
-                <PostCard key={post._id} post={post} variant="row" />
+                <PostCard key={post._id} post={post} variant={view} />
               ))}
             </div>
           )}

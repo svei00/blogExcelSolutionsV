@@ -3,13 +3,16 @@ import { Button } from "flowbite-react";
 import CallToAction from "../components/CallToAction";
 import { useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
+import PostViewToggle from "../components/PostViewToggle";
 import ButtonEx from "../components/Buttons";
 import { categoryLabel } from "../config/categories";
 import trackCtaClick from "../utils/trackCtaClick";
+import useViewPreference from "../hooks/useViewPreference";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [view, setView] = useViewPreference();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -96,19 +99,38 @@ export default function Home() {
       </div>
 
       {/* Recent Posts Section */}
-      <div className="max-w-3xl mx-auto p-3 flex flex-col gap-6 py-7">
+      <div
+        className={`mx-auto p-3 flex flex-col gap-6 py-7 ${
+          view === "grid" ? "max-w-6xl" : "max-w-3xl"
+        }`}
+      >
         {restPosts.length > 0 && (
           <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-semibold text-center">Recent Posts</h2>
-            {/* Hairline row list (REBUILD_PLAN 6b.3/6b.5) - the
-                container owns the divider lines via divide-y so they
-                stay correct regardless of how many posts render;
-                PostCard itself carries no border. */}
-            <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
-              {restPosts.map((post) => (
-                <PostCard key={post._id} post={post} variant="row" />
-              ))}
+            <div className="flex items-center justify-center gap-4">
+              <h2 className="text-2xl font-semibold">Recent Posts</h2>
+              <PostViewToggle view={view} onChange={setView} />
             </div>
+            {view === "grid" ? (
+              // CSS Grid replaces the wrapped-flex row (REBUILD_PLAN
+              // 6b.5) - flex-wrap + justify-center centers a ragged
+              // last row while the rest sit left; auto-fill/minmax
+              // doesn't have that problem.
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-x divide-y divide-gray-200 dark:divide-gray-700 border-t border-l border-gray-200 dark:border-gray-700">
+                {restPosts.map((post) => (
+                  <PostCard key={post._id} post={post} variant="grid" />
+                ))}
+              </div>
+            ) : (
+              // Hairline row list (REBUILD_PLAN 6b.3/6b.5) - the
+              // container owns the divider lines via divide-y so they
+              // stay correct regardless of how many posts render;
+              // PostCard itself carries no border.
+              <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
+                {restPosts.map((post) => (
+                  <PostCard key={post._id} post={post} variant="row" />
+                ))}
+              </div>
+            )}
             {/* View All Posts Link */}
             <Link
               to="/search"
