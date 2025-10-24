@@ -134,7 +134,7 @@ export default function Header() {
       >
         <span className="flex items-end justify-center">
           <img src={logo} alt="Logo Excel Solutions" className="h-10" />
-          <span className="text-secondary"> Blog</span>
+          <span className="text-secondaryText dark:text-secondary"> Blog</span>
         </span>
         {/* <span className="px-2 py-1 bg-gradient-to-r from-primary to-secondary rounded-lg text-white">
           Excel Solutions®
@@ -231,8 +231,8 @@ export default function Header() {
               <span
                 className={`font-bold ${
                   path === "/search"
-                    ? "text-primary hover:text-secondary"
-                    : "text-gray-400 hover:text-secondary"
+                    ? "text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
+                    : "text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
                 }`}
               >
                 Categories

@@ -217,7 +217,7 @@ export default function Search() {
           {showMore && (
             <button
               onClick={handleShowMore}
-              className="text-secondary text-lg hover:text-primary p-7 w-full"
+              className="text-secondaryText dark:text-secondary text-lg hover:text-primaryText dark:hover:text-primary p-7 w-full"
             >
               Show More
             </button>

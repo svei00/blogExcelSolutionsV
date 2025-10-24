@@ -38,9 +38,13 @@ const HeaderLayout = ({ children }) => {
       >
         <Header />
       </div>
-      <div className="flex-grow" style={{ marginTop: `${headerHeight}px` }}>
+      <main
+        id="main-content"
+        className="flex-grow"
+        style={{ marginTop: `${headerHeight}px` }}
+      >
         {children}
-      </div>
+      </main>
     </div>
   );
 };

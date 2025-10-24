@@ -130,15 +130,15 @@ export default function CommentSection({ postId }) {
           />
           <Link
             to={"/dasboard?tab=profile"}
-            className="text-xs text-primary hover:text-secondary"
+            className="text-xs text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
           >
             @{currentUser.username}
           </Link>
         </div>
       ) : (
-        <div className="text-sm text-primary my-5 flex gap-1">
+        <div className="text-sm text-primaryText dark:text-primary my-5 flex gap-1">
           You must be Signed In to comment.
-          <Link to={"/signin"} className="text-secondary hover:font-bold">
+          <Link to={"/signin"} className="text-secondaryText dark:text-secondary hover:font-bold">
             {" "}
             Sign In
           </Link>

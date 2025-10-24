@@ -121,7 +121,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
                     <button
                       type="button"
                       onClick={handleEdit}
-                      className="text-gray-400 hover:text-secondary font-semibold"
+                      className="text-gray-400 hover:text-secondaryText dark:hover:text-secondary font-semibold"
                     >
                       Edit
                     </button>

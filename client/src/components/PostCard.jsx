@@ -23,7 +23,7 @@ export default function PostCard({ post, variant = "row" }) {
     : null;
 
   const categoryTag = (
-    <div className="font-mono text-[11px] uppercase tracking-wide text-primary">
+    <div className="font-mono text-[11px] uppercase tracking-wide text-primaryText dark:text-primary">
       {category}
     </div>
   );

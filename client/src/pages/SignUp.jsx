@@ -51,7 +51,7 @@ const SignUp = () => {
           >
             <span className="flex items-end">
               <img src={logo} alt="Logo Excel Solutions" className="h-20" />
-              <span className="text-secondary"> Blog</span>
+              <span className="text-secondaryText dark:text-secondary"> Blog</span>
             </span>
             {/* <span className="px-2 py-1 bg-gradient-to-r from-primary to-secondary rounded-lg text-white">
           Excel Solutions®
@@ -115,7 +115,7 @@ const SignUp = () => {
             <span>Do you have an account?</span>
             <Link
               to="/sign-in"
-              className="text-bold text-secondary font-bold hover:text-primary"
+              className="text-bold text-secondaryText dark:text-secondary font-bold hover:text-primaryText dark:hover:text-primary"
             >
               Sign In
             </Link>

@@ -164,7 +164,7 @@ export default function PostPage() {
         >
           <ol className="flex flex-wrap items-center gap-1">
             <li>
-              <Link to="/" className="hover:text-primary">
+              <Link to="/" className="hover:text-primaryText dark:hover:text-primary">
                 Home
               </Link>
             </li>
@@ -174,7 +174,7 @@ export default function PostPage() {
                 <li>
                   <Link
                     to={`/search?category=${post.category}`}
-                    className="hover:text-primary"
+                    className="hover:text-primaryText dark:hover:text-primary"
                   >
                     {categoryLabel(post.category)}
                   </Link>

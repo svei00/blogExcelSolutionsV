@@ -87,10 +87,10 @@ export default function Home() {
               className="w-full aspect-video object-cover"
             />
             <div className="p-4 bg-gray-50 dark:bg-gray-800">
-              <span className="text-xs uppercase tracking-wide text-secondary font-semibold">
+              <span className="text-xs uppercase tracking-wide text-secondaryText dark:text-secondary font-semibold">
                 Latest Article
               </span>
-              <h2 className="text-lg font-semibold mt-1 group-hover:text-primary transition-colors">
+              <h2 className="text-lg font-semibold mt-1 group-hover:text-primaryText dark:group-hover:text-primary transition-colors">
                 {featuredPost.title}
               </h2>
             </div>
@@ -134,7 +134,7 @@ export default function Home() {
             {/* View All Posts Link */}
             <Link
               to="/search"
-              className="text-lg font-semibold text-secondary hover:text-primary text-center"
+              className="text-lg font-semibold text-secondaryText dark:text-secondary hover:text-primaryText dark:hover:text-primary text-center"
             >
               View all Posts
             </Link>

@@ -77,7 +77,7 @@ export default function About() {
                   (Svei)
                 </span>
               </h1>
-              <p className="text-primary font-semibold mt-1">
+              <p className="text-primaryText dark:text-primary font-semibold mt-1">
                 Founder, Excel Solutions V — Especialista en Excel y automatización fiscal
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function About() {
             {skills.map((skill) => (
               <span
                 key={skill}
-                className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-primary dark:bg-blue-900 dark:text-blue-200"
+                className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-primaryText dark:bg-blue-900 dark:text-blue-200"
               >
                 {skill}
               </span>

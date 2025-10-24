@@ -278,13 +278,13 @@ export default function DashProfile() {
       <div className="text-red-500 flex justify-between mt-5 font-semibold">
         <span
           onClick={() => setShowModal(true)}
-          className="cursor-pointer hover:text-primary"
+          className="cursor-pointer hover:text-primaryText dark:hover:text-primary"
         >
           Delete Account
         </span>
         <span
           onClick={handleSignout}
-          className="cursor-pointer  hover:text-secondary"
+          className="cursor-pointer  hover:text-secondaryText dark:hover:text-secondary"
         >
           Sign Out
         </span>

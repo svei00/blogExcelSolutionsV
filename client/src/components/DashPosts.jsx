@@ -140,7 +140,7 @@ export default function DashPosts() {
           {showMore && (
             <button
               onClick={handleShowMore}
-              className="w-full text-primary font-semibold self-center text-sm py-7 hover:text-secondary"
+              className="w-full text-primaryText dark:text-primary font-semibold self-center text-sm py-7 hover:text-secondaryText dark:hover:text-secondary"
             >
               Show More
             </button>

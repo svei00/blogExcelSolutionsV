@@ -79,7 +79,10 @@ body {
 }
 
 .post-content a {
-  @apply text-primary dark:text-secondary;
+  /* primaryText (light) / secondary (dark) both clear 4.5:1 on their
+     respective background (REBUILD_PLAN 7.1) - text-primary alone
+     only hits 3.90:1 on white, below AA for body-size link text. */
+  @apply text-primaryText dark:text-secondary;
   text-decoration: none;
 }
 

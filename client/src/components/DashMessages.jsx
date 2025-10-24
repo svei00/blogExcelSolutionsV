@@ -118,7 +118,7 @@ export default function DashMessages() {
                   <Table.Cell>
                     <a
                       href={`mailto:${message.email}`}
-                      className="text-primary hover:underline"
+                      className="text-primaryText dark:text-primary hover:underline"
                     >
                       {message.email}
                     </a>
@@ -154,7 +154,7 @@ export default function DashMessages() {
           {showMore && (
             <button
               onClick={handleShowMore}
-              className="w-full text-primary font-semibold self-center text-sm py-7 hover:text-secondary"
+              className="w-full text-primaryText dark:text-primary font-semibold self-center text-sm py-7 hover:text-secondaryText dark:hover:text-secondary"
             >
               Show More
             </button>

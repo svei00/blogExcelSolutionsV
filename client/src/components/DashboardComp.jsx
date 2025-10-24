@@ -86,7 +86,7 @@ export default function DashboardComp() {
             <HiOutlineUserGroup className="bg-blue-600 text-white rounded-full text-5xl p-3 shadow-lg" />
           </div>
           <div className="flex gap-2 text-sm">
-            <span className="text-secondary flex items-center">
+            <span className="text-secondaryText dark:text-secondary flex items-center">
               <HiArrowNarrowUp />
               {/* You can Add an in to the arrow so if there is no user don't show it */}
               {lastMonthUsers}
@@ -107,7 +107,7 @@ export default function DashboardComp() {
             <HiAnnotation className="bg-yellow-300 text-white rounded-full text-5xl p-3 shadow-lg" />
           </div>
           <div className="flex gap-2 text-sm">
-            <span className="text-secondary flex items-center">
+            <span className="text-secondaryText dark:text-secondary flex items-center">
               <HiArrowNarrowUp />
               {lastMonthComments}
             </span>
@@ -127,7 +127,7 @@ export default function DashboardComp() {
             <HiDocumentText className="bg-purple-600 text-white rounded-full text-5xl p-3 shadow-lg" />
           </div>
           <div className="flex gap-2 text-sm">
-            <span className="text-secondary flex items-center">
+            <span className="text-secondaryText dark:text-secondary flex items-center">
               <HiArrowNarrowUp />
               {lastMonthPosts}
             </span>
