@@ -160,6 +160,7 @@ export default function Header() {
         color="gray"
         pill
         onClick={handleSubmit}
+        aria-label="Search"
       >
         <AiOutlineSearch />
       </Button>
@@ -169,6 +170,7 @@ export default function Header() {
           color="gray"
           pill
           onClick={() => dispatch(toggleTheme())}
+          aria-label={`Theme: ${theme}. Click to change.`}
         >
           {theme === "light" ? (
             <FaSun />

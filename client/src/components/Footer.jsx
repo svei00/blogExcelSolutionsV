@@ -11,7 +11,6 @@ import {
   FaInstagram,
   FaTiktok,
   FaFacebook,
-  FaDribbble,
 } from "react-icons/fa6";
 
 export default function FooterComponent() {
@@ -106,6 +105,7 @@ export default function FooterComponent() {
                   href="https://www.github.com/svei00"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="GitHub"
                 >
                   <FaGithub className="hover:text-github" />
                 </Footer.Link>
@@ -113,6 +113,7 @@ export default function FooterComponent() {
                   href="https://www.linkedin.com/in/ivan-e-villanueva-26253157/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="LinkedIn"
                 >
                   <FaLinkedin className="hover:text-linkedin" />
                 </Footer.Link>
@@ -120,6 +121,7 @@ export default function FooterComponent() {
                   href="https://www.youtube.com/svei00"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="YouTube"
                 >
                   <FaYoutube className="hover:text-red-600" />
                 </Footer.Link>
@@ -141,7 +143,7 @@ export default function FooterComponent() {
         <Footer.Divider />
         <div className="w-full sm:flex sm:items-center sm:justify-between">
           <Footer.Copyright
-            href="excelsolucionesv@gmail.com"
+            href="mailto:excelsolucionesv@gmail.com"
             year={new Date().getFullYear()}
             by=<span className="px-2 py-1 bg-gradient-to-r from-secondary to-primary font-semi-bold font-serif rounded-lg text-white hover:from-primary hover:to-secondary transition-colors duration-300 ease-in-out">
               Ivan E. Villanueva
@@ -152,6 +154,7 @@ export default function FooterComponent() {
               href="https://www.instagram.com/excelsolutionsv"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Instagram"
               className="text-gray-500 hover:text-instagram transition-colors duration-300 ease-in-out"
             >
               <FaInstagram />
@@ -160,6 +163,7 @@ export default function FooterComponent() {
               href="https://www.facebook.com/profile.php?id=61551997675646"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Facebook"
               className="text-gray-500 hover:text-facebook transition-colors duration-300 ease-in-out"
             >
               <FaFacebook />
@@ -168,6 +172,7 @@ export default function FooterComponent() {
               href="https://www.tiktok.com/@excel.solutionsv"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="TikTok"
               className="text-gray-500 hover:text-tiktok transition-colors duration-300 ease-in-out"
             >
               <FaTiktok />
@@ -176,17 +181,10 @@ export default function FooterComponent() {
               href="https://x.com/svei00"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="X (Twitter)"
               className="text-gray-500 hover:text-xTwitter transition-colors duration-300 ease-in-out"
             >
               <FaXTwitter />
-            </a>
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-dribbble transition-colors duration-300 ease-in-out"
-            >
-              <FaDribbble />
             </a>
           </div>
         </div>
