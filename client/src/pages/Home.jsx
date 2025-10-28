@@ -16,9 +16,13 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const res = await fetch("/api/post/getposts");
-      const data = await res.json();
-      setPosts(data.posts);
+      try {
+        const res = await fetch("/api/post/getposts");
+        const data = await res.json();
+        setPosts(Array.isArray(data.posts) ? data.posts : []);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+      }
     };
     fetchPosts();
   }, []);
