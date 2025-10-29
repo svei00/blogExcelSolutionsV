@@ -195,7 +195,7 @@ export default function PostPage() {
         to={`/search/?category=${post && post.category}`}
         className="self-center mt-5"
       >
-        <Button color="gray" pill size="xs">
+        <Button color="gray" pill size="xs" tabIndex={-1}>
           {post && post.category}
         </Button>
       </Link>

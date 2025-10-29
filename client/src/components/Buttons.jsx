@@ -12,6 +12,7 @@ const ButtonEx = ({ title, type, size, onClick, outline, to }) => {
           onClick={onClick}
           className="bg-gradient-to-r from-secondary to-primary hover:from-primary hover:to-secondary"
           outline={outline}
+          tabIndex={-1}
         >
           {title}
         </Button>

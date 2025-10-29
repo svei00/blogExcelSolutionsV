@@ -202,7 +202,11 @@ export default function Header() {
           </Dropdown>
         ) : (
           <Link to={"/sign-in"}>
-            <Button className="bg-gradient-to-r from-primary to-secondary" outline>
+            <Button
+              className="bg-gradient-to-r from-primary to-secondary"
+              outline
+              tabIndex={-1}
+            >
               Sign In
             </Button>
           </Link>

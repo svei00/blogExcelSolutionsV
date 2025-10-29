@@ -71,7 +71,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-2 mt-1">
               {categories.map((category) => (
                 <Link key={category} to={`/search?category=${category}`}>
-                  <Button color="gray" pill size="xs">
+                  <Button color="gray" pill size="xs" tabIndex={-1}>
                     {categoryLabel(category)}
                   </Button>
                 </Link>

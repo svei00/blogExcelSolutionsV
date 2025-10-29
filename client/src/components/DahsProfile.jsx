@@ -269,6 +269,7 @@ export default function DashProfile() {
               type="button"
               className=" w-full bg-gradient-to-r from-secondary to-primary"
               //outline
+              tabIndex={-1}
             >
               Create a Post
             </Button>
