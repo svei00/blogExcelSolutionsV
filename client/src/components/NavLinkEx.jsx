@@ -6,7 +6,7 @@ const NavLinkEx = ({ to, children }) => {
   const isActive = location.pathname === to;
   const activeClassName = isActive
     ? "text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
-    : "text-gray-400 hover:text-secondaryText dark:hover:text-secondary";
+    : "text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary";
 
   return (
     <Link to={to} className={`font-bold ${activeClassName}`}>

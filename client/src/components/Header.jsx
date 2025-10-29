@@ -238,7 +238,7 @@ export default function Header() {
                 className={`font-bold ${
                   path === "/search"
                     ? "text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
-                    : "text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
+                    : "text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
                 }`}
               >
                 Categories
