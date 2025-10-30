@@ -129,7 +129,7 @@ export default function CommentSection({ postId }) {
             alt=""
           />
           <Link
-            to={"/dasboard?tab=profile"}
+            to={"/dashboard?tab=profile"}
             className="text-xs text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
           >
             @{currentUser.username}
@@ -138,7 +138,7 @@ export default function CommentSection({ postId }) {
       ) : (
         <div className="text-sm text-primaryText dark:text-primary my-5 flex gap-1">
           You must be Signed In to comment.
-          <Link to={"/signin"} className="text-secondaryText dark:text-secondary hover:font-bold">
+          <Link to={"/sign-in"} className="text-secondaryText dark:text-secondary hover:font-bold">
             {" "}
             Sign In
           </Link>
@@ -150,6 +150,7 @@ export default function CommentSection({ postId }) {
           className="border border-primary rounded-md p-3"
         >
           <Textarea
+            aria-label="Write a comment"
             placeholder="Write a comment..."
             rows="3"
             maxLength="1000"
