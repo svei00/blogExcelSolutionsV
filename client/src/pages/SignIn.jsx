@@ -81,7 +81,7 @@ const SignIn = () => {
           )}
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="">
-              <Label value="Type your Email: " />
+              <Label htmlFor="email" value="Type your Email: " />
               <TextInput
                 type="email"
                 placeholder="someone@somecompany.com"
@@ -90,7 +90,7 @@ const SignIn = () => {
               />
             </div>
             <div className="">
-              <Label value="Type your password: " />
+              <Label htmlFor="password" value="Type your password: " />
               <TextInput
                 type="password"
                 placeholder="**********"

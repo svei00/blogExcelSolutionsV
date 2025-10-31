@@ -52,6 +52,7 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
         <TextInput
           type="text"
           placeholder="Title"
+          aria-label="Title"
           required
           id="title"
           className="flex-1"
@@ -69,6 +70,7 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
       <div>
         <Textarea
           placeholder="Meta description (optional - shown in search results and social shares. Falls back to the first 160 characters of the post if left blank.)"
+          aria-label="Meta description"
           rows={2}
           maxLength={160}
           value={formData.metaDescription || ""}
@@ -103,7 +105,12 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
       </div>
 
       <div className="flex gap-4 items-center justify-between border-2 border-primary p-3">
-        <FileInput type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
+        <FileInput
+          type="file"
+          accept="image/*"
+          aria-label="Cover image file"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
         <Button
           type="button"
           className="bg-gradient-to-r from-secondary to-primary "
@@ -128,6 +135,7 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
           <TextInput
             type="text"
             placeholder="Cover image alt text (optional - falls back to the post title)"
+            aria-label="Cover image alt text"
             value={formData.imageAlt || ""}
             onChange={(e) =>
               setFormData({ ...formData, imageAlt: e.target.value })

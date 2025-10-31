@@ -75,6 +75,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
           <>
             <Textarea
               className="mb2"
+              aria-label="Edit comment"
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
             />

@@ -69,7 +69,7 @@ const SignUp = () => {
         <div className="flex-1">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="">
-              <Label value="What's your name: " />
+              <Label htmlFor="username" value="What's your name: " />
               <TextInput
                 type="text"
                 placeholder="Username"
@@ -78,7 +78,7 @@ const SignUp = () => {
               />
             </div>
             <div className="">
-              <Label value="Type your Email: " />
+              <Label htmlFor="email" value="Type your Email: " />
               <TextInput
                 type="email"
                 placeholder="someone@somecompany.com"
@@ -87,7 +87,7 @@ const SignUp = () => {
               />
             </div>
             <div className="">
-              <Label value="What's your Password: " />
+              <Label htmlFor="password" value="What's your Password: " />
               <TextInput
                 type="password"
                 placeholder="Password"

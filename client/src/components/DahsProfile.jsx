@@ -239,6 +239,7 @@ export default function DashProfile() {
           type="text"
           id="username"
           placeholder="Username"
+          aria-label="Username"
           defaultValue={currentUser.username}
           onChange={handleChange}
         />
@@ -246,6 +247,7 @@ export default function DashProfile() {
           type="text"
           id="email"
           placeholder="Email"
+          aria-label="Email"
           defaultValue={currentUser.email}
           onChange={handleChange}
         />
@@ -253,6 +255,7 @@ export default function DashProfile() {
           type="password"
           id="password"
           placeholder="Would you like to change your Password?"
+          aria-label="Password"
           onChange={handleChange}
         />
         <Button
