@@ -122,7 +122,12 @@ export default function PostPage() {
     : "";
 
   return (
-    <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
+    // A plain div, not <main> - HeaderLayout.jsx already provides the
+    // page's one <main id="main-content"> landmark; nesting a second
+    // <main> here is invalid HTML and confuses screen readers about
+    // which region is "the" main content (REBUILD_PLAN 7.5 audit,
+    // found live on production - the only page with this bug).
+    <div className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
       {post && (
         <Helmet>
           <title>{post.title} | Excel SolutionsV Blog</title>
@@ -234,6 +239,6 @@ export default function PostPage() {
             ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
