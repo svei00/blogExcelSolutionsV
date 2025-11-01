@@ -155,7 +155,7 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
 
       <Button
         type="submit"
-        className="bg-gradient-to-r from-secondary to-primary hover:from-primary hover:to-secondary"
+        className="bg-gradient-to-r from-secondaryText to-primaryText hover:from-primaryText hover:to-secondaryText"
       >
         {submitLabel}
       </Button>

@@ -227,38 +227,50 @@ export default function Header() {
           <Link to="/projects">Projects</Link>
         </Navbar.Link> */}
 
-        {/* Custom NavBar */}
-        <NavLinkEx to="/">Home</NavLinkEx>
+        {/* Custom NavBar - each item wrapped in <li> because
+            Navbar.Collapse renders a <ul>, and a <ul> may only contain
+            <li> (REBUILD_PLAN 7.5 audit: axe "list" violation). */}
+        <li>
+          <NavLinkEx to="/">Home</NavLinkEx>
+        </li>
         {categories.length > 0 && (
-          <Dropdown
-            arrowIcon={true}
-            inline
-            label={
-              <span
-                className={`font-bold ${
-                  path === "/search"
-                    ? "text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
-                    : "text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
-                }`}
-              >
-                Categories
-              </span>
-            }
-          >
-            {categories.map((category) => (
-              <Link key={category} to={`/search?category=${category}`}>
-                <Dropdown.Item>{categoryLabel(category)}</Dropdown.Item>
-              </Link>
-            ))}
-          </Dropdown>
+          <li className="list-none">
+            <Dropdown
+              arrowIcon={true}
+              inline
+              label={
+                <span
+                  className={`font-bold ${
+                    path === "/search"
+                      ? "text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
+                      : "text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
+                  }`}
+                >
+                  Categories
+                </span>
+              }
+            >
+              {categories.map((category) => (
+                <Link key={category} to={`/search?category=${category}`}>
+                  <Dropdown.Item>{categoryLabel(category)}</Dropdown.Item>
+                </Link>
+              ))}
+            </Dropdown>
+          </li>
         )}
         {/* Search itself was only reachable by typing into the top-right
             box (desktop) or a bare icon button (mobile, which submits an
             empty term and just lands on /search). Neither tells a reader
             "you can browse everything here" - a plain nav link does. */}
-        <NavLinkEx to="/search">Search</NavLinkEx>
-        <NavLinkEx to="/about">About</NavLinkEx>
-        <NavLinkEx to="/projects">Projects</NavLinkEx>
+        <li>
+          <NavLinkEx to="/search">Search</NavLinkEx>
+        </li>
+        <li>
+          <NavLinkEx to="/about">About</NavLinkEx>
+        </li>
+        <li>
+          <NavLinkEx to="/projects">Projects</NavLinkEx>
+        </li>
       </Navbar.Collapse>
     </Navbar>
   );

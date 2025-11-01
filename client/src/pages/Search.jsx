@@ -137,7 +137,10 @@ export default function Search() {
         <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
           {/* Search Term */}
           <div className="flex items-center gap-2">
-            <label className="whitespace-nowrap font-semibold">
+            <label
+              htmlFor="searchTerm"
+              className="whitespace-nowrap font-semibold"
+            >
               Search Term:
             </label>
             {/* TextInput for search term */}
@@ -152,7 +155,9 @@ export default function Search() {
 
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <label className="font-semibold">Sort:</label>
+            <label htmlFor="sort" className="font-semibold">
+              Sort:
+            </label>
             {/* Dropdown for sort options */}
             <Select onChange={handleChange} value={sidebarData.sort} id="sort">
               <option value="desc">Latest</option>
@@ -162,7 +167,9 @@ export default function Search() {
 
           {/* Category */}
           <div className="flex items-center gap-2">
-            <label className="font-semibold">Category:</label>
+            <label htmlFor="category" className="font-semibold">
+              Category:
+            </label>
             {/* Dropdown for category options */}
             <Select
               onChange={handleChange}
@@ -195,10 +202,16 @@ export default function Search() {
         >
           {/* Display message for no posts */}
           {!loading && posts.length === 0 && (
-            <p className="text-xl text-gray-500 text-center">No posts found.</p>
+            <p className="text-xl text-gray-500 dark:text-gray-400 text-center">
+              No posts found.
+            </p>
           )}
           {/* Loading indicator */}
-          {loading && <p className="text-xl text-gray-500 text-center">Loading...</p>}
+          {loading && (
+            <p className="text-xl text-gray-500 dark:text-gray-400 text-center">
+              Loading...
+            </p>
+          )}
           {/* Post cards - hairline row/grid list, see Home.jsx (REBUILD_PLAN 6b.3/6b.5) */}
           {!loading && posts && posts.length > 0 && (
             <div

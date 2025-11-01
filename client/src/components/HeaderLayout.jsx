@@ -38,9 +38,15 @@ const HeaderLayout = ({ children }) => {
       >
         <Header />
       </div>
+      {/* tabIndex={-1} makes this a valid focus target (not a tab stop)
+          so the skip link (App.jsx, REBUILD_PLAN 7.3) actually moves
+          keyboard focus here, not just the scroll position - confirmed
+          missing in the 7.5 audit: document.activeElement fell back to
+          <body> after activating the skip link without this. */}
       <main
         id="main-content"
-        className="flex-grow"
+        tabIndex={-1}
+        className="flex-grow focus:outline-none"
         style={{ marginTop: `${headerHeight}px` }}
       >
         {children}

@@ -145,7 +145,7 @@ export default function FooterComponent() {
           <Footer.Copyright
             href="mailto:excelsolucionesv@gmail.com"
             year={new Date().getFullYear()}
-            by=<span className="px-2 py-1 bg-gradient-to-r from-secondary to-primary font-semi-bold font-serif rounded-lg text-white hover:from-primary hover:to-secondary transition-colors duration-300 ease-in-out">
+            by=<span className="px-2 py-1 bg-gradient-to-r from-secondaryText to-primaryText font-semi-bold font-serif rounded-lg text-white hover:from-primaryText hover:to-secondaryText transition-colors duration-300 ease-in-out">
               Ivan E. Villanueva
             </span>
           />

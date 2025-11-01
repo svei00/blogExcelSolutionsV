@@ -59,11 +59,11 @@ export default function About() {
       <div className="max-w-4xl mx-auto flex flex-col gap-6">
 
         {/* Profile card */}
-        <div className="flex flex-col md:flex-row gap-8 items-center md:items-start bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8">
+        <div className="flex flex-col md:flex-row gap-8 items-center md:items-start bg-white dark:bg-gray-900 rounded-2xl shadow-md p-8">
 
           {/* Avatar placeholder */}
           <div className="flex-shrink-0">
-            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-4xl font-bold shadow-lg select-none">
+            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-primaryText to-secondaryText flex items-center justify-center text-white text-4xl font-bold shadow-lg select-none">
               SV
             </div>
           </div>
@@ -73,7 +73,7 @@ export default function About() {
             <div>
               <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Iván E. Villanueva Sandoval{" "}
-                <span className="text-gray-400 dark:text-gray-500 font-normal text-base">
+                <span className="text-gray-500 dark:text-gray-400 font-normal text-base">
                   (Svei)
                 </span>
               </h1>

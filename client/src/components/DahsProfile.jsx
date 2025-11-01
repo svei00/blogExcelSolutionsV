@@ -270,7 +270,7 @@ export default function DashProfile() {
           <Link to={"/create-post"}>
             <Button
               type="button"
-              className=" w-full bg-gradient-to-r from-secondary to-primary"
+              className=" w-full bg-gradient-to-r from-secondaryText to-primaryText"
               //outline
               tabIndex={-1}
             >

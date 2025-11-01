@@ -51,7 +51,7 @@ export default function Contact() {
       <h1 className="text-3xl mt-10 mb-3 text-center font-serif">
         Let's talk about your Excel workflow
       </h1>
-      <p className="text-gray-500 text-center mb-8">
+      <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
         Formula troubleshooting, automation, custom dashboards, or general
         consulting - send a message and I'll get back to you.
       </p>
@@ -95,7 +95,7 @@ export default function Contact() {
           </div>
           <Button
             type="submit"
-            className="bg-gradient-to-r from-secondary to-primary hover:from-primary hover:to-secondary"
+            className="bg-gradient-to-r from-secondaryText to-primaryText hover:from-primaryText hover:to-secondaryText"
             disabled={loading}
           >
             {loading ? (

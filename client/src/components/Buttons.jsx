@@ -10,7 +10,7 @@ const ButtonEx = ({ title, type, size, onClick, outline, to }) => {
           type={type}
           size={size}
           onClick={onClick}
-          className="bg-gradient-to-r from-secondary to-primary hover:from-primary hover:to-secondary"
+          className="bg-gradient-to-r from-secondaryText to-primaryText hover:from-primaryText hover:to-secondaryText"
           outline={outline}
           tabIndex={-1}
         >
@@ -25,7 +25,7 @@ const ButtonEx = ({ title, type, size, onClick, outline, to }) => {
       type={type}
       size={size}
       onClick={onClick}
-      className="bg-gradient-to-r from-secondary to-primary hover:from-primary hover:to-secondary"
+      className="bg-gradient-to-r from-secondaryText to-primaryText hover:from-primaryText hover:to-secondaryText"
       outline={outline}
     >
       {title}

@@ -99,7 +99,7 @@ const SignIn = () => {
               />
             </div>
             <Button
-              className="bg-gradient-to-r from-primary to-secondary"
+              className="bg-gradient-to-r from-primaryText to-secondaryText"
               type="submit"
               disabled={loading}
             >

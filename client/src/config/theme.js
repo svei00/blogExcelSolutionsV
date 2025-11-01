@@ -10,10 +10,24 @@
 // `primaryText`/`secondaryText` (below) are darkened for light-mode
 // body text and normal-weight links; pair them with the ORIGINAL
 // `primary`/`secondary` in dark mode (e.g. `text-primaryText
-// dark:text-primary`), never use them standalone in dark mode (they
-// drop to ~2.8:1 / ~3.5:1 there). `primary`/`secondary` stay as-is for
-// large headings, buttons, and backgrounds, where 3:1 is enough and
-// the brighter brand color is wanted.
+// dark:text-primary`), never use them standalone AS TEXT COLOR in dark
+// mode (they drop to ~2.8:1 / ~3.5:1 there). `primary`/`secondary`
+// stay as-is for large headings and backgrounds, where 3:1 is enough
+// and the brighter brand color is wanted.
+//
+// Exception: solid (non-`outline`) gradient BUTTONS carrying WHITE
+// text (`bg-gradient-to-r from-secondary to-primary` + `text-white`)
+// use `primaryText`/`secondaryText` as the gradient stops instead,
+// in BOTH light and dark mode (REBUILD_PLAN 7.5 audit) - white text
+// directly on the vivid `primary`/`secondary` gradient measures only
+// 2.59:1-3.90:1 across the whole gradient, failing AA everywhere.
+// `primaryText`/`secondaryText` clear 4.5:1 at both endpoints AND at
+// the midpoint (verified by hand against the WCAG luminance formula),
+// so white text on that gradient is safe regardless of theme. This
+// doesn't apply to Flowbite's `outline` button variant, which fills
+// the button's interior with a solid dark background and only shows
+// the gradient as a thin border - a non-text UI element, held to the
+// looser 3:1 threshold.
 const theme = {
   colors: {
     // Primary brand blue — large text/buttons/backgrounds (3:1 on white: 3.90:1 pass; on dark bg: 4.55:1 pass).
