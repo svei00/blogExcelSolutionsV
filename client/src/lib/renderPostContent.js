@@ -15,6 +15,21 @@ DOMPurify.addHook("afterSanitizeAttributes", (node) => {
   node.setAttribute("loading", "lazy");
 });
 
+// Legacy Quill-editor posts bake inline `color`/`background-color`
+// styles straight into the stored HTML (e.g. `style="color: black"`).
+// An inline style always wins over the theme's dark-mode text classes,
+// so on a dark background that renders as near-black-on-near-black -
+// confirmed via a live Lighthouse audit at a 1.18:1 contrast ratio
+// (REBUILD_PLAN 7.5). Post text color must always come from the
+// theme, never from stored content, so strip it here rather than
+// hand-editing every affected legacy post.
+DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+  if (!node.style || node.style.length === 0) return;
+  node.style.removeProperty("color");
+  node.style.removeProperty("background-color");
+  node.style.removeProperty("background");
+});
+
 // The ONLY sanitization point client-side. Both branches end in DOMPurify —
 // legacy posts are already HTML from Quill, new posts are Markdown from
 // Toast UI, but neither is trusted until it passes through here.
