@@ -118,7 +118,7 @@ export default function PostPage() {
   };
 
   const renderedContent = post
-    ? renderPostContent(post.content, post.contentFormat)
+    ? renderPostContent(post.content, post.contentFormat, post.title)
     : "";
 
   return (
