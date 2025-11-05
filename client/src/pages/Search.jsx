@@ -1,21 +1,53 @@
-import { Select, TextInput } from "flowbite-react";
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { HiOutlineSearch } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
-import ButtonEx from "../components/Buttons";
 import PostCard from "../components/PostCard";
 import PostViewToggle from "../components/PostViewToggle";
 import useViewPreference from "../hooks/useViewPreference";
 
+// Excel AutoFilter-style toolbar select: a mono, pill-bordered <select>
+// with its own label baked in, instead of a generic Flowbite <Select>
+// in a form-field row (REBUILD_PLAN post-6b search redesign, direction
+// A). Category/sort apply immediately on change - no separate "Apply"
+// step, same as clicking a column filter arrow in Excel.
+function ToolbarSelect({ id, label, value, onChange, children }) {
+  return (
+    <div className="flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs">
+      <label
+        htmlFor={id}
+        className="font-mono uppercase tracking-wide text-gray-500 dark:text-gray-400"
+      >
+        {label}
+      </label>
+      <select
+        id={id}
+        value={value}
+        onChange={onChange}
+        className="border-none bg-transparent p-0 pr-5 text-xs font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0"
+      >
+        {children}
+      </select>
+    </div>
+  );
+}
+
+ToolbarSelect.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
 export default function Search() {
   const [view, setView] = useViewPreference();
-  // State for sidebar filters
+  // State for toolbar filters
   const [sidebarData, setSidebarData] = useState({
     searchTerm: "",
     sort: "desc", // Default sort order
     category: "uncategorized", // Default category
   });
-
-  console.log(sidebarData); // Debugging the state of sidebarData
 
   const [posts, setPosts] = useState([]); // Posts data
   const [loading, setLoading] = useState(false); // Loading state for API calls
@@ -61,28 +93,28 @@ export default function Search() {
     fetchPosts();
   }, [location.search]); // Re-run effect when the URL changes
 
-  // Handles input changes for sidebar filters
-  const handleChange = (e) => {
-    if (e.target.id === "searchTerm") {
-      setSidebarData({
-        ...sidebarData,
-        searchTerm: e.target.value, // Update the search term
-      });
-    }
-    if (e.target.id === "sort") {
-      const order = e.target.value || "desc";
-      setSidebarData({
-        ...sidebarData,
-        sort: order, // Update the sort order
-      });
-    }
-    if (e.target.id === "category") {
-      const category = e.target.value || "uncategorized";
-      setSidebarData({
-        ...sidebarData,
-        category, // Update the category
-      });
-    }
+  // Search term just updates local state as the user types - it applies
+  // on Enter (form submit), not per keystroke.
+  const handleSearchTermChange = (e) => {
+    setSidebarData({ ...sidebarData, searchTerm: e.target.value });
+  };
+
+  // Builds the URL from a given filter set and navigates - the one
+  // place that turns "filters" into "the query that actually ran".
+  const applyFilters = (filters) => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("searchTerm", filters.searchTerm);
+    urlParams.set("sort", filters.sort);
+    urlParams.set("category", filters.category);
+    navigate(`/search?${urlParams.toString()}`);
+  };
+
+  // Category/sort apply immediately on change, AutoFilter-style - no
+  // separate "Apply" step for these two (REBUILD_PLAN search redesign).
+  const handleFilterChange = (e) => {
+    const next = { ...sidebarData, [e.target.id]: e.target.value };
+    setSidebarData(next);
+    applyFilters(next);
   };
 
   // Fetch categories when the component mounts
@@ -100,16 +132,10 @@ export default function Search() {
     fetchCategories();
   }, []); // Only runs on mount
 
-  // Handles form submission to apply filters and update the URL
+  // Handles Enter/search-icon submit for the search term.
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent default form behavior
-    const urlParams = new URLSearchParams(location.search);
-    urlParams.set("searchTerm", sidebarData.searchTerm);
-    urlParams.set("sort", sidebarData.sort);
-    urlParams.set("category", sidebarData.category);
-
-    const searchQuery = urlParams.toString();
-    navigate(`/search?${searchQuery}`); // Navigate to the updated URL
+    e.preventDefault();
+    applyFilters(sidebarData);
   };
 
   // Handles "Show More" functionality to fetch additional posts
@@ -131,61 +157,55 @@ export default function Search() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <div className="p-7 border-b md:border-r md:min-h-screen border-primary">
-        <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
-          {/* Search Term */}
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="searchTerm"
-              className="whitespace-nowrap font-semibold"
+    <div>
+      {/* Toolbar - search + filters in one bar, like Excel's AutoFilter
+          row, instead of a sidebar form (REBUILD_PLAN search redesign). */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto flex max-w-6xl flex-col gap-3 p-4 sm:flex-row sm:items-center"
+        >
+          <div className="flex flex-1 items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2">
+            <button
+              type="submit"
+              aria-label="Search"
+              className="text-gray-400 hover:text-primaryText dark:hover:text-primary"
             >
-              Search Term:
-            </label>
-            {/* TextInput for search term */}
-            <TextInput
-              placeholder="Search..."
+              <HiOutlineSearch className="h-4 w-4" />
+            </button>
+            <input
               id="searchTerm"
               type="text"
+              placeholder="Buscar tutoriales, funciones, plantillas..."
               value={sidebarData.searchTerm}
-              onChange={handleChange}
+              onChange={handleSearchTermChange}
+              className="w-full border-none bg-transparent p-0 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-0"
             />
           </div>
 
-          {/* Sort */}
           <div className="flex items-center gap-2">
-            <label htmlFor="sort" className="font-semibold">
-              Sort:
-            </label>
-            {/* Dropdown for sort options */}
-            <Select onChange={handleChange} value={sidebarData.sort} id="sort">
-              <option value="desc">Latest</option>
-              <option value="asc">Oldest</option>
-            </Select>
-          </div>
-
-          {/* Category */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="category" className="font-semibold">
-              Category:
-            </label>
-            {/* Dropdown for category options */}
-            <Select
-              onChange={handleChange}
-              value={sidebarData.category}
+            <ToolbarSelect
               id="category"
+              label="Categoría"
+              value={sidebarData.category}
+              onChange={handleFilterChange}
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
                   {category}
                 </option>
               ))}
-            </Select>
+            </ToolbarSelect>
+            <ToolbarSelect
+              id="sort"
+              label="Orden"
+              value={sidebarData.sort}
+              onChange={handleFilterChange}
+            >
+              <option value="desc">Recientes</option>
+              <option value="asc">Antiguos</option>
+            </ToolbarSelect>
           </div>
-
-          {/* Apply Filters Button */}
-          <ButtonEx title="Apply Filters" type="submit" outline />
         </form>
       </div>
 
