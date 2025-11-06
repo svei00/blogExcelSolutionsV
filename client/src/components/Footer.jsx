@@ -13,6 +13,22 @@ import {
   FaFacebook,
 } from "react-icons/fa6";
 
+// Flowbite's Footer.Link/Footer.Copyright hard-code "hover:underline" in
+// their default theme, and a plain className prop on either component only
+// reaches the OUTER wrapper, not the inner <a> that carries that class
+// (see FooterLink.js/FooterCopyright.js) - the only way to change it is
+// this `theme` prop, which deep-merges onto the built-in theme and fully
+// replaces string leaves like `href`. Swaps the underline for bold +
+// brand-color text, matching the hover treatment used elsewhere on the
+// site (e.g. the Search "Show More" link).
+const footerLinkHover = {
+  href: "hover:no-underline hover:font-bold hover:text-primaryText dark:hover:text-primary",
+};
+// Icon-only links keep their own per-brand hover color (set on the icon
+// itself below) - this just drops the underline the <a> would otherwise
+// still render under the icon.
+const footerIconLinkHover = { href: "hover:no-underline" };
+
 export default function FooterComponent() {
   // The "lost reader's" fallback (REBUILD_PLAN 6.7): a footer with real
   // navigation, not just social links, so someone who scrolls to the
@@ -55,13 +71,13 @@ export default function FooterComponent() {
             <div>
               <Footer.Title title="Explore" />
               <Footer.LinkGroup col>
-                <Footer.Link as={Link} to="/">
+                <Footer.Link as={Link} to="/" theme={footerLinkHover}>
                   Home
                 </Footer.Link>
-                <Footer.Link as={Link} to="/search">
+                <Footer.Link as={Link} to="/search" theme={footerLinkHover}>
                   All Posts
                 </Footer.Link>
-                <Footer.Link as={Link} to="/contact">
+                <Footer.Link as={Link} to="/contact" theme={footerLinkHover}>
                   Services / Contact
                 </Footer.Link>
               </Footer.LinkGroup>
@@ -75,6 +91,7 @@ export default function FooterComponent() {
                       key={category}
                       as={Link}
                       to={`/search?category=${category}`}
+                      theme={footerLinkHover}
                     >
                       {categoryLabel(category)}
                     </Footer.Link>
@@ -89,10 +106,11 @@ export default function FooterComponent() {
                   href="https://portfolio.excelsolutionsv.com"
                   target="_blank"
                   rel="noopener noreferrer"
+                  theme={footerLinkHover}
                 >
                   Portfolio
                 </Footer.Link>
-                <Footer.Link as={Link} to="/about">
+                <Footer.Link as={Link} to="/about" theme={footerLinkHover}>
                   About
                 </Footer.Link>
               </Footer.LinkGroup>
@@ -106,6 +124,7 @@ export default function FooterComponent() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="GitHub"
+                  theme={footerIconLinkHover}
                 >
                   <FaGithub className="hover:text-github" />
                 </Footer.Link>
@@ -114,6 +133,7 @@ export default function FooterComponent() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn"
+                  theme={footerIconLinkHover}
                 >
                   <FaLinkedin className="hover:text-linkedin" />
                 </Footer.Link>
@@ -122,6 +142,7 @@ export default function FooterComponent() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="YouTube"
+                  theme={footerIconLinkHover}
                 >
                   <FaYoutube className="hover:text-red-600" />
                 </Footer.Link>
@@ -130,10 +151,20 @@ export default function FooterComponent() {
             <div>
               <Footer.Title title="Legal" />
               <Footer.LinkGroup col>
-                <Footer.Link href="#" target="_blank" rel="noopener noreferrer">
+                <Footer.Link
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  theme={footerLinkHover}
+                >
                   Privacy Policy
                 </Footer.Link>
-                <Footer.Link href="#" target="_blank" rel="noopener noreferrer">
+                <Footer.Link
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  theme={footerLinkHover}
+                >
                   Terms & Conditions
                 </Footer.Link>
               </Footer.LinkGroup>
@@ -145,7 +176,12 @@ export default function FooterComponent() {
           <Footer.Copyright
             href="mailto:excelsolucionesv@gmail.com"
             year={new Date().getFullYear()}
-            by=<span className="px-2 py-1 bg-gradient-to-r from-secondaryText to-primaryText font-semi-bold font-serif rounded-lg text-white hover:from-primaryText hover:to-secondaryText transition-colors duration-300 ease-in-out">
+            // theme.href overrides Flowbite's default "ml-1 hover:underline"
+            // (see footerLinkHover above) - without it the badge below got
+            // an underline drawn under it by the wrapping <a>, on top of
+            // its own gradient-reverse hover.
+            theme={{ href: "ml-1 hover:no-underline" }}
+            by=<span className="px-2 py-1 bg-gradient-to-r from-secondaryText to-primaryText font-semibold font-serif rounded-lg text-white hover:from-primaryText hover:to-secondaryText transition-colors duration-300 ease-in-out">
               Ivan E. Villanueva
             </span>
           />

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { HiOutlineSearch } from "react-icons/hi";
+import { HiChevronDown, HiOutlineSearch } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import PostViewToggle from "../components/PostViewToggle";
@@ -20,14 +20,24 @@ function ToolbarSelect({ id, label, value, onChange, children }) {
       >
         {label}
       </label>
-      <select
-        id={id}
-        value={value}
-        onChange={onChange}
-        className="border-none bg-transparent p-0 pr-5 text-xs font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0"
-      >
-        {children}
-      </select>
+      <div className="relative flex items-center">
+        {/* appearance-none strips the native OS combobox skin - without
+            it, Chrome/Windows paints its own white background behind the
+            value regardless of bg-transparent, so dark-mode text (light)
+            landed on that forced-white background and was unreadable. */}
+        <select
+          id={id}
+          value={value}
+          onChange={onChange}
+          className="appearance-none border-none bg-transparent p-0 pr-4 text-xs font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0"
+        >
+          {children}
+        </select>
+        <HiChevronDown
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 h-3 w-3 text-gray-500 dark:text-gray-400"
+        />
+      </div>
     </div>
   );
 }
