@@ -8,7 +8,6 @@ import { toggleTheme, setTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import NavLinkEx from "./NavLinkEx";
-import { categoryLabel } from "../config/categories";
 
 // Detect System Preferences
 const getSystemThemePreference = () => {
@@ -22,7 +21,6 @@ const getSystemThemePreference = () => {
 };
 
 export default function Header() {
-  const path = useLocation().pathname;
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -30,20 +28,6 @@ export default function Header() {
   const { theme } = useSelector((state) => state.theme);
   const [searchTerm, setSearchTerm] = useState("");
   // console.log(searchTerm); // For testing purposes
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/post/categories");
-        const data = await res.json();
-        setCategories(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   // Floating pill navbar on scroll (REBUILD_PLAN 6.9, Upscayl-style).
   // Passive listener - scroll handlers block the compositor thread if
@@ -233,31 +217,10 @@ export default function Header() {
         <li>
           <NavLinkEx to="/">Home</NavLinkEx>
         </li>
-        {categories.length > 0 && (
-          <li className="list-none">
-            <Dropdown
-              arrowIcon={true}
-              inline
-              label={
-                <span
-                  className={`font-bold ${
-                    path === "/search"
-                      ? "text-primaryText dark:text-primary hover:text-secondaryText dark:hover:text-secondary"
-                      : "text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
-                  }`}
-                >
-                  Categories
-                </span>
-              }
-            >
-              {categories.map((category) => (
-                <Link key={category} to={`/search?category=${category}`}>
-                  <Dropdown.Item>{categoryLabel(category)}</Dropdown.Item>
-                </Link>
-              ))}
-            </Dropdown>
-          </li>
-        )}
+        {/* Categories dropdown removed (REBUILD_PLAN search redesign) -
+            a flat list of a dozen+ categories doesn't scale as a nav
+            menu, and it duplicated what /search's toolbar now does
+            better. Category browsing lives on /search only. */}
         {/* Search itself was only reachable by typing into the top-right
             box (desktop) or a bare icon button (mobile, which submits an
             empty term and just lands on /search). Neither tells a reader
