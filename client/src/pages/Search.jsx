@@ -21,15 +21,21 @@ function ToolbarSelect({ id, label, value, onChange, children }) {
         {label}
       </label>
       <div className="relative flex items-center">
-        {/* appearance-none strips the native OS combobox skin - without
-            it, Chrome/Windows paints its own white background behind the
-            value regardless of bg-transparent, so dark-mode text (light)
-            landed on that forced-white background and was unreadable. */}
+        {/* appearance-none strips the native OS chrome for the CLOSED
+            box, which fixed that part. But the OPEN option list is a
+            separate native popup no browser lets you fully restyle, and
+            it defaults to color-scheme: normal - the browser doesn't
+            know the page is dark, so it renders the popup with its
+            light-mode form-control palette regardless of our classes,
+            which is why the list itself stayed white-on-white in dark
+            mode. [color-scheme] tells the browser which palette to use
+            for that native chrome, tied to the same .dark class this
+            site already toggles. */}
         <select
           id={id}
           value={value}
           onChange={onChange}
-          className="appearance-none border-none bg-transparent p-0 pr-4 text-xs font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0"
+          className="appearance-none border-none bg-transparent p-0 pr-4 text-xs font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0 [color-scheme:light] dark:[color-scheme:dark]"
         >
           {children}
         </select>
