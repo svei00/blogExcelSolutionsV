@@ -1,3 +1,4 @@
+import { Dropdown } from "flowbite-react";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { HiChevronDown, HiOutlineSearch } from "react-icons/hi";
@@ -6,54 +7,57 @@ import PostCard from "../components/PostCard";
 import PostViewToggle from "../components/PostViewToggle";
 import useViewPreference from "../hooks/useViewPreference";
 
-// Excel AutoFilter-style toolbar select: a mono, pill-bordered <select>
-// with its own label baked in, instead of a generic Flowbite <Select>
-// in a form-field row (REBUILD_PLAN post-6b search redesign, direction
-// A). Category/sort apply immediately on change - no separate "Apply"
-// step, same as clicking a column filter arrow in Excel.
-function ToolbarSelect({ id, label, value, onChange, children }) {
+// A native <select>'s CLOSED box can be restyled with appearance-none,
+// but its OPEN option list is a separate browser-native popup that no
+// amount of CSS reaches - it renders with the browser's own light/dark
+// palette (color-scheme), independently of any class on the <select>,
+// which is why that popup kept showing up unreadable in dark mode no
+// matter what was tried there. Flowbite's Dropdown/Dropdown.Item sidesteps
+// the whole problem: the "popup" is just a Tailwind-styled <div>, so it's
+// exactly as dark-mode-correct as any other element on the page - the
+// same component already used for the header's Sign-in menu without any
+// of these issues.
+function ToolbarDropdown({ id, label, value, options, onChange }) {
+  const current = options.find((option) => option.value === value);
   return (
-    <div className="flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs">
-      <label
-        htmlFor={id}
-        className="font-mono uppercase tracking-wide text-gray-500 dark:text-gray-400"
-      >
-        {label}
-      </label>
-      <div className="relative flex items-center">
-        {/* appearance-none strips the native OS chrome for the CLOSED
-            box, which fixed that part. But the OPEN option list is a
-            separate native popup no browser lets you fully restyle, and
-            it defaults to color-scheme: normal - the browser doesn't
-            know the page is dark, so it renders the popup with its
-            light-mode form-control palette regardless of our classes,
-            which is why the list itself stayed white-on-white in dark
-            mode. [color-scheme] tells the browser which palette to use
-            for that native chrome, tied to the same .dark class this
-            site already toggles. */}
-        <select
-          id={id}
-          value={value}
-          onChange={onChange}
-          className="appearance-none border-none bg-transparent p-0 pr-4 text-xs font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0 [color-scheme:light] dark:[color-scheme:dark]"
-        >
-          {children}
-        </select>
-        <HiChevronDown
-          aria-hidden="true"
-          className="pointer-events-none absolute right-0 h-3 w-3 text-gray-500 dark:text-gray-400"
-        />
-      </div>
-    </div>
+    <Dropdown
+      inline
+      arrowIcon={false}
+      label={
+        <span className="flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs hover:border-gray-400 dark:hover:border-gray-500">
+          <span className="font-mono uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            {label}
+          </span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {current?.label ?? value}
+          </span>
+          <HiChevronDown
+            aria-hidden="true"
+            className="h-3 w-3 text-gray-500 dark:text-gray-400"
+          />
+        </span>
+      }
+    >
+      {options.map((option) => (
+        <Dropdown.Item key={option.value} onClick={() => onChange(id, option.value)}>
+          {option.label}
+        </Dropdown.Item>
+      ))}
+    </Dropdown>
   );
 }
 
-ToolbarSelect.propTypes = {
+ToolbarDropdown.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   onChange: PropTypes.func.isRequired,
-  children: PropTypes.node.isRequired,
 };
 
 export default function Search() {
@@ -127,8 +131,8 @@ export default function Search() {
 
   // Category/sort apply immediately on change, AutoFilter-style - no
   // separate "Apply" step for these two (REBUILD_PLAN search redesign).
-  const handleFilterChange = (e) => {
-    const next = { ...sidebarData, [e.target.id]: e.target.value };
+  const handleFilterChange = (id, value) => {
+    const next = { ...sidebarData, [id]: value };
     setSidebarData(next);
     applyFilters(next);
   };
@@ -200,27 +204,26 @@ export default function Search() {
           </div>
 
           <div className="flex items-center gap-2">
-            <ToolbarSelect
+            <ToolbarDropdown
               id="category"
               label="Categoría"
               value={sidebarData.category}
               onChange={handleFilterChange}
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </ToolbarSelect>
-            <ToolbarSelect
+              options={categories.map((category) => ({
+                value: category,
+                label: category,
+              }))}
+            />
+            <ToolbarDropdown
               id="sort"
               label="Orden"
               value={sidebarData.sort}
               onChange={handleFilterChange}
-            >
-              <option value="desc">Recientes</option>
-              <option value="asc">Antiguos</option>
-            </ToolbarSelect>
+              options={[
+                { value: "desc", label: "Recientes" },
+                { value: "asc", label: "Antiguos" },
+              ]}
+            />
           </div>
         </form>
       </div>
