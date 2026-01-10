@@ -36,7 +36,10 @@ export default function Header() {
   // state instead of waiting for the next scroll event.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
+    // Raised from 40 - at 40 the pill kicked in on the very first nudge
+    // of the page, which read as twitchy/aggressive rather than a
+    // response to an actual scroll gesture.
+    const handleScroll = () => setScrolled(window.scrollY > 80);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -102,13 +105,19 @@ export default function Header() {
       // wrapper deliberately turns off (see the comment there) - applied
       // to the Navbar itself, not a full-width div, so the transparent
       // margin beside a shrunk pill never blocks the content under it.
-      // w-[calc(100%-2rem)] + max-w-5xl + mx-auto: full-width bar when
-      // not scrolled (calc result exceeds max-w-5xl on any real
-      // viewport, so max-w-5xl doesn't engage); once scrolled, side
-      // margins on mobile and a centered 5xl-wide pill on larger screens.
-      className={`pointer-events-auto transition-all duration-300 ${
+      // w-[calc(100%-2rem)] + max-w-6xl + mx-auto: full-width bar when
+      // not scrolled (calc result exceeds max-w-6xl on any real
+      // viewport, so max-w-6xl doesn't engage); once scrolled, side
+      // margins on mobile and a centered 6xl-wide pill on larger screens.
+      // max-w-6xl (was 5xl) + duration-500 ease-out (was 300, default
+      // ease) + shadow-md (was shadow-lg): the transform itself was
+      // fine, but a sharp 300ms snap into a noticeably narrower, more
+      // heavily-shadowed shape read as aggressive - widening the target
+      // shape and slowing/softening the easing makes it a glide instead
+      // of a jump, without changing what it settles into.
+      className={`pointer-events-auto transition-all duration-500 ease-out ${
         scrolled
-          ? "mt-2 w-[calc(100%-2rem)] max-w-5xl mx-auto rounded-2xl md:rounded-full border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-lg"
+          ? "mt-2 w-[calc(100%-2rem)] max-w-6xl mx-auto rounded-2xl md:rounded-full border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-md"
           : "w-full border-b-2 bg-white dark:bg-gray-900"
       }`}
     >
