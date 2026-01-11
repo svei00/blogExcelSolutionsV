@@ -5,6 +5,32 @@ import escapeRegex from "../utils/escapeRegex.util.js";
 import stripToPlainText, { getMetaDescription } from "../utils/stripToPlainText.util.js";
 import Post from "../models/post.model.js";
 
+// Single place that turns whatever the client sent (a categories[] array
+// from the new multi-select, or just the legacy singular category) into
+// the { category, categories } pair every post document stores. Both
+// create() and updatepost() call this so the two fields can never drift
+// out of sync with each other - the exact "forgot to update it in the
+// second place" bug this codebase keeps hitting (notes.md 27.4).
+function resolveCategories(body) {
+  const categories =
+    Array.isArray(body.categories) && body.categories.length > 0
+      ? body.categories
+      : [body.category || "uncategorized"];
+  return { category: categories[0], categories };
+}
+
+// Read-time counterpart to resolveCategories(): a post from before this
+// field existed has no `categories` array stored at all (see the "no
+// default" comment on the schema), so fall back to wrapping its legacy
+// `category` string. Only matters for posts that haven't been
+// created/edited since this migration landed - every write always
+// produces a real categories[] going forward.
+function readCategories(post) {
+  return Array.isArray(post.categories) && post.categories.length > 0
+    ? post.categories
+    : [post.category || "uncategorized"];
+}
+
 export const create = async (req, res, next) => {
   if (!req.user.isAdmin) {
     return next(errorHandler(403, "You are not allowed to create a post"));
@@ -31,9 +57,13 @@ export const create = async (req, res, next) => {
       ? DOMPurify.sanitize(req.body.content)
       : req.body.content;
 
+  const { category, categories } = resolveCategories(req.body);
+
   const newPost = new Post({
     ...req.body,
     content,
+    category,
+    categories,
     slug,
     userId: req.user.id,
   });
@@ -50,28 +80,44 @@ export const getposts = async (req, res, next) => {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9; // The see the page in tiles 3 x 3
     const sortDirection = req.query.order === "asc" ? 1 : -1;
-    const posts = await Post.find({
-      ...(req.query.userId && { userId: req.query.userId }),
-      ...(req.query.category && { category: req.query.category }),
-      ...(req.query.slug && { slug: req.query.slug }),
-      ...(req.query.postId && { _id: req.query.postId }),
-      ...(req.query.searchTerm && {
-        $or: [
-          // It allow us to use multiple criteria. escapeRegex prevents a
-          // crafted searchTerm from being interpreted as a regex pattern
-          // (ReDoS - see REBUILD_PLAN H7).
-          {
-            title: { $regex: escapeRegex(req.query.searchTerm), $options: "i" },
-          }, // "i" stands for that upper case or lower case text doesn't matter
-          {
-            content: {
-              $regex: escapeRegex(req.query.searchTerm),
-              $options: "i",
+
+    // Category matching needs its own $or (legacy singular `category`
+    // equals it, OR the new `categories` array contains it, so a post
+    // tagged with 2+ categories is findable by any of them, not just its
+    // primary). That's now a SECOND $or alongside searchTerm's - both
+    // can't live as sibling keys in one object literal (the second
+    // would just silently overwrite the first), so each condition is
+    // built as its own object and combined with $and instead.
+    const conditions = [
+      ...(req.query.userId ? [{ userId: req.query.userId }] : []),
+      ...(req.query.category
+        ? [{ $or: [{ category: req.query.category }, { categories: req.query.category }] }]
+        : []),
+      ...(req.query.slug ? [{ slug: req.query.slug }] : []),
+      ...(req.query.postId ? [{ _id: req.query.postId }] : []),
+      ...(req.query.searchTerm
+        ? [
+            {
+              // It allow us to use multiple criteria. escapeRegex prevents a
+              // crafted searchTerm from being interpreted as a regex pattern
+              // (ReDoS - see REBUILD_PLAN H7).
+              $or: [
+                {
+                  title: { $regex: escapeRegex(req.query.searchTerm), $options: "i" },
+                }, // "i" stands for that upper case or lower case text doesn't matter
+                {
+                  content: {
+                    $regex: escapeRegex(req.query.searchTerm),
+                    $options: "i",
+                  },
+                },
+              ],
             },
-          },
-        ],
-      }),
-    })
+          ]
+        : []),
+    ];
+
+    const posts = await Post.find(conditions.length ? { $and: conditions } : {})
       // createdAt, not updatedAt (REBUILD_PLAN M8/6.6): sorting by
       // updatedAt meant fixing a typo in a 2024 post bumped it above
       // everything published since - surprising editorial behavior for
@@ -113,6 +159,10 @@ export const getposts = async (req, res, next) => {
         ...post,
         excerpt: getMetaDescription(post),
         readingMinutes: Math.max(1, Math.round(words / 200)),
+        // Always a real array, even for a post from before this field
+        // existed (readCategories() falls back to the legacy `category`
+        // string) - callers never need to know the difference.
+        categories: readCategories(post),
       };
       if (!includeContent) delete enriched.content;
       return enriched;
@@ -165,6 +215,8 @@ export const updatepost = async (req, res, next) => {
       ? DOMPurify.sanitize(req.body.content)
       : req.body.content;
 
+  const { category, categories } = resolveCategories(req.body);
+
   try {
     const updatepost = await Post.findByIdAndUpdate(
       req.params.postId,
@@ -174,15 +226,16 @@ export const updatepost = async (req, res, next) => {
           title: req.body.title,
           content,
           contentFormat: req.body.contentFormat,
-          category: req.body.category,
+          category,
+          categories,
           image: req.body.image,
           imageAlt: req.body.imageAlt,
           metaDescription: req.body.metaDescription,
-          // 5th field added to this whitelist (contentFormat 2.6,
-          // metaDescription 5.3, imageAlt 5.6, now reviewedAt 6b.2) -
-          // forgetting to add a new post field here is this project's
-          // most-repeated bug (notes.md 27.4). $set: req.body is not used
-          // deliberately - see the comment above.
+          // 6th field added to this whitelist (contentFormat 2.6,
+          // metaDescription 5.3, imageAlt 5.6, reviewedAt 6b.2, now
+          // categories) - forgetting to add a new post field here is
+          // this project's most-repeated bug (notes.md 27.4). $set:
+          // req.body is not used deliberately - see the comment above.
           reviewedAt: req.body.reviewedAt || null,
         },
       },
@@ -196,7 +249,14 @@ export const updatepost = async (req, res, next) => {
 
 export const getCategories = async (req, res, next) => {
   try {
-    const categories = await Post.distinct("category");
+    // Merge both: `category` alone would miss a value that's only ever
+    // a post's SECOND (or later) tag, since only categories[0] gets
+    // mirrored into the legacy singular field.
+    const [fromLegacy, fromArray] = await Promise.all([
+      Post.distinct("category"),
+      Post.distinct("categories"),
+    ]);
+    const categories = [...new Set([...fromLegacy, ...fromArray])].sort();
     res.status(200).json(categories);
   } catch (error) {
     next(errorHandler(500, "Failed to fetch categories"));

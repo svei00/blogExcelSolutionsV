@@ -1,4 +1,4 @@
-import { Button, Spinner } from "flowbite-react";
+import { Spinner } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CallToAction from "../components/CallToAction";
@@ -196,14 +196,6 @@ export default function PostPage() {
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
         {post && post.title}
       </h1>
-      <Link
-        to={`/search/?category=${post && post.category}`}
-        className="self-center mt-5"
-      >
-        <Button color="gray" pill size="xs" tabIndex={-1}>
-          {post && post.category}
-        </Button>
-      </Link>
       <img
         src={post && post.image}
         alt={post && (post.imageAlt || post.title)}

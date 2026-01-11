@@ -24,7 +24,7 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
   const validate = () => {
     const newErrors = {};
     if (!formData.title) newErrors.title = "Title is required";
-    if (!formData.category) newErrors.category = "Category is required";
+    if (!formData.categories?.length) newErrors.category = "Category is required";
     if (!formData.content) newErrors.content = "Content is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -61,8 +61,8 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
         />
         {errors.title && <span className="text-red-500">{errors.title}</span>}
         <CategoriesSelect
-          value={formData.category || ""}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          value={formData.categories || []}
+          onChange={(categories) => setFormData({ ...formData, categories })}
         />
         {errors.category && <span className="text-red-500">{errors.category}</span>}
       </div>

@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import PostForm from "../components/PostForm";
 import useAuthFetch from "../hooks/useAuthFetch";
 
-const emptyPost = { title: "", category: "", content: "" };
+const emptyPost = { title: "", categories: [], content: "" };
 
 export default function CreatePost() {
   const [publishError, setPublishError] = useState(null);

@@ -10,7 +10,20 @@ import { categoryLabel } from "../config/categories";
 // border-right-on-every-cell trick that breaks the moment a row wraps
 // differently at a different breakpoint.
 export default function PostCard({ post, variant = "row" }) {
-  const category = categoryLabel(post.category);
+  // Multi-category support: falls back to the legacy singular `category`
+  // for anything that hasn't gone through readCategories() server-side
+  // yet (shouldn't happen post-getposts, but keeps this component safe
+  // to reuse anywhere). Same plain mono-text style either way, just
+  // joined - NOT individual links: 6b.3 deliberately made the whole
+  // card ONE <Link> (kills the two-tab-stops-per-card problem), and a
+  // <Link> per category tag would mean a nested <a>, which is invalid
+  // HTML. Per-category links still exist on the post page's breadcrumb,
+  // which isn't wrapped in a bigger link.
+  const categories =
+    post.categories && post.categories.length > 0
+      ? post.categories
+      : [post.category || "uncategorized"];
+  const categoryText = categories.map((slug) => categoryLabel(slug)).join(" · ");
 
   // Never falls back to createdAt/updatedAt when unset (REBUILD_PLAN
   // 6b.2) - a card with no reviewedAt shows no date at all rather than
@@ -24,7 +37,7 @@ export default function PostCard({ post, variant = "row" }) {
 
   const categoryTag = (
     <div className="font-mono text-[11px] uppercase tracking-wide text-primaryText dark:text-primary">
-      {category}
+      {categoryText}
     </div>
   );
 
@@ -101,6 +114,7 @@ PostCard.propTypes = {
     image: PropTypes.string,
     imageAlt: PropTypes.string,
     category: PropTypes.string,
+    categories: PropTypes.arrayOf(PropTypes.string),
     readingMinutes: PropTypes.number,
     reviewedAt: PropTypes.string,
   }).isRequired,

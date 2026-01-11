@@ -41,7 +41,10 @@ export default function UpdatePost() {
             : post.content;
         setInitialData({
           title: post.title,
-          category: post.category,
+          // getposts already falls back to [post.category] for a post
+          // that predates this field (post.controller.js's
+          // readCategories()), so this is always a real array here.
+          categories: post.categories,
           image: post.image,
           content,
           contentFormat: "md",

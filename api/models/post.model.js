@@ -54,9 +54,24 @@ const postSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // Legacy primary category - kept for every post (old and new) so
+    // every existing single-category reader (breadcrumbs, injectMeta's
+    // BreadcrumbList JSON-LD, related-posts-by-category, DashPosts) keeps
+    // working unmodified. post.controller.js's resolveCategories() keeps
+    // this in sync with categories[0] on every create/update.
     category: {
       type: String,
       default: "uncategorized",
+    },
+    // Multi-category support. Deliberately NO default here, unlike
+    // `category` above - an absent `categories` array is exactly how a
+    // post that predates this field is told apart from a genuinely
+    // single-category one at read time (post.controller.js's
+    // readCategories()). A default would make Mongoose hydrate every
+    // legacy document with a fabricated ["uncategorized"], indistinguishable
+    // from a real value, and break that fallback.
+    categories: {
+      type: [String],
     },
     slug: {
       type: String,
