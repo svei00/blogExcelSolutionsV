@@ -1,8 +1,8 @@
 import { Footer } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
 import { categoryLabel } from "../config/categories";
+import useCategories from "../hooks/useCategories";
 import {
   FaGithub,
   FaLinkedin,
@@ -33,20 +33,9 @@ export default function FooterComponent() {
   // The "lost reader's" fallback (REBUILD_PLAN 6.7): a footer with real
   // navigation, not just social links, so someone who scrolls to the
   // bottom of any page has a way out other than the browser back button.
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/post/categories");
-        const data = await res.json();
-        setCategories(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
+  // Shared cache (useCategories) - Search.jsx fetches the same list on
+  // /search, and this footer renders there too (REBUILD_PLAN 11.A.6).
+  const categories = useCategories();
 
   return (
     <Footer container className="border border-t-8 border-primary">

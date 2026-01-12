@@ -249,8 +249,8 @@ Every library named below is free for this use: MIT unless noted.
 
 ---
 
-### Phase 11 — SEO & crawlability *(handoff brief — wants an architecture pass before implementation)*
-**Branch:** none yet.
+### Phase 11 — SEO & crawlability *(architected 2026-08-28; ready to implement)*
+**Branch:** `phase-11-seo`
 
 **Source:** a live GSC audit (2026-08-28, URL-prefix property `https://excelsolutionsv.com/`) — Indexing/Pages, Performance/Search results (28d), Sitemaps, Links, plus a live browser session reading rendered DOM/network/raw HTML. Full original brief and CSVs are NOT committed (they lived in the gitignored `screenshots/` working folder) — this section is the durable, self-contained summary. Two headline numbers: **5 of 18 sitemap URLs are actually indexed**, and Google sees **1 total internal link on the entire site**.
 
@@ -268,6 +268,109 @@ Every library named below is free for this use: MIT unless noted.
 | 8 MEDIUM | The ES/EN twin posts (formula-protection tutorial) have no `hreflang` connecting them. | Reciprocal `hreflang="es-MX"` / `"en"` / `"x-default"` link tags, both directions. |
 | 9 MEDIUM | `BreadcrumbList` JSON-LD exists (Phase 5.4/5.5) but no `Article`/`BlogPosting` or `Organization`/`WebSite` JSON-LD anywhere. | Add `BlogPosting` per post (`author` as `Person` + `sameAs` LinkedIn matters — real E-E-A-T signal for a credentialed accountant writing fiscal content that's currently invisible to Google), `Organization`+`WebSite` on Home. |
 | 10 LOW | Only 4 backlinks, 2 self-referential; not a code problem. | Content/outreach, not engineering — see the brief's Sprint 4 for concrete leads (CFDI/SAT/IMSS/INFONAVIT topic clusters as the moat, not generic Excel tips). |
+
+---
+
+#### 11.0 — The architecture decision (the fork findings #1/#3 were waiting on)
+
+**Decision: extend the existing `injectMeta.js` server-render path to inject page BODY content, for three routes. Do NOT migrate to Next/Astro, and do NOT add build-time prerendering.**
+
+**Why this option exists at all** — it isn't in the brief's list of three, and it's better than all of them. The brief framed the fork as *SSR migration vs. prerendering vs. do nothing*, which misses what this codebase already has:
+
+- `api/middleware/injectMeta.js` **already** reads `client/dist/index.html` at startup, string-replaces a marked block, and serves the result from Express — **in production, verified live this session** (a post page's canonical is genuinely post-specific).
+- nginx **already** routes selected paths (`/post/*`, `/sitemap.xml`) to Express instead of serving the static file, with the pattern documented and two successful precedents.
+- `client/index.html` ships `<div id="root"></div>` — **empty, and verified empty in the live production response.** That is a free, uncontested injection point.
+- `main.jsx` uses `ReactDOM.createRoot(...).render(...)`. `createRoot` (unlike `hydrateRoot`) **replaces** whatever DOM is inside the container on mount. So server-injected body content is cleanly discarded the instant React boots — no hydration mismatch, no dual-render bug class, nothing to reconcile.
+
+So the machinery for server-rendered HTML is already built, deployed, and proven here. The gap between "injects `<head>` tags" and "injects `<head>` tags **and** a body" is one more marked block and a few HTML builder functions — not a framework.
+
+**Why not a Next/Astro migration.** It is the textbook-correct long-term answer and Phase 8 already parks it there, but priced honestly against this repo it is the wrong move *now*: it rewrites routing, data fetching, the build, and the deploy pipeline; the admin half of this app (Toast UI editor, Firebase upload, Redux+persist, the whole dashboard) is deeply client-only and would need islands/`ssr:false` escape hatches everywhere; and it is a **one-way door** — weeks of work, touching every file, to fix a problem that is currently *18 URLs deep*. Revisit it when organic traffic actually justifies the rebuild, which is exactly the condition Phase 8 already sets.
+
+**Why not prerendering.** `react-snap` is effectively unmaintained and would need headless Chrome in the deploy pipeline; worse, it is **build-time**, so post slugs would have to be known at build (they live in Mongo) and every new post would require a rebuild+redeploy to become crawlable. Prerender.io is a paid external service and is "dynamic rendering", which Google has explicitly deprecated as a long-term pattern. Both are *more* moving parts than the option above, for *staler* output.
+
+**The clinching property: this is reversible.** Everything below is additive — a new module, an extended middleware, one nginx block. If Astro/Next ever happens, this code is **deleted**, not untangled. It buys years of runway (exactly what Phase 5.1 was designed to do) at a fraction of the cost, with no lock-in.
+
+**Not cloaking, to be explicit:** the same HTML is served to every client, human or bot, and the injected content is the *same content* React then renders. No user-agent sniffing, nothing hidden with CSS. It also lands as a genuine progressive-enhancement win — the Tailwind CSS file loads before the JS bundle, so real users see article text *sooner* than they do today, which should help LCP rather than hurt it.
+
+##### Architecture
+
+```
+client/index.html
+  <head> … <!--META-START--> … <!--META-END--> …        ← existing contract, unchanged
+  <body>
+    <div id="root"><!--SSR-START--><!--SSR-END--></div>  ← NEW second contract, same technique
+```
+
+```
+api/
+  lib/
+    seoHtml.js        ← NEW. Pure functions: (data) -> HTML string. No Express, no DB, no fs.
+                        buildPostMeta() (moved from injectMeta), buildHomeBody(),
+                        buildPostBody(), buildArchiveBody(). Unit-testable in isolation.
+  middleware/
+    injectMeta.js     ← EXTENDED, not replaced. Still the one file that owns
+                        "read index.html, swap marked blocks, send". Gains: route
+                        handling for / and /search, the body-block replacement, and
+                        the response cache. Name/contract comment in index.html
+                        updated in the same commit.
+```
+
+**Caching — required, not optional.** `/` moves from *static file, zero Node* to *Express + Mongo per request*. A module-level `Map` keyed by route (`home`, `post:<slug>`, `archive`) holding `{ html, expires }` with a **60s TTL** removes essentially all of that load. No invalidation hooks into `post.controller.js` — at 60s an editor sees their change before they can alt-tab, and zero coupling is worth more than instant freshness here.
+
+**Failure mode — the one real regression risk.** Today, if pm2/Node is down, the homepage still serves from nginx. After this change it would 502. That is a strictly worse failure mode and must be neutralised **in the same nginx edit**, not later:
+
+```nginx
+location = / {
+    proxy_intercept_errors on;
+    error_page 502 503 504 = @spa_static;
+    proxy_pass http://127.0.0.1:3000;
+    # + the usual proxy_set_header block, mirroring the existing /post/ location
+}
+location @spa_static { root /var/www/blogExcelSolutionsV/client/dist; try_files /index.html =404; }
+```
+
+With that fallback, a dead API degrades to exactly today's behaviour instead of an outage. `location = /` is an **exact** match, so static assets are untouched. ⚠️ This is the riskiest nginx change in the project so far — it is the homepage, not a sub-route — so notes.md 27.1's rule is absolute here: **Express routes deployed and `curl`-confirmed live BEFORE the nginx reload.**
+
+##### Sequencing — three shippable slices, in dependency order
+
+**11.A — Unblock discovery (highest value, zero new dependencies).** Fixes the "1 internal link" number, which is the single biggest lever in the whole audit.
+
+| Task | Notes |
+|------|-------|
+| 11.A.1 Spike (30 min, throwaway) | Confirm empirically that `createRoot` discards pre-existing `#root` children with no warning and no flash, using the real bundle. Everything below rests on this — verify it, don't trust the docs. |
+| 11.A.2 `<!--SSR-START/END-->` markers + `api/lib/seoHtml.js` | Add the marker pair inside `#root`; document the second contract in `client/index.html` next to the existing one (same "read these two files together" framing). Move `buildPostMetaBlock` out of `injectMeta.js` into `seoHtml.js` unchanged, as the first pure builder. |
+| 11.A.3 `buildHomeBody()` + route `/` through Express | Latest ~12 posts as real `<a href="/post/…">` with `<h2>` titles and excerpts, plus links to `/about`, `/projects`, `/contact`, `/search`. Reuse the same Tailwind classes as `PostCard` for the structural elements so the React swap isn't visually jarring. Takes internal links from **1 → ~20** on its own. |
+| 11.A.4 `buildArchiveBody()` for unfiltered `/search` | `/search` *is* the archive and is already in the sitemap — inject the full post list. At 14 posts every article is then one hop from the homepage. ⚠️ **Scaling trigger:** past ~50 posts this needs real pagination links, or it becomes one giant page. Note it, don't build it. |
+| 11.A.5 Response cache + nginx `location = /` with the 502 fallback | As specified above. Deploy order is non-negotiable. |
+| 11.A.6 **Fix the live `/search` bug (finding #2 — worse than the brief said)** ✅ **DONE (2026-08-28)** | **Verified against production this session: `getposts?category=uncategorized` returns `posts: []` against 14 real posts.** `Search.jsx` initialised `category: "uncategorized"`, and `handleFilterChange`/`handleSubmit` pushed that into the URL — so changing the sort order, or running any search, silently applied a filter that matched **nothing**. Fixed: new `ALL_CATEGORIES = "all"` sentinel is never written to the URL (`applyFilters` deletes the `category` param instead), and the dropdown gets an explicit "Todas" option. `/api/post/categories` deduped into `client/src/hooks/useCategories.js` (module-level promise cache, shared by `Footer.jsx` and `Search.jsx` — the two components that render together on `/search`) - verified live with a clean tab: exactly **one** network request for both mounts. ⚠️ **Second, unrelated bug found and fixed in the same file:** `Search.jsx` was sending the sort direction as `?sort=`, but `post.controller.js`'s `getposts` only ever reads `req.query.order` (`comment`/`user` controllers correctly use `sort` — just an inconsistency nobody caught, since the wrong key silently no-ops instead of erroring). The "Antiguos" (oldest-first) option has likely never worked. Renamed the client's URL param to `order` to match the existing API contract — verified live: selecting "Antiguos" now genuinely reorders results. |
+
+**11.B — Make the articles themselves cheap for Google to read.** Only after 11.A is live and stable.
+
+| Task | Notes |
+|------|-------|
+| 11.B.1 `buildPostBody()` | Breadcrumb links, `<h1>`, the rendered article body, and related-post links. This is what closes finding #3. |
+| 11.B.2 Add `marked` to the API | The client already uses `marked ^18.0.6`; the API has `isomorphic-dompurify` but no Markdown renderer. ⚠️ **Pin the same major as the client** — divergent versions would mean the server and client render the same post differently, which is exactly the drift this whole approach has to avoid. Sanitize with the `isomorphic-dompurify` already present. |
+| 11.B.3 JSON-LD upgrade (finding #9) | `Article` → `BlogPosting`; `author` becomes a `Person` with `sameAs` (LinkedIn/GitHub) — a real E-E-A-T signal for a credentialed accountant writing fiscal content that is currently invisible to Google. Add `Organization` + `WebSite` (with a `SearchAction` pointing at `/search?searchTerm=`) on the homepage. Author details go in `api/config/site.js` alongside `SITE_URL`/`SITE_NAME`. |
+| 11.B.4 `noindex,follow` on filtered `/search?category=…` (finding #6) | ⚠️ **The brief's "either/or" is a trap: do NOT also add `Disallow: /search?` to robots.txt.** Disallowing prevents Google from crawling the page, which prevents it from ever *seeing* the noindex — the thin page stays indexed indefinitely. Use `noindex,follow` alone (the `follow` keeps link equity flowing to the posts). Revisit a `Disallow` only once GSC confirms they've dropped out. **Real category routes (`/categoria/:slug`) are deliberately deferred** — YAGNI at 14 posts; revisit when Phase 9's glossary makes hub pages earn their keep. |
+| 11.B.5 Sitemap `<lastmod>` on the 4 static entries (finding #4) | Trivial edit to `sitemap.controller.js`. `changefreq`/`priority` are ignored by Google and can stay or go. |
+
+**11.C — Cleanup and equity preservation.** Last, deliberately: these touch live URLs that already carry impressions.
+
+| Task | Notes |
+|------|-------|
+| 11.C.1 hreflang for the ES/EN twins (finding #8) | Needs schema: `lang` (default `"es"`) + `translationSlug` on `post.model.js`, two fields in `PostForm.jsx`, reciprocal `<link rel="alternate">` from `injectMeta`. ⚠️ **7th and 8th fields to need the `updatepost` `$set` whitelist + both zod schemas** — notes.md 27.4, six-for-six so far. |
+| 11.C.2 Slug migration (finding #7) | `slugAliases: [String]` on the model; `/post/:slug` falls back to an alias lookup and **301s to the canonical slug**; sitemap emits canonical only. ⚠️ Two of the damaged slugs carry real impressions — migrate **one post at a time**, verify the 301 and the GSC entry for each before moving to the next. Never bulk-rename. |
+| 11.C.3 `/index.php` 301 (finding #5) | nginx-only, manual (matches 1.12/3.6/4.5 precedent): `location = /index.php { return 301 /; }`. Batch it with the 11.A.5 nginx work — one VPS session, not two. |
+
+**Manual, svei-only (no code, but gates the measurement):** submit `sitemap.xml` in GSC (0 rows today), then URL-Inspection → Request Indexing on the unindexed posts, a handful per day. Worth doing **after** 11.A lands so the recrawl finds the new links.
+
+##### Risks, honestly
+
+- **Divergence.** This is a second, hand-written renderer for three routes; it *will* drift from the React components unless kept deliberately minimal. Mitigation: inject only what a crawler needs — links, headings, text — never UI chrome, hover states, or view toggles. It is a crawler-oriented subset, not a copy of the app.
+- **Rate limiting.** `globalLimiter` is 100 req/min per IP and would now apply to homepage HTML (assets stay on nginx, so it's 1 request per pageview). Fine for Googlebot in normal operation; worth watching, and worth exempting the shell routes if a burst crawl ever trips it.
+- **The 40–60s API hang could not be reproduced** (~1.4–1.8s on repeated live tests). Do not architect around it. If it resurfaces, the 60s response cache from 11.A.5 already blunts it for HTML routes.
+
+**Done when:** `curl -s https://excelsolutionsv.com/ | grep -c 'href="/post/'` returns ≥ 10; a post page's raw HTML contains its `<h1>` and article text with no JS executed; `/search` shows posts by default and changing sort no longer empties the results; `/index.php` returns 301; sitemap submitted in GSC with 18 discovered; GSC → Links internal count climbs off 1 into the dozens; Rich Results Test passes `BlogPosting` on a post page; and a URL Inspection re-check on 3 previously-unindexed posts reads "URL is on Google" within ~2 weeks of 11.A shipping.
 
 **On AdSense** (surfaced by the same audit, not a separate finding): the publisher account (`ca-pub-5050087617356218`) is correctly wired (Phase 1.1). Approval risk is real — a reviewer hitting the broken `/search` or the empty-feeling homepage reads as an unfinished site. A privacy policy page (cookie/ad disclosure) is also missing and is a common rejection reason. Revenue expectations should stay low regardless (current traffic is nowhere near AdSense-meaningful) — this is a "turn on and don't count on it" layer, not a goal.
 
@@ -393,9 +496,16 @@ client/src/
   pages/                  ← thin: fetch + compose components
 
 api/
+  lib/
+    seoHtml.js       ← pure (data) -> HTML string builders for the server-rendered
+                       shell: meta block + home/post/archive bodies. No Express, no
+                       DB, no fs — so it's testable in isolation (Phase 11)
   middleware/
     rateLimits.js    ← all limits, one file (Phase 3)
-    injectMeta.js    ← SEO injection; most-commented file in the repo (Phase 5)
+    injectMeta.js    ← THE server-render entry point: reads client/dist/index.html,
+                       swaps the META and SSR marked blocks, caches, sends. Owns
+                       routing/DB/caching; owns no HTML strings (those live in
+                       lib/seoHtml.js). Most-commented file in the repo (Phase 5/11)
   validators/        ← zod schemas, one file per resource (Phase 3)
   controllers/       ← thinner after validators absorb input checks
 ```

@@ -5,7 +5,17 @@ import { HiChevronDown, HiOutlineSearch } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import PostViewToggle from "../components/PostViewToggle";
+import useCategories from "../hooks/useCategories";
 import useViewPreference from "../hooks/useViewPreference";
+
+// Sentinel for "no category filter" - deliberately NOT "uncategorized",
+// which is a real category value (posts explicitly tagged as having
+// none). Using it as the default meant every filter change pushed
+// category=uncategorized into the URL even though the user never chose
+// it, silently filtering the results down to zero posts (REBUILD_PLAN
+// 11.A.6 - confirmed live: getposts?category=uncategorized returned
+// posts: [] against 14 real posts).
+const ALL_CATEGORIES = "all";
 
 // A native <select>'s CLOSED box can be restyled with appearance-none,
 // but its OPEN option list is a separate browser-native popup that no
@@ -66,13 +76,13 @@ export default function Search() {
   const [sidebarData, setSidebarData] = useState({
     searchTerm: "",
     sort: "desc", // Default sort order
-    category: "uncategorized", // Default category
+    category: ALL_CATEGORIES, // Default: no category filter
   });
 
   const [posts, setPosts] = useState([]); // Posts data
   const [loading, setLoading] = useState(false); // Loading state for API calls
   const [showMore, setShowMore] = useState(false); // Show More button toggle
-  const [categories, setCategories] = useState([]); // Categories data
+  const categories = useCategories(); // Shared with Footer.jsx - REBUILD_PLAN 11.A.6
 
   const location = useLocation(); // Provides access to the current URL
   const navigate = useNavigate(); // Allows navigation programmatically
@@ -81,7 +91,12 @@ export default function Search() {
     // Parse the query parameters from the URL
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
-    const sortFromUrl = urlParams.get("sort");
+    // "order", not "sort" - post.controller.js's getposts reads
+    // req.query.order (comment/user controllers use "sort" instead, an
+    // inconsistency nobody caught because sending the wrong key just
+    // silently defaults to desc rather than erroring). The "Orden"
+    // dropdown has been a no-op for "Antiguos" until this fix.
+    const sortFromUrl = urlParams.get("order");
     const categoryFromUrl = urlParams.get("category");
 
     // If any query parameters exist, update sidebarData accordingly
@@ -89,7 +104,7 @@ export default function Search() {
       setSidebarData({
         searchTerm: searchTermFromUrl || "",
         sort: sortFromUrl || "desc",
-        category: categoryFromUrl || "uncategorized",
+        category: categoryFromUrl || ALL_CATEGORIES,
       });
     }
 
@@ -121,11 +136,19 @@ export default function Search() {
 
   // Builds the URL from a given filter set and navigates - the one
   // place that turns "filters" into "the query that actually ran".
+  // ALL_CATEGORIES is deliberately never written to the URL - the API
+  // has no "all" concept, only "filter by this value" (omit the param
+  // entirely) or "filter by category=X". Setting it unconditionally is
+  // exactly how this page ended up defaulting to zero results.
   const applyFilters = (filters) => {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set("searchTerm", filters.searchTerm);
-    urlParams.set("sort", filters.sort);
-    urlParams.set("category", filters.category);
+    urlParams.set("order", filters.sort);
+    if (filters.category === ALL_CATEGORIES) {
+      urlParams.delete("category");
+    } else {
+      urlParams.set("category", filters.category);
+    }
     navigate(`/search?${urlParams.toString()}`);
   };
 
@@ -136,21 +159,6 @@ export default function Search() {
     setSidebarData(next);
     applyFilters(next);
   };
-
-  // Fetch categories when the component mounts
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/post/categories");
-        const data = await res.json();
-        setCategories(data); // Update categories state
-      } catch (error) {
-        console.error("Failed to fetch categories:", error); // Log errors
-      }
-    };
-
-    fetchCategories();
-  }, []); // Only runs on mount
 
   // Handles Enter/search-icon submit for the search term.
   const handleSubmit = (e) => {
@@ -209,10 +217,13 @@ export default function Search() {
               label="Categoría"
               value={sidebarData.category}
               onChange={handleFilterChange}
-              options={categories.map((category) => ({
-                value: category,
-                label: category,
-              }))}
+              options={[
+                { value: ALL_CATEGORIES, label: "Todas" },
+                ...categories.map((category) => ({
+                  value: category,
+                  label: category,
+                })),
+              ]}
             />
             <ToolbarDropdown
               id="sort"
