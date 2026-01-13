@@ -82,7 +82,39 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      THE SSR-BODY CONTRACT (REBUILD_PLAN 11.A.2) - a second injection
+      point, same technique as THE PLACEHOLDER CONTRACT above, read
+      those two files together (this comment assumes you already have).
+
+      Most crawlers that DO execute JS (Googlebot included) still defer
+      that JS-render pass - it's slower and rate-limited, which is why a
+      brand-new site with almost no authority can sit un-indexed for
+      months even though the content technically "works" once JS runs.
+      Serving real links/headings/text in the raw HTML response closes
+      that gap for the routes that matter most for discovery.
+
+      Empty by default here - every route except the few injectMeta.js
+      handles (currently /, /search, /post/:slug) serves this file with
+      nothing between the markers, and React's createRoot() mounts into
+      the empty <div id="root"> exactly like it always has. For the
+      routes injectMeta DOES handle, it string-replaces this block with
+      real server-rendered markup (api/lib/seoHtml.js owns the actual
+      HTML strings; injectMeta.js only does the read/replace/serve).
+
+      createRoot() REPLACES whatever's inside #root on its first render
+      pass, not append/merge - confirmed empirically (REBUILD_PLAN 11.A.1
+      spike: injected placeholder content, zero console warnings, gone
+      the instant React mounts). This is NOT hydrateRoot()/hydration -
+      there is no mismatch warning class to worry about, and there never
+      will be as long as main.jsx keeps using createRoot().
+
+      Same non-negotiable rule as the META block: rename/move/reformat
+      these markers and injectMeta.js's regex silently stops matching -
+      not a crash, the page just quietly stops getting a server-rendered
+      body. Update both files in the same commit.
+    -->
+    <div id="root"><!--SSR-START--><!--SSR-END--></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
