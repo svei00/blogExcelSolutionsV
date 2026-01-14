@@ -8,6 +8,7 @@ import {
   SSR_END,
   buildPostMetaBlock,
   buildHomeBody,
+  buildArchiveBody,
 } from "../lib/seoHtml.js";
 
 // See the big comment blocks in client/index.html (search "THE PLACEHOLDER
@@ -106,6 +107,38 @@ export async function injectHome(req, res, next) {
     const html = indexHtmlTemplate.replace(
       new RegExp(`${SSR_START}[\\s\\S]*?${SSR_END}`),
       buildHomeBody(posts)
+    );
+    res.type("html").send(html);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Mounted on GET /search (REBUILD_PLAN 11.A.4) - same shape as
+// injectHome. Only injects a body for the UNFILTERED archive (no query
+// params) - a filtered view (?category=X, ?searchTerm=X) is a different
+// page conceptually and gets noindex treatment instead (REBUILD_PLAN
+// 11.B.4), not a server-rendered body, so it falls through with `next()`
+// to whatever would have served it anyway (express.static -> the
+// wildcard catch-all -> plain index.html, same as today). Also inert in
+// production until 11.A.5's nginx routing lands, same as injectHome.
+export async function injectArchive(req, res, next) {
+  if (!indexHtmlTemplate || Object.keys(req.query).length > 0) {
+    next();
+    return;
+  }
+
+  try {
+    const posts = await Post.find(
+      {},
+      "title slug content contentFormat metaDescription"
+    )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const html = indexHtmlTemplate.replace(
+      new RegExp(`${SSR_START}[\\s\\S]*?${SSR_END}`),
+      buildArchiveBody(posts)
     );
     res.type("html").send(html);
   } catch (error) {

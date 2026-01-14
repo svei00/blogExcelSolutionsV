@@ -42,13 +42,12 @@ export function escapeHtml(value) {
 // (createRoot() replaces #root's children - REBUILD_PLAN 11.A.1 spike),
 // so it never has to be pixel-perfect, only present.
 //
-// ⚠️ The <h1>/subtitle copy below is hand-synced with Home.jsx's hero
-// text, not derived from it (that component isn't reachable from here -
-// separate bundle, browser-only APIs). If you change the hero copy in
-// Home.jsx, update this string in the same commit or the pre-JS moment
-// and the post-hydration moment will say different things.
-export function buildHomeBody(posts) {
-  const postItems = posts
+// Shared by buildHomeBody and buildArchiveBody (REBUILD_PLAN 11.A.4) -
+// both are just "a heading, then this list of posts" with different
+// framing around it. One place for the actual post markup so the two
+// pages can't quietly diverge in how a post link looks.
+function buildPostListItems(posts) {
+  return posts
     .map(
       (post) => `
       <article class="border-t border-gray-200 py-4">
@@ -61,6 +60,15 @@ export function buildHomeBody(posts) {
       </article>`
     )
     .join("");
+}
+
+// ⚠️ The <h1>/subtitle copy below is hand-synced with Home.jsx's hero
+// text, not derived from it (that component isn't reachable from here -
+// separate bundle, browser-only APIs). If you change the hero copy in
+// Home.jsx, update this string in the same commit or the pre-JS moment
+// and the post-hydration moment will say different things.
+export function buildHomeBody(posts) {
+  const postItems = buildPostListItems(posts);
 
   return `${SSR_START}
     <div class="bg-white text-gray-700 min-h-screen">
@@ -77,6 +85,29 @@ export function buildHomeBody(posts) {
       <div class="max-w-3xl mx-auto px-3 pb-16">
         <h2 class="text-2xl font-semibold mb-2">Recent Posts</h2>
         ${postItems}
+      </div>
+    </div>
+    ${SSR_END}`;
+}
+
+// The full archive (REBUILD_PLAN 11.A.4) - /search already IS the post
+// archive and is already in the sitemap, so this is a second free path
+// into every article alongside the homepage's latest-12. Only for the
+// UNFILTERED view (injectMeta.js's injectArchive only calls this when
+// the request has no query params) - a filtered view (?category=X) is a
+// different page conceptually and gets noindex treatment instead
+// (REBUILD_PLAN 11.B.4), not a server-rendered body.
+//
+// ⚠️ Scaling trigger, noted but not built: past ~50 posts this needs
+// real pagination links (rel=next/prev or numbered pages) or it turns
+// into one unpaginated wall of posts. Not a real problem at today's
+// count (14) - don't build pagination pre-emptively.
+export function buildArchiveBody(posts) {
+  return `${SSR_START}
+    <div class="bg-white text-gray-700 min-h-screen">
+      <div class="max-w-3xl mx-auto px-3 py-10">
+        <h1 class="text-3xl font-semibold mb-6">All Posts</h1>
+        ${buildPostListItems(posts)}
       </div>
     </div>
     ${SSR_END}`;

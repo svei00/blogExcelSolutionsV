@@ -8,7 +8,7 @@ import postRouters from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { authLimiter, commentLimiter, globalLimiter } from "./middleware/rateLimits.js";
-import injectMeta, { injectHome } from "./middleware/injectMeta.js";
+import injectMeta, { injectHome, injectArchive } from "./middleware/injectMeta.js";
 import { getSitemap } from "./controllers/sitemap.controller.js";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -76,6 +76,13 @@ app.get("/sitemap.xml", getSitemap);
 // change - reloading nginx first, before this handler exists on the
 // running process, would 502 the entire homepage (notes.md 27.1).
 app.get("/", injectHome);
+
+// Server-rendered archive body for the UNFILTERED /search only
+// (REBUILD_PLAN 11.A.4) - injectArchive itself falls through via
+// next() for any query params, so filtered views keep working exactly
+// as today. Same "inert until 11.A.5's nginx work lands" caveat as
+// injectHome above - nginx doesn't route /search here yet either.
+app.get("/search", injectArchive);
 
 // Static pages of the FrontEnd
 app.use(express.static(path.join(__dirname, "/client/dist"))); // Use build for React. Use dist for Vite
