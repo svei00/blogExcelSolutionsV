@@ -10,6 +10,7 @@ import {
   buildHomeBody,
   buildArchiveBody,
 } from "../lib/seoHtml.js";
+import { getCached, setCached } from "../lib/responseCache.js";
 
 // See the big comment blocks in client/index.html (search "THE PLACEHOLDER
 // CONTRACT" and "THE SSR-BODY CONTRACT") before changing anything here -
@@ -60,6 +61,15 @@ export default async function injectMeta(req, res, next) {
     return;
   }
 
+  // 404s aren't cached (REBUILD_PLAN 11.A.5) - a bad slug is a cheap,
+  // rare `findOne` that returns null fast, not worth a cache slot.
+  const cacheKey = `post:${req.params.slug}`;
+  const cached = getCached(cacheKey);
+  if (cached) {
+    res.type("html").send(cached);
+    return;
+  }
+
   try {
     const post = await Post.findOne({ slug: req.params.slug });
 
@@ -75,6 +85,7 @@ export default async function injectMeta(req, res, next) {
       new RegExp(`${META_START}[\\s\\S]*?${META_END}`),
       buildPostMetaBlock(post)
     );
+    setCached(cacheKey, html);
     res.type("html").send(html);
   } catch (error) {
     next(error);
@@ -85,13 +96,22 @@ export default async function injectMeta(req, res, next) {
 // as the default export above, different data (latest posts instead of
 // one post by slug) and a different marker pair (SSR, not META - the
 // homepage's <head> tags are already correct as index.html's site-wide
-// defaults; only the body needed real links). No response cache yet
-// (REBUILD_PLAN 11.A.5) and no nginx routing for "/" yet either - this
-// handler is inert in production until both of those land, since nginx
-// still serves "/" as a static file until its location block changes.
+// defaults; only the body needed real links). Cached (REBUILD_PLAN
+// 11.A.5) - "/" moves from "static file, zero Node" to "Express + a
+// Mongo query per request" once nginx routes it here, and this is the
+// single highest-traffic route on the site. Still no nginx routing for
+// "/" yet, though - this handler is deployed and curl-confirmed live on
+// purpose, ahead of the nginx change (notes.md 27.1's deploy-order
+// rule), so it's inert in production until that lands.
 export async function injectHome(req, res, next) {
   if (!indexHtmlTemplate) {
     next();
+    return;
+  }
+
+  const cached = getCached("home");
+  if (cached) {
+    res.type("html").send(cached);
     return;
   }
 
@@ -108,6 +128,7 @@ export async function injectHome(req, res, next) {
       new RegExp(`${SSR_START}[\\s\\S]*?${SSR_END}`),
       buildHomeBody(posts)
     );
+    setCached("home", html);
     res.type("html").send(html);
   } catch (error) {
     next(error);
@@ -115,16 +136,24 @@ export async function injectHome(req, res, next) {
 }
 
 // Mounted on GET /search (REBUILD_PLAN 11.A.4) - same shape as
-// injectHome. Only injects a body for the UNFILTERED archive (no query
-// params) - a filtered view (?category=X, ?searchTerm=X) is a different
-// page conceptually and gets noindex treatment instead (REBUILD_PLAN
-// 11.B.4), not a server-rendered body, so it falls through with `next()`
-// to whatever would have served it anyway (express.static -> the
-// wildcard catch-all -> plain index.html, same as today). Also inert in
-// production until 11.A.5's nginx routing lands, same as injectHome.
+// injectHome, cache included. Only injects a body for the UNFILTERED
+// archive (no query params) - a filtered view (?category=X,
+// ?searchTerm=X) is a different page conceptually and gets noindex
+// treatment instead (REBUILD_PLAN 11.B.4), not a server-rendered body,
+// so it falls through with `next()` to whatever would have served it
+// anyway (express.static -> the wildcard catch-all -> plain index.html,
+// same as today) - and is never cached, since it's not this handler
+// doing the work. Also inert in production until 11.A.5's nginx routing
+// lands, same as injectHome.
 export async function injectArchive(req, res, next) {
   if (!indexHtmlTemplate || Object.keys(req.query).length > 0) {
     next();
+    return;
+  }
+
+  const cached = getCached("archive");
+  if (cached) {
+    res.type("html").send(cached);
     return;
   }
 
@@ -140,6 +169,7 @@ export async function injectArchive(req, res, next) {
       new RegExp(`${SSR_START}[\\s\\S]*?${SSR_END}`),
       buildArchiveBody(posts)
     );
+    setCached("archive", html);
     res.type("html").send(html);
   } catch (error) {
     next(error);
