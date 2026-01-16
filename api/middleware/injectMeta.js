@@ -9,6 +9,7 @@ import {
   buildPostMetaBlock,
   buildHomeBody,
   buildArchiveBody,
+  buildPostBody,
 } from "../lib/seoHtml.js";
 import { getCached, setCached } from "../lib/responseCache.js";
 
@@ -48,6 +49,23 @@ try {
   );
 }
 
+// Filtered /search (?category=, ?searchTerm=) needs noindex,follow -
+// finding #6 in REBUILD_PLAN's Phase 11 audit, a thin faceted page was
+// indexed while real articles weren't. ⚠️ Deliberately `noindex,follow`
+// ONLY, never combined with a robots.txt `Disallow: /search?` - a
+// Disallow would stop Google from crawling the page AT ALL, which means
+// it never sees the noindex tag either, and the thin page stays indexed
+// forever. This augments index.html's own default META block (title/
+// og/etc.) rather than reinventing a copy of it, so those defaults stay
+// index.html's single source of truth - if they change, this doesn't
+// need touching. Same cached HTML string regardless of which filter is
+// active, since the injected content itself never varies by query.
+const NOINDEX_TAG = '<meta name="robots" content="noindex,follow" />';
+let filteredSearchHtml = null;
+if (indexHtmlTemplate) {
+  filteredSearchHtml = indexHtmlTemplate.replace(META_START, `${META_START}\n    ${NOINDEX_TAG}`);
+}
+
 // Mounted on GET /post/:slug only (see index.js) - nginx routes that one
 // path prefix to Express instead of serving dist/index.html as a static
 // file (see the nginx location block in notes.md/DEPLOY.md), specifically
@@ -81,9 +99,29 @@ export default async function injectMeta(req, res, next) {
       return;
     }
 
-    const html = indexHtmlTemplate.replace(
+    // Related-by-category, excluding self - same rule PostPage.jsx
+    // uses client-side, kept simple here (no "fall back to recent"
+    // heading-swap logic - see buildPostBody's comment). Only queried
+    // when there's a real category to match; "uncategorized" matching
+    // itself would just surface other uncategorized posts, not
+    // genuinely related content.
+    const relatedPosts =
+      post.category && post.category !== "uncategorized"
+        ? await Post.find(
+            { category: post.category, _id: { $ne: post._id } },
+            "title slug"
+          )
+            .limit(3)
+            .lean()
+        : [];
+
+    let html = indexHtmlTemplate.replace(
       new RegExp(`${META_START}[\\s\\S]*?${META_END}`),
       buildPostMetaBlock(post)
+    );
+    html = html.replace(
+      new RegExp(`${SSR_START}[\\s\\S]*?${SSR_END}`),
+      buildPostBody(post, relatedPosts)
     );
     setCached(cacheKey, html);
     res.type("html").send(html);
@@ -135,19 +173,26 @@ export async function injectHome(req, res, next) {
   }
 }
 
-// Mounted on GET /search (REBUILD_PLAN 11.A.4) - same shape as
-// injectHome, cache included. Only injects a body for the UNFILTERED
-// archive (no query params) - a filtered view (?category=X,
-// ?searchTerm=X) is a different page conceptually and gets noindex
-// treatment instead (REBUILD_PLAN 11.B.4), not a server-rendered body,
-// so it falls through with `next()` to whatever would have served it
-// anyway (express.static -> the wildcard catch-all -> plain index.html,
-// same as today) - and is never cached, since it's not this handler
-// doing the work. Also inert in production until 11.A.5's nginx routing
-// lands, same as injectHome.
+// Mounted on GET /search (REBUILD_PLAN 11.A.4/11.B.4) - same shape as
+// injectHome, cache included. Only injects a real BODY for the
+// UNFILTERED archive (no query params) - a filtered view (?category=X,
+// ?searchTerm=X) is a different page conceptually: it gets `noindex`
+// treatment instead (see filteredSearchHtml above), never a server-
+// rendered body (that would mean Google indexing N thin filter pages,
+// the exact problem being fixed). Also inert in production until
+// 11.A.5's nginx routing lands, same as injectHome.
 export async function injectArchive(req, res, next) {
-  if (!indexHtmlTemplate || Object.keys(req.query).length > 0) {
+  if (!indexHtmlTemplate) {
     next();
+    return;
+  }
+
+  if (Object.keys(req.query).length > 0) {
+    if (!filteredSearchHtml) {
+      next();
+      return;
+    }
+    res.type("html").send(filteredSearchHtml);
     return;
   }
 

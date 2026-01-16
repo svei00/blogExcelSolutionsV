@@ -21,6 +21,7 @@
     "helmet": "^8.3.0",
     "isomorphic-dompurify": "^3.19.0",
     "jsonwebtoken": "^9.0.2",
+    "marked": "^18.0.11",
     "mongoose": "^8.2.0",
     "serverless-http": "^3.2.0",
     "slugify": "^1.6.9",
@@ -30,6 +31,10 @@
     "nodemon": "^3.1.0"
   },
   "nodemonConfig": {
-    "ignore": ["client/dist/**", "client/node_modules/**", ".claude/**"]
+    "ignore": [
+      "client/dist/**",
+      "client/node_modules/**",
+      ".claude/**"
+    ]
   }
 }

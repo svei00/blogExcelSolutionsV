@@ -14,6 +14,15 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Gmail-dot/+suffix-normalized form of `email` (see
+    // spamDetection.util.js's normalizeEmail) - lets the dashboard spot
+    // the same sender hiding behind superficially different addresses
+    // (the "seeded dots" evasion technique) without ever touching the
+    // original `email`, which stays exactly what was submitted.
+    normalizedEmail: {
+      type: String,
+      required: true,
+    },
     message: {
       type: String,
       required: true,
@@ -21,6 +30,18 @@ const messageSchema = new mongoose.Schema(
     isRead: {
       type: Boolean,
       default: false,
+    },
+    // Origin data for abuse investigation (2026-08-30 incident: by the
+    // time svei went looking for the sender of a spam message, nginx's
+    // own access logs had already rotated past it). Stored here instead
+    // of relying on log retention, since Mongo doesn't rotate. `ip` is
+    // req.ip post-trust-proxy, i.e. the real client IP from
+    // X-Forwarded-For, not nginx's.
+    ip: {
+      type: String,
+    },
+    userAgent: {
+      type: String,
     },
   },
   { timestamps: true }

@@ -5,6 +5,7 @@ import validate from "../middleware/validate.js";
 import { createMessageSchema } from "../validators/message.validator.js";
 import {
   createMessage,
+  getFormToken,
   getMessages,
   markMessageRead,
   deleteMessage,
@@ -12,8 +13,12 @@ import {
 
 const router = express.Router();
 
-// The only public route here - no verifyToken, this is the contact
-// form, submitted by anonymous visitors.
+// Both of these are public - no verifyToken, this is the contact form,
+// submitted by anonymous visitors. form-token isn't itself rate-limited
+// beyond globalLimiter (index.js) - it's a lightweight signed-timestamp
+// mint, not a write, so it isn't a spam vector on its own; /create is
+// the actual gate.
+router.get("/form-token", getFormToken);
 router.post(
   "/create",
   messageLimiter,

@@ -1,5 +1,5 @@
 import { Alert, Button, Label, Spinner, Textarea, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { SITE_URL } from "../config/site";
 
@@ -8,6 +8,24 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  // "website" is the honeypot - a field no real visitor sees or fills,
+  // that bots filling every input they find happily populate. Kept as
+  // its own ref rather than in formData so a re-render can never touch
+  // it (autofill/extensions sometimes rewrite state-driven fields).
+  const honeypotRef = useRef(null);
+  // Signed submit-timing token (2026-08-30 anti-spam hardening, see
+  // spamDetection.util.js) - fetched once on mount, proves server-side
+  // that at least MIN_SUBMIT_MS passed between page load and submit,
+  // something a script POSTing directly can't fake since it never asked
+  // us for a token in the first place.
+  const [formToken, setFormToken] = useState("");
+
+  useEffect(() => {
+    fetch("/api/message/form-token")
+      .then((res) => res.json())
+      .then((data) => setFormToken(data.token))
+      .catch(() => {}); // a failed fetch just leaves formToken empty - createMessage treats that as a bot signal, not a crash
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -21,7 +39,11 @@ export default function Contact() {
       const res = await fetch("/api/message/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          website: honeypotRef.current?.value || "",
+          formToken,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -62,6 +84,20 @@ export default function Contact() {
         </Alert>
       ) : (
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          {/* Honeypot - invisible to a real visitor, irresistible to a bot
+              that fills every field it finds in the DOM. Off-screen via
+              absolute positioning rather than display:none/hidden, which
+              some bots are specifically coded to skip. tabIndex/aria-hidden
+              keep it out of the way for keyboard and screen-reader users. */}
+          <input
+            ref={honeypotRef}
+            type="text"
+            name="website"
+            tabIndex="-1"
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+          />
           <div>
             <Label htmlFor="name" value="Name" />
             <TextInput

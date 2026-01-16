@@ -1,6 +1,7 @@
 import { getMetaDescription } from "../utils/stripToPlainText.util.js";
-import { SITE_URL, SITE_NAME } from "../config/site.js";
+import { SITE_URL, SITE_NAME, AUTHOR_NAME, AUTHOR_SAME_AS } from "../config/site.js";
 import { categoryLabel } from "../config/categories.js";
+import renderPostContent from "./renderPostContent.js";
 
 // Pure (data) -> HTML string builders for the server-rendered shell - no
 // Express, no DB, no fs. injectMeta.js owns routing/DB access/caching/
@@ -62,6 +63,36 @@ function buildPostListItems(posts) {
     .join("");
 }
 
+// Organization + WebSite JSON-LD (REBUILD_PLAN 11.B.3) - homepage-only,
+// site-wide identity markup Google can use for a Sitelinks Search Box
+// and richer brand results. Valid to place in <body> (Google explicitly
+// supports JSON-LD anywhere in the document) - lives here rather than
+// index.html's <head> META block so home doesn't need its own META
+// override, unlike a post page.
+function buildHomeJsonLd() {
+  const organization = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+  }).replace(/</g, "\\u003c");
+
+  const website = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: SITE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${SITE_URL}/search?searchTerm={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  }).replace(/</g, "\\u003c");
+
+  return `<script type="application/ld+json">${organization}</script>
+    <script type="application/ld+json">${website}</script>`;
+}
+
 // ⚠️ The <h1>/subtitle copy below is hand-synced with Home.jsx's hero
 // text, not derived from it (that component isn't reachable from here -
 // separate bundle, browser-only APIs). If you change the hero copy in
@@ -87,6 +118,7 @@ export function buildHomeBody(posts) {
         ${postItems}
       </div>
     </div>
+    ${buildHomeJsonLd()}
     ${SSR_END}`;
 }
 
@@ -123,15 +155,20 @@ export function buildPostMetaBlock(post) {
   const imageAlt = escapeHtml(post.imageAlt || post.title);
   const url = `${SITE_URL}/post/${post.slug}`;
 
-  // Article JSON-LD - the structured-data piece Google uses for rich
-  // results (author, publish date). JSON.stringify handles its own
-  // escaping for the JSON itself; the surrounding <script> tag content
-  // is not HTML-parsed the same way attributes are, but the "<" guard
-  // below still prevents a title/description containing "</script>"
-  // from breaking out of the block.
+  // BlogPosting JSON-LD (REBUILD_PLAN 11.B.3 - was a generic "Article"
+  // with an "Organization" author, upgraded to the more specific type
+  // Google recommends for blog content, with a real named author).
+  // `author.sameAs` is the actual E-E-A-T signal: a credentialed
+  // 17-year accountant writing about Mexican fiscal topics is a real
+  // trust signal, but it was invisible to Google as long as every post
+  // was attributed to the site itself rather than a person.
+  // JSON.stringify handles its own escaping for the JSON itself; the
+  // surrounding <script> tag content is not HTML-parsed the same way
+  // attributes are, but the "<" guard below still prevents a title/
+  // description containing "</script>" from breaking out of the block.
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     description: getMetaDescription(post),
     image: post.image,
@@ -143,7 +180,9 @@ export function buildPostMetaBlock(post) {
     // unset, so an unreviewed post never claims a freshness it hasn't
     // earned.
     dateModified: post.reviewedAt || post.createdAt,
-    author: { "@type": "Organization", name: SITE_NAME },
+    author: { "@type": "Person", name: AUTHOR_NAME, sameAs: AUTHOR_SAME_AS },
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    inLanguage: "es",
   }).replace(/</g, "\\u003c");
 
   // BreadcrumbList JSON-LD (REBUILD_PLAN 6.4) - rides on the same
@@ -188,4 +227,56 @@ export function buildPostMetaBlock(post) {
     <script type="application/ld+json">${jsonLd}</script>
     <script type="application/ld+json">${breadcrumbJsonLd}</script>
     ${META_END}`;
+}
+
+// Post-page body (REBUILD_PLAN 11.B.1) - unlike buildHomeBody/
+// buildArchiveBody, this is deliberately NOT a trimmed crawler-only
+// subset. The article text IS the page; rendering anything less than
+// the real content would defeat the entire point of Phase 11 (Google's
+// fast, non-JS crawl pass has to see the actual tutorial, not a teaser).
+// renderPostContent() is the same sanitization pipeline the client
+// uses, server-side (see that file's own comment for why it's a
+// separate module rather than a shared import).
+export function buildPostBody(post, relatedPosts) {
+  const contentHtml = renderPostContent(post.content, post.contentFormat, post.title);
+
+  // Mirrors PostPage.jsx's breadcrumb (same skip-uncategorized rule as
+  // the JSON-LD BreadcrumbList above, so the visible trail and the
+  // structured data never disagree) - kept deliberately simpler than
+  // the client's version (no "Recent Articles" fallback heading logic)
+  // since this is discarded the instant React mounts.
+  const categoryCrumb =
+    post.category && post.category !== "uncategorized"
+      ? ` &rsaquo; <a href="/search?category=${escapeHtml(post.category)}">${escapeHtml(
+          categoryLabel(post.category)
+        )}</a>`
+      : "";
+
+  const relatedHtml =
+    relatedPosts.length > 0
+      ? `<nav class="max-w-2xl mx-auto px-3 py-10">
+          <h2 class="text-xl font-semibold mb-3">Related Articles</h2>
+          ${relatedPosts
+            .map(
+              (p) =>
+                `<a href="/post/${escapeHtml(p.slug)}" class="block py-1">${escapeHtml(
+                  p.title
+                )}</a>`
+            )
+            .join("")}
+        </nav>`
+      : "";
+
+  return `${SSR_START}
+    <div class="bg-white text-gray-700 min-h-screen">
+      <nav class="max-w-2xl mx-auto px-3 mt-6 text-sm text-gray-500">
+        <a href="/">Home</a>${categoryCrumb} &rsaquo; ${escapeHtml(post.title)}
+      </nav>
+      <h1 class="text-3xl mt-10 p-3 text-center max-w-2xl mx-auto lg:text-4xl">${escapeHtml(
+        post.title
+      )}</h1>
+      <div class="post-content max-w-2xl mx-auto p-3">${contentHtml}</div>
+      ${relatedHtml}
+    </div>
+    ${SSR_END}`;
 }

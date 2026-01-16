@@ -20,9 +20,26 @@ export const getSitemap = async (req, res, next) => {
   try {
     const posts = await Post.find({}, "slug updatedAt").lean();
 
+    // REBUILD_PLAN 11.B.5 - the 4 static pages have no DB-backed "last
+    // changed" timestamp of their own (unlike a post). Rather than fake
+    // precision with a hardcoded date that would silently go stale, or
+    // emit `lastmod` as the current request time (dishonest - it'd say
+    // "just now" on every single crawl regardless of whether anything
+    // changed, the exact kind of freshness-that-wasn't-earned this
+    // project's `reviewedAt` field was built to avoid - REBUILD_PLAN
+    // 6b.2), use the most recently updated post as a proxy: these are
+    // all navigational hub pages whose actual content (the post list
+    // they link to) really did last change at that moment. Falls back
+    // to "now" only in the edge case of zero posts existing at all.
+    const mostRecentPostUpdate = posts.reduce(
+      (latest, post) => (post.updatedAt > latest ? post.updatedAt : latest),
+      posts[0]?.updatedAt ?? new Date()
+    );
+
     const staticUrls = staticPages.map(
       (page) => `  <url>
     <loc>${SITE_URL}${page.path}</loc>
+    <lastmod>${mostRecentPostUpdate.toISOString()}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
   </url>`
