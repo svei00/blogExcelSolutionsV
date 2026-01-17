@@ -19,6 +19,8 @@ export const createPostSchema = z.object({
   // null on every update until this was added, even though
   // post.controller.js's $set whitelist already had it - REBUILD_PLAN 6b.2).
   reviewedAt: z.string().nullable().optional(),
+  lang: z.enum(["es", "en"]).optional(),
+  translationSlug: z.string().optional(),
 });
 
 // Update allows partial edits (a client might only change the title),
@@ -38,4 +40,6 @@ export const updatePostSchema = z.object({
   metaDescription: z.string().max(160).optional(),
   imageAlt: z.string().optional(),
   reviewedAt: z.string().nullable().optional(),
+  lang: z.enum(["es", "en"]).optional(),
+  translationSlug: z.string().optional(),
 });

@@ -54,6 +54,29 @@ const postSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // hreflang support for the ES/EN post pair (REBUILD_PLAN 11.C.1,
+    // finding #8). "es" default matches the site's Spanish-first
+    // convention elsewhere (e.g. injectMeta's JSON-LD inLanguage).
+    // Every OTHER post on the site is Spanish-only and simply never
+    // sets translationSlug - lang alone on those posts is inert.
+    lang: {
+      type: String,
+      enum: ["es", "en"],
+      default: "es",
+    },
+    // Slug of this post's translated counterpart, if one exists.
+    // Deliberately just a slug string, not a Mongo ref/ObjectId - same
+    // "manual editorial field, admin is responsible for keeping it
+    // accurate" pattern as reviewedAt above. injectMeta.js looks this
+    // post up at request time to read ITS OWN lang (not an assumption)
+    // for the reciprocal <link rel="alternate" hreflang> pair - Google
+    // ignores hreflang annotations that aren't reciprocal, so a stale/
+    // wrong translationSlug just means the tag quietly doesn't appear,
+    // never a broken link shown to a user.
+    translationSlug: {
+      type: String,
+      default: "",
+    },
     // Legacy primary category - kept for every post (old and new) so
     // every existing single-category reader (breadcrumbs, injectMeta's
     // BreadcrumbList JSON-LD, related-posts-by-category, DashPosts) keeps
@@ -77,6 +100,22 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+    },
+    // Every slug this post has EVER lived at (REBUILD_PLAN 11.C.2,
+    // finding #7) - several pre-5.7 slugs stripped accents instead of
+    // transliterating them (dinmico instead of dinámico), plus a couple
+    // with a leading/triple hyphen. Empty on every post by default;
+    // only populated by the deliberate one-post-at-a-time migration
+    // script (never through the normal admin edit form - `slug` isn't
+    // in updatepost's $set whitelist on purpose, a slug is not meant to
+    // be an incidentally-editable field). injectMeta.js's /post/:slug
+    // handler falls back to this on a canonical-slug miss and 301s to
+    // the real slug, so a page that's already ranked/linked at an old
+    // damaged URL doesn't just silently break or fork into two live
+    // addresses for the same content.
+    slugAliases: {
+      type: [String],
+      default: [],
     },
     likes: [
       {

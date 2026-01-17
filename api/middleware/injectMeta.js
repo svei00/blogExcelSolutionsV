@@ -92,9 +92,25 @@ export default async function injectMeta(req, res, next) {
     const post = await Post.findOne({ slug: req.params.slug });
 
     if (!post) {
-      // Unknown slug: serve the page unmodified (site-wide default meta)
-      // and let the client-side React app render its own not-found
-      // state - same as it already does today for a bad slug.
+      // Not a canonical slug - check whether this is an OLD slug a post
+      // was migrated away from (REBUILD_PLAN 11.C.2, finding #7). A 301
+      // here, not a 200 render at the old URL: this is what actually
+      // preserves whatever search-engine equity the old URL still has -
+      // it tells Google/any inbound link the content permanently moved,
+      // rather than silently serving the same content at two different
+      // addresses (which reads as duplicate content, not a redirect).
+      const aliasPost = await Post.findOne(
+        { slugAliases: req.params.slug },
+        "slug"
+      ).lean();
+      if (aliasPost) {
+        res.redirect(301, `/post/${aliasPost.slug}`);
+        return;
+      }
+
+      // Genuinely unknown slug: serve the page unmodified (site-wide
+      // default meta) and let the client-side React app render its own
+      // not-found state - same as it already does today for a bad slug.
       res.status(404).type("html").send(indexHtmlTemplate);
       return;
     }
@@ -115,9 +131,17 @@ export default async function injectMeta(req, res, next) {
             .lean()
         : [];
 
+    // hreflang counterpart (REBUILD_PLAN 11.C.1) - only looked up when
+    // this post actually claims one. A stale/typo'd translationSlug
+    // just resolves to null here, and buildPostMetaBlock silently omits
+    // the hreflang tags rather than emitting a link to nothing.
+    const translation = post.translationSlug
+      ? await Post.findOne({ slug: post.translationSlug }, "lang slug").lean()
+      : null;
+
     let html = indexHtmlTemplate.replace(
       new RegExp(`${META_START}[\\s\\S]*?${META_END}`),
-      buildPostMetaBlock(post)
+      buildPostMetaBlock(post, translation)
     );
     html = html.replace(
       new RegExp(`${SSR_START}[\\s\\S]*?${SSR_END}`),

@@ -148,12 +148,28 @@ export function buildArchiveBody(posts) {
 // Moved unchanged from injectMeta.js (REBUILD_PLAN 11.A.2) - same logic,
 // new home. See client/index.html's "THE PLACEHOLDER CONTRACT" comment
 // for what this block is and why it exists.
-export function buildPostMetaBlock(post) {
+// `translation` (REBUILD_PLAN 11.C.1) is the counterpart post's own
+// {lang, slug} - or null when this post has no translationSlug set, or
+// it points at a slug that doesn't exist (stale/typo'd reference).
+// Passed in already-looked-up rather than queried here, keeping this
+// file DB-free (REBUILD_PLAN 11.A.2's whole reason for existing) -
+// injectMeta.js owns the lookup.
+export function buildPostMetaBlock(post, translation = null) {
   const title = escapeHtml(post.title);
   const description = escapeHtml(getMetaDescription(post));
   const image = escapeHtml(post.image);
   const imageAlt = escapeHtml(post.imageAlt || post.title);
   const url = `${SITE_URL}/post/${post.slug}`;
+
+  // hreflang (REBUILD_PLAN 11.C.1, finding #8) - only emitted for posts
+  // that are actually half of a real translated pair. Google requires
+  // this to be RECIPROCAL (each page lists both itself and its
+  // counterpart) or it ignores the annotation entirely - the self link
+  // is not optional decoration, it's part of what makes the pair valid.
+  const hreflangLinks = translation
+    ? `<link rel="alternate" hreflang="${post.lang}" href="${url}" />
+    <link rel="alternate" hreflang="${translation.lang}" href="${SITE_URL}/post/${translation.slug}" />`
+    : "";
 
   // BlogPosting JSON-LD (REBUILD_PLAN 11.B.3 - was a generic "Article"
   // with an "Organization" author, upgraded to the more specific type
@@ -182,7 +198,7 @@ export function buildPostMetaBlock(post) {
     dateModified: post.reviewedAt || post.createdAt,
     author: { "@type": "Person", name: AUTHOR_NAME, sameAs: AUTHOR_SAME_AS },
     publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-    inLanguage: "es",
+    inLanguage: post.lang || "es",
   }).replace(/</g, "\\u003c");
 
   // BreadcrumbList JSON-LD (REBUILD_PLAN 6.4) - rides on the same
@@ -224,6 +240,7 @@ export function buildPostMetaBlock(post) {
     <meta property="og:url" content="${url}" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="${url}" />
+    ${hreflangLinks}
     <script type="application/ld+json">${jsonLd}</script>
     <script type="application/ld+json">${breadcrumbJsonLd}</script>
     ${META_END}`;

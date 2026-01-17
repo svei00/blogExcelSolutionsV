@@ -231,12 +231,15 @@ export const updatepost = async (req, res, next) => {
           image: req.body.image,
           imageAlt: req.body.imageAlt,
           metaDescription: req.body.metaDescription,
-          // 6th field added to this whitelist (contentFormat 2.6,
-          // metaDescription 5.3, imageAlt 5.6, reviewedAt 6b.2, now
-          // categories) - forgetting to add a new post field here is
-          // this project's most-repeated bug (notes.md 27.4). $set:
-          // req.body is not used deliberately - see the comment above.
+          // 8th field added to this whitelist (contentFormat 2.6,
+          // metaDescription 5.3, imageAlt 5.6, reviewedAt 6b.2,
+          // categories, now lang/translationSlug 11.C.1) - forgetting to
+          // add a new post field here is this project's most-repeated
+          // bug (notes.md 27.4). $set: req.body is not used deliberately
+          // - see the comment above.
           reviewedAt: req.body.reviewedAt || null,
+          lang: req.body.lang || "es",
+          translationSlug: req.body.translationSlug || "",
         },
       },
       { new: true }

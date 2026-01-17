@@ -1,4 +1,4 @@
-import { Alert, Button, FileInput, Label, TextInput, Textarea } from "flowbite-react";
+import { Alert, Button, FileInput, Label, Select, TextInput, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -102,6 +102,37 @@ export default function PostForm({ initialData, onSubmit, submitLabel, publishEr
           current Excel. Leave blank for content that hasn't been
           re-verified.
         </p>
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row">
+        <div>
+          <Label htmlFor="lang" value="Language" />
+          <Select
+            id="lang"
+            value={formData.lang || "es"}
+            onChange={(e) => setFormData({ ...formData, lang: e.target.value })}
+          >
+            <option value="es">Spanish</option>
+            <option value="en">English</option>
+          </Select>
+        </div>
+        <div className="flex-1">
+          <Label htmlFor="translationSlug" value="Translation slug (optional)" />
+          <TextInput
+            id="translationSlug"
+            placeholder="slug-of-the-translated-post"
+            value={formData.translationSlug || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, translationSlug: e.target.value })
+            }
+          />
+          <p className="text-gray-500 text-xs mt-1">
+            Only for posts that have a real translated counterpart - the
+            exact slug of that other post. Leave blank otherwise; a wrong
+            or stale slug here just means the hreflang tag silently
+            doesn't appear, not a broken link.
+          </p>
+        </div>
       </div>
 
       <div className="flex gap-4 items-center justify-between border-2 border-primary p-3">
