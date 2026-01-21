@@ -12,7 +12,10 @@ export const signinSchema = z.object({
 });
 
 export const googleAuthSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  name: z.string().min(1, "Name is required"),
-  googlePhotoUrl: z.string().optional(),
+  // ONLY the Firebase ID token (SECURITY - notes.md 34.1). email/name/
+  // googlePhotoUrl are deliberately absent: z.object() STRIPS keys it
+  // doesn't list, so even if a client (or an attacker) still sends
+  // them, they are discarded here and can never reach the controller.
+  // Every one of those values now comes from the verified token instead.
+  idToken: z.string().min(1, "Google ID token is required"),
 });

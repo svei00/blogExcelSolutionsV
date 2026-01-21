@@ -2,6 +2,8 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.util.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import verifyFirebaseToken from "../utils/verifyFirebaseToken.util.js";
 
 export const signup = async (req, res, next) => {
   // console.log(req.body); This line was added for testing purpouses.
@@ -76,12 +78,28 @@ export const signin = async (req, res, next) => {
 };
 
 export const google = async (req, res, next) => {
-  const { email, name, googlePhotoUrl } = req.body; // Corrected variable name
+  // SECURITY (notes.md 34.1): the email is taken from the VERIFIED
+  // token, never from req.body. The previous version trusted a
+  // body-supplied email outright, which meant anyone who knew an
+  // account's address - the admin's included, readable via the public
+  // GET /api/user/:userId - could POST it here and be handed that
+  // account's session cookie, isAdmin and all. The request body no
+  // longer carries an email at all; there is nothing left to forge.
+  let googleUser;
+  try {
+    googleUser = await verifyFirebaseToken(req.body.idToken);
+  } catch (error) {
+    // Deliberately opaque and always 401 - never leak whether the token
+    // was expired, malformed, for another project, or simply absent.
+    console.warn("Rejected Google sign-in:", error.message);
+    return next(errorHandler(401, "Google sign-in could not be verified"));
+  }
+
+  const { email, name, picture } = googleUser;
 
   try {
     const user = await User.findOne({ email });
     if (user) {
-      // Corrected variable name
       const token = jwt.sign(
         { id: user._id, isAdmin: user.isAdmin },
         process.env.JWT_SECRET,
@@ -97,18 +115,25 @@ export const google = async (req, res, next) => {
         })
         .json(rest);
     } else {
-      // Math.randon will generate password 36 means any number between 1-9 and letters a-z Slice(-8) will take the last 8 characters
-      const generatePassword =
-        Math.random().toString(36).slice(-8) +
-        Math.random().toString(36).slice(-8);
+      // Placeholder password for an OAuth-created account: the user never
+      // sees or uses it (they always sign in through Google), but it has
+      // to be unguessable anyway - /api/auth/signin accepts email+password
+      // for ANY account, including these. The previous version built it
+      // from Math.random(), which is NOT cryptographically secure and is
+      // seeded predictably enough to be reconstructed - that would have
+      // let someone derive an OAuth user's password and sign in as them
+      // through the normal form. crypto.randomBytes is the correct source.
+      const generatePassword = crypto.randomBytes(32).toString("hex");
       const hashedPassword = bcryptjs.hashSync(generatePassword, 10);
       const newUser = new User({
+        // Same shape as before (name + 4 digits), but the suffix is also
+        // crypto-random now rather than Math.random.
         username:
-          name.toLowerCase().split(" ").join("") +
-          Math.random().toString(9).slice(-4), // We put 9 to use only numers
+          (name || email.split("@")[0]).toLowerCase().split(" ").join("") +
+          crypto.randomInt(1000, 10000),
         email,
         password: hashedPassword,
-        profilePicture: googlePhotoUrl, // Corrected variable name
+        profilePicture: picture,
       });
       await newUser.save();
       const token = jwt.sign(

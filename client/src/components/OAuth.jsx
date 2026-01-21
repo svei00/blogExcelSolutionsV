@@ -16,15 +16,17 @@ export default function OAuth() {
 
     try {
       const resultsFromGoogle = await signInWithPopup(auth, provider);
-      // console.log(resultsFromGoogle); // For testing purposes
+      // Send the Firebase ID TOKEN, not the profile fields (SECURITY -
+      // notes.md 34.1). This token is signed by Google; the server
+      // verifies it and reads the email/name/photo out of it itself.
+      // Previously this posted the email as plain JSON, which the server
+      // trusted outright - meaning the popup was decorative and anyone
+      // could skip it by POSTing someone else's address directly.
+      const idToken = await resultsFromGoogle.user.getIdToken();
       const res = await fetch("/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: resultsFromGoogle.user.displayName,
-          email: resultsFromGoogle.user.email,
-          googlePhotoUrl: resultsFromGoogle.user.photoURL,
-        }),
+        body: JSON.stringify({ idToken }),
       });
       const data = await res.json();
       if (res.ok) {
