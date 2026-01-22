@@ -122,16 +122,32 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+// PUBLIC - deliberately no verifyToken: comment authors have to render
+// for logged-out readers too (Comment.jsx calls this for every comment).
+//
+// SECURITY (notes.md 34.5): returns ONLY the two fields the public UI
+// actually renders. It used to return the whole user document minus the
+// password - including `email` and `isAdmin` - to anyone, unauthenticated.
+// Since every post exposes its author's userId and every comment exposes
+// its commenter's, that made the admin's email address a public read,
+// which was step 2 of the authentication-bypass chain in 34.1. Even with
+// 34.1 fixed, handing out every user's email to anonymous callers is its
+// own problem, so this stays narrow.
+//
+// Allowlist, not a denylist (`delete user.email`): a field added to the
+// schema later is then private by default instead of leaking the moment
+// someone forgets to exclude it.
 export const getUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId).select(
+      "username profilePicture"
+    );
 
     if (!user) {
       return next(errorHandler(404, "User not found"));
     }
 
-    const { password, ...rest } = user._doc;
-    res.status(200).json(rest);
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }

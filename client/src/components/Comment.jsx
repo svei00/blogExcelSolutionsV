@@ -12,7 +12,6 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const [editedContent, setEditedContent] = useState(comment.content);
   const { currentUser } = useSelector((state) => state.user);
   const authFetch = useAuthFetch();
-  console.log(user); // For testing purposes
   useEffect(() => {
     const getUser = async () => {
       try {
