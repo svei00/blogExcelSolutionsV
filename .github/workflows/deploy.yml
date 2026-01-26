@@ -99,15 +99,70 @@ jobs:
             # curl - a fresh process can take a few seconds to finish
             # connecting to Mongo, and one slow-but-fine boot shouldn't
             # fail the whole deploy.
+            HEALTH_OK=0
             for i in 1 2 3 4 5 6; do
               sleep 5
               if curl -f https://excelsolutionsv.com/api/post/getposts?limit=1 > /dev/null 2>&1; then
                 echo "Health check passed."
-                exit 0
+                HEALTH_OK=1
+                break
               fi
               echo "Health check attempt $i failed, retrying..."
             done
-            echo "Health check failed: API did not respond correctly after deploy."
-            pm2 logs mern-blog --lines 30 --nostream
-            exit 1
+
+            if [ "$HEALTH_OK" != "1" ]; then
+              echo "Health check failed: API did not respond correctly after deploy."
+              pm2 logs mern-blog --lines 30 --nostream
+              exit 1
+            fi
+
+            # Smoke assertions (2026-09-01, notes.md 34/35) - the API
+            # answering is necessary but not sufficient. The 2026-08-30/31
+            # VPS reinstall silently dropped nginx routes (5.1's /post/,
+            # 5.2's sitemap.xml) while THIS EXACT health check kept passing
+            # the whole time - it only exercises a plain API call, which
+            # never depended on either route. REBUILD_PLAN.md kept claiming
+            # both were "DONE" because nothing ever re-checked them. These
+            # specifically exercise the nginx-routed paths that check missed,
+            # so a future config regression fails the deploy loudly instead
+            # of silently degrading SEO for however long nobody notices.
+            echo "Running smoke assertions..."
+
+            # sitemap.xml must be real XML with real entries, not the SPA
+            # shell served as text/html - which is what happened when the
+            # nginx route for it went missing (still a 200, so a check that
+            # only looked at status code would have passed anyway).
+            SITEMAP_CT=$(curl -s -o /tmp/sitemap_check.xml -w "%{content_type}" https://excelsolutionsv.com/sitemap.xml)
+            if [[ "$SITEMAP_CT" != *"xml"* ]] || ! grep -q "<loc>" /tmp/sitemap_check.xml; then
+              echo "SMOKE FAIL: /sitemap.xml is not real XML with <loc> entries (content-type: $SITEMAP_CT)"
+              exit 1
+            fi
+
+            # A known post must carry its OWN title, not the generic
+            # site-wide default - proves injectMeta.js is actually being
+            # reached through nginx, not just that Express itself is alive.
+            if ! curl -s "https://excelsolutionsv.com/post/ocultar-una-hoja-en-excel-no-es-protegerla" | grep -q "<title>Ocultar una hoja en Excel"; then
+              echo "SMOKE FAIL: known post page did not return its own <title> - injectMeta.js may not be routed."
+              exit 1
+            fi
+
+            # A known migrated slug must still 301 to its new slug - proves
+            # the slugAliases redirect path (11.C.2) is reachable through
+            # nginx, not just present in the code.
+            OLD_SLUG_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://excelsolutionsv.com/post/actualizador-dinmico-de-impuestos")
+            if [ "$OLD_SLUG_STATUS" != "301" ]; then
+              echo "SMOKE FAIL: known old slug returned $OLD_SLUG_STATUS, expected 301."
+              exit 1
+            fi
+
+            # A nonexistent slug must 404, not silently 200 - guards against
+            # a catch-all route swallowing unknown paths.
+            UNKNOWN_SLUG_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://excelsolutionsv.com/post/this-slug-does-not-exist-smoke-test")
+            if [ "$UNKNOWN_SLUG_STATUS" != "404" ]; then
+              echo "SMOKE FAIL: unknown slug returned $UNKNOWN_SLUG_STATUS, expected 404."
+              exit 1
+            fi
+
+            echo "All smoke assertions passed."
+            exit 0
           EOF
