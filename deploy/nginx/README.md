@@ -2,9 +2,12 @@
 
 `excelsolutionsv.conf` in this directory is a **copy** of the file that
 actually runs the site: `/etc/nginx/conf.d/excelsolutionsv.conf` on the
-VPS. This copy is not live and nginx never reads it directly - it exists
-so the config has a git history, a diff, and a recovery path, none of
-which it had before.
+VPS. `snippets/security-headers.conf` is the same for
+`/etc/nginx/snippets/security-headers.conf` - the site conf `include`s
+it twice (server block + `/assets/`), so it's not optional; without it
+on the VPS the config fails `nginx -t` outright. Neither copy is live
+and nginx never reads either directly - they exist so the config has a
+git history, a diff, and a recovery path, none of which it had before.
 
 ## Why this exists
 
@@ -27,15 +30,17 @@ invisible.
 
 ## Keeping this copy in sync
 
-This file is **not** automatically synced with the VPS - editing it here
-does nothing to production, and editing production does nothing here.
-After ANY change to the live config, copy it back:
+Neither file here is automatically synced with the VPS - editing them
+here does nothing to production, and editing production does nothing
+here. After ANY change to the live config, copy BOTH back:
 
 ```bash
 # on the VPS
 cat /etc/nginx/conf.d/excelsolutionsv.conf
-# paste the output into deploy/nginx/excelsolutionsv.conf on a dev
-# machine, commit, push
+cat /etc/nginx/snippets/security-headers.conf
+# paste the output into deploy/nginx/excelsolutionsv.conf and
+# deploy/nginx/snippets/security-headers.conf on a dev machine,
+# commit, push
 ```
 
 ## Applying a change from this file to the VPS
@@ -43,10 +48,16 @@ cat /etc/nginx/conf.d/excelsolutionsv.conf
 Never skip a step here - this is what actually keeps the site up:
 
 ```bash
-# on the VPS, as a user with permission to write /etc/nginx/conf.d/
+# on the VPS, as a user with permission to write /etc/nginx/
 sudo cp /etc/nginx/conf.d/excelsolutionsv.conf \
         /etc/nginx/conf.d/excelsolutionsv.conf.bak-$(date +%Y%m%d-%H%M%S)
-# edit /etc/nginx/conf.d/excelsolutionsv.conf to match this file
+if [ -f /etc/nginx/snippets/security-headers.conf ]; then
+  sudo cp /etc/nginx/snippets/security-headers.conf \
+          /etc/nginx/snippets/security-headers.conf.bak-$(date +%Y%m%d-%H%M%S)
+fi
+sudo mkdir -p /etc/nginx/snippets
+# edit /etc/nginx/conf.d/excelsolutionsv.conf and
+# /etc/nginx/snippets/security-headers.conf to match these two files
 sudo nginx -t
 # only if that reports "syntax is ok" / "test is successful":
 sudo systemctl reload nginx
@@ -68,13 +79,36 @@ or anything else ending in `.conf` - nginx's `include conf.d/*.conf;`
 directive would load a `.conf`-suffixed backup as a second, conflicting
 server block the moment one exists.
 
-## Known open item
+## Known open items (2026-09-02, from the gzip/header restoration)
 
-`@spa_static`'s `root` in the 502-fallback block points at
-`/var/www/blogExcelSolutionsV/client/dist`. The VPS's actual nginx web
-root for normal static serving is a separately symlinked directory (the
-`rsync` target from `deploy.yml`). The two are currently byte-identical,
-so nothing is broken today, but a deploy that ever updates one without
-the other would make that fallback silently serve stale content instead
-of failing loudly. Worth pointing `@spa_static` at whatever the real
-symlink target is, next time this file is touched for any other reason.
+None of these are broken, exactly - they're redundant or messy, found
+while verifying that fix, not blocking anything:
+
+- **Duplicate, and in one case conflicting, headers on proxied routes.**
+  helmet (Node) and nginx's `snippets/security-headers.conf` both set
+  the same security headers, so a proxied route (`/`, `/search`,
+  `/post/*`, `/api/*`) ships each one twice. Worse: they disagree on
+  `Referrer-Policy` - helmet sets `no-referrer`, nginx sets
+  `strict-origin-when-cross-origin`. Per the actual spec (confirmed via
+  MDN/W3C, not assumed), when a header repeats, the browser applies the
+  **last** valid value - so nginx's looser policy is what's actually in
+  effect on every proxied route right now, silently overriding helmet's
+  more private, deliberately-chosen one. Pick one layer to own these
+  headers and stop setting them in the other.
+- **Duplicate `Cache-Control` on `/assets/`.** `expires 1y;` and
+  `add_header Cache-Control "public, immutable";` both emit the header,
+  so it ships twice (`max-age=31536000` and `public, immutable`
+  separately, not merged). Collapse to one `add_header Cache-Control
+  "public, max-age=31536000, immutable";` and drop `expires 1y;`.
+- **`stats.html` (757 KB) is still physically in the web root**, only
+  kept unreachable by the `location = /stats.html { return 404; }`
+  block. Belt-and-suspenders is fine, but excluding it from the
+  `rsync` in `deploy.yml` in the first place would be more correct -
+  right now a config mistake in this one block is the only thing
+  keeping a full bundle map off the public internet.
+
+Not being tracked as tasks yet, mentioned for whoever picks this up
+next: `http2` isn't enabled on the 443 block, and there are 4 backup
+files sitting directly in `/etc/nginx/conf.d/` (harmless - none match
+the `*.conf` glob nginx includes - but conf.d is meant to hold only
+active config).
