@@ -186,6 +186,17 @@ export default function Search() {
 
   return (
     <div>
+      {/* Real page <h1>, visually hidden (REBUILD_PLAN 7.2) - this
+          toolbar-first design has no visible page title (the filter bar
+          IS the top of the page, by design), but a page still needs
+          exactly one real <h1> for document structure. Without this,
+          "Posts Results" below was doubling as the h1, which meant an
+          h1 -> h3 jump straight into the post cards with no h2 between
+          them - a real heading-order violation, confirmed live via
+          document.querySelectorAll. Home.jsx doesn't have this problem
+          because it has a real hero h1 already, with "Recent Posts" as
+          a genuine h2 before its own h3 cards - this mirrors that. */}
+      <h1 className="sr-only">Search Articles</h1>
       {/* Toolbar - search + filters in one bar, like Excel's AutoFilter
           row, instead of a sidebar form (REBUILD_PLAN search redesign). */}
       <div className="border-b border-gray-200 dark:border-gray-700">
@@ -242,7 +253,7 @@ export default function Search() {
       {/* Main Content */}
       <div className="w-full">
         <div className="flex items-center justify-between sm:border-b border-secondary p-3 mt-5">
-          <h1 className="text-3xl font-semibold">Posts Results</h1>
+          <h2 className="text-3xl font-semibold">Posts Results</h2>
           <PostViewToggle view={view} onChange={setView} />
         </div>
         <div
