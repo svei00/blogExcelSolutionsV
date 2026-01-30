@@ -205,7 +205,12 @@ export default function Header() {
           </Link>
         )}
 
-        <Navbar.Toggle />
+        {/* type="button" - Flowbite's NavbarToggle doesn't set one itself,
+            so it defaults to type="submit" (found during a 7.3 keyboard
+            audit). Harmless today with no enclosing <form>, but wrong
+            semantics for a non-submit toggle button - explicit fix rather
+            than relying on there never being a form ancestor later. */}
+        <Navbar.Toggle type="button" />
       </div>
 
       <Navbar.Collapse>
