@@ -159,7 +159,7 @@ export default function DashboardComp() {
                     <Table.Cell className="flex items-center">
                       <img
                         src={user.profilePicture}
-                        alt="user"
+                        alt={user.username}
                         className="w-10 h-10 rounded-full bg-gray-500"
                       />
                     </Table.Cell>
@@ -224,7 +224,7 @@ export default function DashboardComp() {
                     <Table.Cell className="flex items-center">
                       <img
                         src={post.image}
-                        alt="Post-Image"
+                        alt={post.title}
                         className="w-10 h-10 rounded-md bg-gray-500"
                       />
                     </Table.Cell>

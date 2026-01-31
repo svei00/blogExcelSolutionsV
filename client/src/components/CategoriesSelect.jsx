@@ -9,6 +9,18 @@ import { CATEGORIES, categoryLabel } from "../config/categories";
 // dismissOnClick={false} so picking several categories in a row doesn't
 // close the menu after each click, the way an AutoFilter checkbox list
 // behaves.
+//
+// The visible <input type="checkbox"> in each item is aria-hidden - it's
+// a pure visual indicator, the real interactive element is Dropdown.Item
+// itself (a real <button>, confirmed via its source). Without aria-pressed
+// on that button (REBUILD_PLAN 7.4), a screen reader heard "Uncategorized,
+// menu item" with zero indication of whether it was currently selected -
+// the checked/unchecked state was entirely visual. aria-pressed is the
+// correct pattern for a genuinely binary toggle button, not aria-checked/
+// role=menuitemcheckbox - DropdownItem
+// hardcodes role="menuitem" on its own <li> wrapper, not overridable via
+// props, so a real menuitemcheckbox role isn't achievable here without
+// forking the component.
 const CategoriesSelect = ({ value, onChange }) => {
   const selected = value.length > 0 ? value : ["uncategorized"];
 
@@ -34,7 +46,10 @@ const CategoriesSelect = ({ value, onChange }) => {
 
   return (
     <Dropdown label={summary} color="gray" dismissOnClick={false}>
-      <Dropdown.Item onClick={() => toggle("uncategorized")}>
+      <Dropdown.Item
+        onClick={() => toggle("uncategorized")}
+        aria-pressed={selected.includes("uncategorized")}
+      >
         <input
           type="checkbox"
           readOnly
@@ -46,7 +61,11 @@ const CategoriesSelect = ({ value, onChange }) => {
       </Dropdown.Item>
       <Dropdown.Divider />
       {CATEGORIES.map((c) => (
-        <Dropdown.Item key={c.value} onClick={() => toggle(c.value)}>
+        <Dropdown.Item
+          key={c.value}
+          onClick={() => toggle(c.value)}
+          aria-pressed={selected.includes(c.value)}
+        >
           <input
             type="checkbox"
             readOnly

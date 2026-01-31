@@ -89,7 +89,12 @@ export default function DashUsers() {
                   <Table.Cell>
                     <img
                       src={user.profilePicture}
-                      alt={user.title}
+                      // Was user.title (REBUILD_PLAN 7.4) - not a User
+                      // field (that's Post's), so this rendered undefined,
+                      // which React drops entirely - no alt attribute at
+                      // all, confirmed. username is the actual identifying
+                      // field here, matching Comment.jsx's same pattern.
+                      alt={user.username}
                       className="w-10 h-10 object-cover bg-gray-500 rounded-full"
                     />
                   </Table.Cell>
