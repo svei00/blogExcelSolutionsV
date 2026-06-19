@@ -12,7 +12,7 @@ const commentSchema = new mongoose.Schema(
     },
     userId: {
       type: String,
-      required: true,
+      required: false,
     },
     likes: {
       type: Array,
