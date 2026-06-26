@@ -11,5 +11,9 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: "/var/www/excelsolutionsv.com",
+    emptyOutDir: true,
+  },
   plugins: [react()],
 });

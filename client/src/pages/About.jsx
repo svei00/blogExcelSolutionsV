@@ -1,46 +1,138 @@
+import { MapPin } from "lucide-react";
+import {
+  FaLinkedin,
+  FaYoutube,
+  FaGithub,
+  FaEnvelope,
+  FaBriefcase,
+} from "react-icons/fa";
+
+const skills = [
+  "Excel Avanzado",
+  "VBA",
+  "Power Query",
+  "Python",
+  "CFDI 4.0",
+  "SAT Anexo 24",
+  "CONTPAQi",
+  "Análisis de Datos",
+  "Modelado Financiero",
+  "Creación de Contenido",
+];
+
+const socials = [
+  {
+    icon: <FaLinkedin size={22} />,
+    href: "#",
+    label: "LinkedIn",
+    className: "text-linkedin hover:opacity-75",
+  },
+  {
+    icon: <FaYoutube size={22} />,
+    href: "#",
+    label: "YouTube",
+    className: "text-red-500 hover:opacity-75",
+  },
+  {
+    icon: <FaBriefcase size={20} />,
+    href: "#",
+    label: "Upwork",
+    className: "text-greenEx hover:opacity-75",
+  },
+  {
+    icon: <FaGithub size={22} />,
+    href: "#",
+    label: "GitHub",
+    className: "text-github hover:opacity-75",
+  },
+  {
+    icon: <FaEnvelope size={22} />,
+    href: "mailto:#",
+    label: "Email",
+    className: "text-blueEx hover:opacity-75",
+  },
+];
+
 export default function About() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="max-w-2xl mx-auto p-3 text-center">
-        <div>
-          <h1 className="text-3xl font-semibold text-center my-7">
-            Excel SolutionsV Blog.
-          </h1>
-          <div className="text-md text-gray-500 flex flex-col text-justify gap-6">
-            <p className="">
-              Welcome to Excel SolutionsV, your ultimate destination for all
-              things related to Microsoft Excel! Our blog is dedicated to
-              bringing you the latest news, comprehensive exercises, and
-              practical examples that cater to data-entry professionals,
-              accountants, and anyone looking to harness the full potential of
-              Excel. Whether you are a beginner or an advanced user, our content
-              is designed to help you improve your skills and streamline your
-              workflow with the most popular spreadsheet software in the world.
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-4xl mx-auto flex flex-col gap-6">
+
+        {/* Profile card */}
+        <div className="flex flex-col md:flex-row gap-8 items-center md:items-start bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8">
+
+          {/* Avatar placeholder */}
+          <div className="flex-shrink-0">
+            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-blueEx to-greenEx flex items-center justify-center text-white text-4xl font-bold shadow-lg select-none">
+              SV
+            </div>
+          </div>
+
+          {/* Name / title / bio / socials */}
+          <div className="flex flex-col gap-3 text-center md:text-left">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Iván E. Villanueva Sandoval{" "}
+                <span className="text-gray-400 dark:text-gray-500 font-normal text-base">
+                  (Svei)
+                </span>
+              </h1>
+              <p className="text-blueEx font-semibold mt-1">
+                Founder, Excel Solutions V — Especialista en Excel y automatización fiscal
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1 justify-center md:justify-start text-gray-500 dark:text-gray-400 text-sm">
+              <MapPin size={14} />
+              <span>Zapopan, Jalisco, México</span>
+            </div>
+
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Especialista autodidacta en Excel y automatización, enfocado en la
+              intersección entre los sistemas contables mexicanos y la ingeniería
+              de hojas de cálculo. Desarrollo herramientas de automatización
+              CFDI/SAT, libros de trabajo de simulación y pipelines en Python que
+              transforman datos fiscales en registros limpios e importables —
+              y genero contenido en español para enseñar lo mismo. Disponible
+              para trabajo freelance en Excel, VBA, Power Query y automatización
+              relacionada con CONTPAQi.
             </p>
-            <p className="">
-              At Excel SolutionsV, we understand the importance of efficiency
-              and accuracy in data management. That’s why we offer a wide range
-              of tutorials and guides on various Excel functionalities, from
-              basic data entry techniques to complex accounting formulas. Our
-              blog features detailed articles on creating and using macros,
-              which can save you valuable time by automating repetitive tasks.
-              We also provide insights into advanced Excel features such as
-              pivot tables, VLOOKUP, and conditional formatting, ensuring that
-              you stay ahead of the curve in your professional endeavors.
-            </p>
-            <p className="">
-              Join our community of Excel enthusiasts and experts who share a
-              passion for mastering this powerful tool. At Excel SolutionsV, we
-              are committed to delivering high-quality, actionable content that
-              will help you excel in your career. Whether you are looking for
-              tips to enhance your productivity, solutions to specific problems,
-              or inspiration for your next Excel project, our blog has something
-              for everyone. Stay tuned for regular updates, expert advice, and a
-              wealth of resources that will make your Excel experience more
-              effective and enjoyable.
-            </p>
+
+            {/* Social icons */}
+            <div className="flex gap-5 mt-1 justify-center md:justify-start">
+              {socials.map(({ icon, href, label, className }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`transition-opacity ${className}`}
+                >
+                  {icon}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Skills */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+            Habilidades
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blueEx dark:bg-blue-900 dark:text-blue-200"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
