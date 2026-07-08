@@ -24,3 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Personal build-log notes, not project documentation
+notes.md
