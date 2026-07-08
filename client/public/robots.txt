@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /create-post
+Disallow: /update-post
+Disallow: /sign-in
+Disallow: /sign-up
+
+Sitemap: https://excelsolutionsv.com/sitemap.xml
