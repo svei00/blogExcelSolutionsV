@@ -42,17 +42,17 @@ jobs:
             # Install backend dependencies
             npm install
 
-            # Build the frontend with production environment
+            # Build the frontend with production environment. vite.config.js's
+            # build.outDir is set directly to /var/www/excelsolutionsv.com
+            # (the nginx root), so this build IS the deploy - no copy step
+            # needed. A prior rsync step here from client/dist/ was actively
+            # harmful: outDir stopped pointing at client/dist a while ago, so
+            # client/dist was a stale leftover, and the rsync --delete was
+            # overwriting every fresh build with that old copy.
             cd client
             npm install
             NODE_ENV=production npm run build
             cd ..
-
-            # nginx serves / from /var/www/excelsolutionsv.com, a separate
-            # directory from this repo's client/dist - without this sync
-            # step the two drift apart (nginx keeps serving a stale build
-            # after the API/backend restarts on the new code).
-            rsync -avz --delete /var/www/blogExcelSolutionsV/client/dist/ /var/www/excelsolutionsv.com/
 
             # Start or restart the backend using PM2
             pm2 start /var/www/blogExcelSolutionsV/api/index.js --name mern-blog || pm2 restart mern-blog
