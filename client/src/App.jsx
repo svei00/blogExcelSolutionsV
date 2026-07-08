@@ -14,6 +14,7 @@ import PostPage from "./pages/PostPage";
 import ScrollToTop from "./components/ScrollToTop";
 import Search from "./pages/Search";
 import HeaderLayout from "./components/HeaderLayout";
+import Analytics from "./components/Analytics";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
           <meta name="description" content="Welcome to ExcelSolutionsV Blog!" />
         </Helmet>
         <ScrollToTop />
+        <Analytics />
         <HeaderLayout>
           <Routes>
             <Route path="/" element={<Home />} />

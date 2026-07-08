@@ -10,6 +10,16 @@
     crossorigin="anonymous"></script>
     <!-- Google AdSense account verification meta (single source of truth; see Header/App/PostPage for why this isn't duplicated per-page) -->
     <meta name="google-adsense-account" content="ca-pub-5050087617356218" />
+
+    <!-- Google tag (gtag.js) - GA4. Initial page_view fires automatically;
+         SPA route changes are tracked separately by client/src/components/Analytics.jsx -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WBDV1SDNZH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WBDV1SDNZH');
+    </script>
   </head>
   <body>
     <div id="root"></div>
