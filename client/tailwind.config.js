@@ -2,6 +2,7 @@
 
 import flowbite from "flowbite/plugin"; // Import the flowbite plugin
 import tailwindScrollbar from "tailwind-scrollbar"; // Import the tailwind scrollbar plugin
+import theme, { legacyAliases } from "./src/config/theme.js"; // 🎛️ single source of truth for brand colors
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -16,15 +17,8 @@ export default {
       colors: {
         transparent: "transparent",
         current: "currentColor",
-        blueEx: "#3182DF",
-        greenEx: "#21B868",
-        github: "#6cc644",
-        linkedin: "#0a66c2",
-        xTwitter: "#1DA1F2",
-        instagram: "#E4405F",
-        facebook: "#1877F2",
-        tiktok: "#ff0050",
-        dribbble: "#ea4c89",
+        ...theme.colors,
+        ...legacyAliases, // blueEx/greenEx aliases — remove once Phase 4.8 migrates all usages
       },
     },
   },
