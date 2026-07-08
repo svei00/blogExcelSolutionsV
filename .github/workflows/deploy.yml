@@ -48,6 +48,12 @@ jobs:
             NODE_ENV=production npm run build
             cd ..
 
+            # nginx serves / from /var/www/excelsolutionsv.com, a separate
+            # directory from this repo's client/dist - without this sync
+            # step the two drift apart (nginx keeps serving a stale build
+            # after the API/backend restarts on the new code).
+            rsync -avz --delete /var/www/blogExcelSolutionsV/client/dist/ /var/www/excelsolutionsv.com/
+
             # Start or restart the backend using PM2
             pm2 start /var/www/blogExcelSolutionsV/api/index.js --name mern-blog || pm2 restart mern-blog
           EOF
