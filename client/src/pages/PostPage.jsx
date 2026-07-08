@@ -5,6 +5,7 @@ import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection.jsx";
 import PostCard from "../components/PostCard.jsx";
 import { Helmet } from "react-helmet-async";
+import { SITE_URL } from "../config/site";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -80,7 +81,7 @@ export default function PostPage() {
           <meta property="og:image" content={post.image} />
           <meta
             property="og:url"
-            content={`https://blog.excel-solutionsv.com/post/${post.slug}`}
+            content={`${SITE_URL}/post/${post.slug}`}
           />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={post.title} />
