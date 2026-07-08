@@ -23,11 +23,6 @@ export default function App() {
         <Helmet>
           <title>ExcelSolutionsV Blog</title>
           <meta name="description" content="Welcome to ExcelSolutionsV Blog!" />
-          {/* Google AdSense meta tag */}
-          <meta
-            name="google-adsense-account"
-            content="ca-pub-5050087617356218"
-          />
         </Helmet>
         <ScrollToTop />
         <HeaderLayout>
