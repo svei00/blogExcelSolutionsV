@@ -42,16 +42,21 @@ jobs:
             # Install backend dependencies
             npm install
 
-            # Build the frontend with production environment. vite.config.js's
-            # build.outDir is set directly to /var/www/excelsolutionsv.com
-            # (the nginx root), so this build IS the deploy - no copy step
-            # needed. A prior rsync step here from client/dist/ was actively
-            # harmful: outDir stopped pointing at client/dist a while ago, so
-            # client/dist was a stale leftover, and the rsync --delete was
-            # overwriting every fresh build with that old copy.
+            # Build the frontend into client/dist. Publishing is a separate
+            # step below so a failed build can never blank the live site.
             cd client
             npm install
             NODE_ENV=production npm run build
+
+            # Sanity-check the build before it goes anywhere near the nginx
+            # root - an empty or index-less dist/ must abort the deploy
+            # rather than get rsynced over a working site.
+            test -f dist/index.html || { echo "build produced no index.html, aborting"; exit 1; }
+
+            # Publish. --delete prunes old hashed assets. Trailing slash on
+            # the source is load-bearing: it copies dist's *contents*, not
+            # the dist directory itself.
+            rsync -a --delete dist/ /var/www/excelsolutionsv.com/
             cd ..
 
             # Start or restart the backend using PM2
