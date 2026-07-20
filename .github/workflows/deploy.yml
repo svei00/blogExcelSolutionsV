@@ -36,8 +36,15 @@ jobs:
             # Navigate to the project directory
             cd /var/www/blogExcelSolutionsV
 
-            # Pull the latest code from the repository
-            git pull origin main
+            # Force the VPS to exactly match origin/main. A plain `git pull`
+            # aborts whenever the working tree is dirty (files edited on the
+            # server, or the same change pushed from elsewhere) - which broke
+            # deploys before. reset --hard makes the server a pure mirror of
+            # the repo: no merge, no dirty-tree aborts. Trade-off: uncommitted
+            # edits made directly on the server are discarded, which is correct
+            # for a deploy target.
+            git fetch origin main
+            git reset --hard origin/main
 
             # Install backend dependencies
             npm install
