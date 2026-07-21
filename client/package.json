@@ -15,7 +15,7 @@
     "dompurify": "^3.4.12",
     "firebase": "^10.8.1",
     "flowbite-react": "^0.7.2",
-    "lucide-react": "^0.454.0",
+    "lucide-react": "^1.25.0",
     "luxon": "^3.4.4",
     "marked": "^18.0.6",
     "normalize.css": "^8.0.1",
