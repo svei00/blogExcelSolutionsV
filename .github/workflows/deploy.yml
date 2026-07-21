@@ -32,9 +32,21 @@ jobs:
           # Connect to the VPS and deploy
           ssh -i ~/.ssh/id_ed25519 vefrmeistari@${{ secrets.VPS_IP }} << 'EOF'
             set -e
-            
+
             # Navigate to the project directory
             cd /var/www/blogExcelSolutionsV
+
+            # Back up the database BEFORE touching any code, so a bad
+            # deploy is always recoverable from data that predates it.
+            # Reads the connection string straight out of .env (already
+            # on the server, dotenv already a root dependency) instead of
+            # hardcoding it here. Keeps only the last 5 dumps so this
+            # doesn't grow the disk forever.
+            BACKUP_DIR=/var/www/blogExcelSolutionsV/backups
+            mkdir -p "$BACKUP_DIR"
+            MONGO_URI=$(node -e "require('dotenv').config(); console.log(process.env.MongoDB)")
+            mongodump --uri="$MONGO_URI" --archive="$BACKUP_DIR/backup_$(date +%Y%m%d_%H%M%S).archive" --gzip
+            ls -1t "$BACKUP_DIR"/backup_*.archive | tail -n +6 | xargs -r rm --
 
             # Force the VPS to exactly match origin/main. A plain `git pull`
             # aborts whenever the working tree is dirty (files edited on the
@@ -68,4 +80,15 @@ jobs:
 
             # Start or restart the backend using PM2
             pm2 start /var/www/blogExcelSolutionsV/api/index.js --name mern-blog || pm2 restart mern-blog
+
+            # Health check: confirm the API actually answers post-restart.
+            # This does NOT roll back automatically - it fails the Action
+            # loudly (instead of a green checkmark on a dead site) so a
+            # broken deploy gets noticed immediately, not whenever someone
+            # happens to visit the site next.
+            sleep 5
+            curl -f https://excelsolutionsv.com/api/post/getposts?limit=1 > /dev/null || {
+              echo "Health check failed: API did not respond correctly after deploy."
+              exit 1
+            }
           EOF
