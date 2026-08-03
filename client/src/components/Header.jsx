@@ -8,6 +8,7 @@ import { toggleTheme, setTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import NavLinkEx from "./NavLinkEx";
+import { categoryLabel } from "../config/categories";
 
 // Detect System Preferences
 const getSystemThemePreference = () => {
@@ -29,6 +30,20 @@ export default function Header() {
   const { theme } = useSelector((state) => state.theme);
   const [searchTerm, setSearchTerm] = useState("");
   // console.log(searchTerm); // For testing purposes
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/post/categories");
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -181,6 +196,29 @@ export default function Header() {
 
         {/* Custom NavBar */}
         <NavLinkEx to="/">Home</NavLinkEx>
+        {categories.length > 0 && (
+          <Dropdown
+            arrowIcon={true}
+            inline
+            label={
+              <span
+                className={`font-bold ${
+                  path === "/search"
+                    ? "text-primary hover:text-secondary"
+                    : "text-gray-400 hover:text-secondary"
+                }`}
+              >
+                Categories
+              </span>
+            }
+          >
+            {categories.map((category) => (
+              <Link key={category} to={`/search?category=${category}`}>
+                <Dropdown.Item>{categoryLabel(category)}</Dropdown.Item>
+              </Link>
+            ))}
+          </Dropdown>
+        )}
         <NavLinkEx to="/about">About</NavLinkEx>
         <NavLinkEx to="/projects">Projects</NavLinkEx>
       </Navbar.Collapse>
