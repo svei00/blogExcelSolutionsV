@@ -78,17 +78,36 @@ jobs:
             rsync -a --delete dist/ /var/www/excelsolutionsv.com/
             cd ..
 
-            # Start or restart the backend using PM2
-            pm2 start /var/www/blogExcelSolutionsV/api/index.js --name mern-blog || pm2 restart mern-blog
+            # Start the backend using PM2. Delete-then-start instead of
+            # `pm2 start || pm2 restart`: api/index.js has no SIGTERM
+            # handler, so `pm2 restart`'s stop-then-start could still race
+            # the new process's app.listen(3000) against the old one
+            # finishing its exit - this showed up in production as
+            # repeated `EADDRINUSE` crash-loops right after every deploy
+            # (visible in `pm2 logs mern-blog`), self-healing after a few
+            # restarts but occasionally catching the health check below
+            # mid-loop. `pm2 delete` first guarantees the port is fully
+            # released before anything tries to bind it again.
+            pm2 delete mern-blog || true
+            pm2 start /var/www/blogExcelSolutionsV/api/index.js --name mern-blog
 
             # Health check: confirm the API actually answers post-restart.
             # This does NOT roll back automatically - it fails the Action
             # loudly (instead of a green checkmark on a dead site) so a
             # broken deploy gets noticed immediately, not whenever someone
-            # happens to visit the site next.
-            sleep 5
-            curl -f https://excelsolutionsv.com/api/post/getposts?limit=1 > /dev/null || {
-              echo "Health check failed: API did not respond correctly after deploy."
-              exit 1
-            }
+            # happens to visit the site next. Retries instead of a single
+            # curl - a fresh process can take a few seconds to finish
+            # connecting to Mongo, and one slow-but-fine boot shouldn't
+            # fail the whole deploy.
+            for i in 1 2 3 4 5 6; do
+              sleep 5
+              if curl -f https://excelsolutionsv.com/api/post/getposts?limit=1 > /dev/null 2>&1; then
+                echo "Health check passed."
+                exit 0
+              fi
+              echo "Health check attempt $i failed, retrying..."
+            done
+            echo "Health check failed: API did not respond correctly after deploy."
+            pm2 logs mern-blog --lines 30 --nostream
+            exit 1
           EOF

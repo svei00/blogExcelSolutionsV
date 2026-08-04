@@ -1,6 +1,7 @@
 import DOMPurify from "isomorphic-dompurify";
 import Message from "../models/message.model.js";
 import { errorHandler } from "../utils/error.util.js";
+import { notifyNewLead } from "../utils/notifyLead.util.js";
 
 // Same reasoning as comment.controller.js's sanitizeCommentContent -
 // this is a PUBLIC, unauthenticated endpoint, so strip HTML entirely
@@ -30,6 +31,7 @@ export const createMessage = async (req, res, next) => {
     const newMessage = new Message({ name, email, message });
     await newMessage.save();
     res.status(201).json({ success: true });
+    notifyNewLead({ name, email, message }); // fire-and-forget, never blocks the response
   } catch (error) {
     next(error);
   }
