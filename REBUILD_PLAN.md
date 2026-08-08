@@ -515,6 +515,57 @@ Current worst offenders this dissolves: `CreatePost`/`UpdatePost` duplication, `
 
 ---
 
+### Phase 12 — Bilingual ES/EN *(architected 2026-09-03; starts with About + Projects as the pattern-setting pair)*
+
+**Decisions taken with svei before any code was written:**
+
+- **URL scheme: path prefix.** ES stays at the root (`/about`, `/projects`), EN lives under `/en/` (`/en/about`, `/en/projects`). This is the scheme Google reads most reliably, it gives clean reciprocal `hreflang`, and React Router does it without a new framework.
+- **No Next.js migration.** Asked and answered: technically possible, and still the textbook long-term answer, but Part 2's Phase 11 reasoning holds unchanged — one-way door, rewrites routing/data-fetching/build/deploy, and the admin half (Toast UI, Firebase upload, Redux+persist, dashboard) is deeply client-only. **Bilingual does not need it**: the `/en/` prefix plus an extended `injectMeta.js` buys real per-language `hreflang` and translated `<head>` tags on the current stack, additively and reversibly — exactly what Phase 5.1/11 were designed for.
+- **No Clerk migration.** Also asked and answered: Clerk's value scales with user-management complexity (profiles, roles, teams); this app has one admin plus commenters, and Phase 3 already hardened the JWT+bcrypt auth it has. The cost is a rewrite of the whole auth surface (`SignIn`/`SignUp`/`OAuth`, `verifyToken` and every protected API route, the Redux `user` slice, dashboard gating), migrating existing users, and a third-party script on a bundle Phase 4 fought down from 424→190 KB gzip. Revisit only if real multi-user features ever land.
+- **Language source of truth: the URL**, not client state. Browser detection only picks the *default* for a first-time visitor; the persisted choice overrides it afterwards; and the URL overrides both on any given page.
+
+⚠️ **The auto-redirect trap — read before implementing 12.A.1.** svei picked "detect from the browser", which is right for the *default*, but a hard `navigator.language`-based redirect is a genuine SEO hazard: Googlebot generally crawls with `Accept-Language: en` from US IPs, so a blanket redirect can send the crawler to the EN page every time and leave the ES pages — the ones that currently carry all the impressions — effectively unindexable. Google's own guidance is to prefer a visible toggle/banner over an automatic redirect. **Implement detection as: pick the initial locale on first visit, never hard-redirect, keep both URLs directly reachable and self-canonical, and always render a real crawlable link to the counterpart.**
+
+**Three things found by reading the code, which the plan depends on:**
+
+1. **`client/index.html` hardcodes `<html lang="es">` (line 2).** Every existing server-injected response inherits it, so an `/en/*` response would currently ship English content declared as Spanish — wrong for both search and screen readers, and precisely the M11 finding this project already fixed once. The `lang` attribute has to become part of the injection contract (12.B.4).
+2. **`/about` and `/projects` are not routed to Express at all.** nginx only proxies `/api/`, `= /`, `= /search`, `/post/`, and `= /sitemap.xml`; everything else falls through to the static SPA. So server-side meta for these pages is *new routing*, not a tweak — and it inherits notes.md 27.1's deploy-order rule (Express side first and inert, nginx second), the same way 11.A.3/11.A.5 did.
+3. **`themeSlice.js` has a latent bug in exactly the code 12.A.1 would otherwise copy:** `getSystemThemePreference()` calls `Window.matchMedia(...)` with a capital `W` — the global constructor, not `window` — which would throw `TypeError` if it ever ran. It never runs (`initialState` hardcodes `"system"` and nothing calls the function), so it is dead code, not a live fault. **Do not mirror that shape into locale detection**; fix or delete it while in the neighbourhood.
+
+**Precedent to follow:** theme state lives in Redux + redux-persist (`redux/theme/themeSlice.js`, persisted via `store.js`). Locale follows the same path as a `localeSlice` rather than introducing a parallel Context for the same job — one state pattern, not two. `react-helmet-async` is **already installed and mounted** in `App.jsx`, so the client half needs **no new dependency**.
+
+#### 12.A — Locale mechanism *(client-side; each row its own commit)*
+
+| Task | Detail |
+|---|---|
+| 12.A.1 `localeSlice` + resolution order | New `client/src/redux/locale/localeSlice.js`, registered in `store.js`'s `combineReducers` and persisted like `theme`. Resolution order, highest first: **URL prefix → persisted choice → `navigator.language` → `"es"`**. Detection reads `navigator.language`/`languages`, matches on the primary subtag only (`en-US` → `en`), and defaults to `es` on anything else. No redirect (see the trap above). Fix or delete `themeSlice`'s `Window.matchMedia` typo in the same commit. |
+| 12.A.2 `useLocale()` + `<html lang>` | One small hook exposing `{ locale, setLocale, t }`. `<html lang>` is set client-side through the already-mounted `react-helmet-async` (`<Helmet htmlAttributes={{ lang: locale }}>` in `App.jsx`) — no new dep. This is the client-side counterpart of 12.B.4's server-side fix; both must agree. |
+| 12.A.3 Language toggle in `Header.jsx` | Sits beside the existing theme button and copies its accessible-label precedent (`"Theme: system. Click to change."` → `"Idioma: español. Cambiar a English."`). ⚠️ The toggle must **navigate to the counterpart URL**, not merely flip state — the URL is authoritative from 12.B onward, and a state-only toggle would desync the two. Renders as a real `<a>`/`<Link>` so a crawler sees the alternate. |
+| 12.A.4 About + Projects content as `{ es, en }` | The content in both pages is already extracted into module-level arrays/objects (About's `skills`/`socials`, Projects' `featured`/`others`), so this is a shape change, not a rewrite. Co-locate the translations with each page rather than a global bundle — two static pages don't earn a resource-file layer yet. ⚠️ **Hard rule carries into both languages: every content `<p>` keeps `text-justify`.** |
+| 12.A.5 Chrome strings | Header nav, Footer headings and links, and `CallToAction`. Noted while reading: `CallToAction.jsx` is **already English copy sitting on Spanish pages** ("Need help with your Excel workflow?"), so this task fixes a live inconsistency rather than only adding a language. |
+
+#### 12.B — Real URLs + server-side SEO
+
+| Task | Detail |
+|---|---|
+| 12.B.1 `/en/*` routes | Add `/en/about` and `/en/projects` to `App.jsx`'s flat route table. ⚠️ **Open decision, deliberately not pre-decided:** whether the ES paths stay `/about`/`/projects` or get localized to `/acerca`/`/proyectos`. Localizing is nicer but both current paths are already indexed and sit in `sitemap.xml`, so it would require 301s — the same class of work as 11.C.2's slug migration, and it should be priced as such, not slipped in. |
+| 12.B.2 `buildStaticPageMetaBlock()` | New builder in `api/lib/seoHtml.js`, reusing `buildPostMetaBlock`'s proven hreflang shape from 11.C.1: reciprocal `<link rel="alternate" hreflang>` **plus `x-default`**, self-referential canonical per URL, translated `<title>`/`<meta name="description">`, and matching `og:locale`. |
+| 12.B.3 `injectStatic` handler | New export in `injectMeta.js`, mounted in `api/index.js` for the four paths. ⚠️ **These pages are DB-free**, so do *not* route them through `responseCache`'s 60s TTL — build the four HTML strings **once at startup**, the way `filteredSearchHtml` already does. Same `if (!indexHtmlTemplate) next()` guard as every other handler, so `npm run dev` on the API alone still works without a client build. |
+| 12.B.4 `<html lang>` in the injected response | Make the `lang` attribute part of the injection contract so `/en/*` serves `lang="en"`. Document it inside `client/index.html` next to the existing "THE PLACEHOLDER CONTRACT" / "THE SSR-BODY CONTRACT" comments — that file and `injectMeta.js` are one contract and are meant to be read together. |
+| 12.B.5 nginx | Four new `location =` blocks mirroring the existing `= /search` block, including its 502 fallback to `@spa_static`. ⚠️ **Deploy order is not optional** (notes.md 27.1): ship 12.B.3 first and let it sit inert, then apply nginx — exactly the sequence 11.A.3→11.A.5 followed. Config is tracked in `deploy/nginx/` now, so unlike 5.1/5.2 this cannot be silently lost in a VPS rebuild. |
+| 12.B.6 Sitemap | Add the `/en/*` entries to `staticPages` in `sitemap.controller.js` and emit reciprocal `xhtml:link` alternates. Keep the existing `lastmod`-by-proxy reasoning (11.B.5) intact. |
+| 12.B.7 Verification | Same bar as 11.A.3: prove it against the **real response with zero JS executed** — `curl` each of the four URLs and confirm correct `<html lang>`, reciprocal `hreflang` in *both* directions, self-canonical, and translated `<title>`. Regression-check `/`, `/search`, `/sitemap.xml`, and a real post page. |
+
+**Done when:** all four URLs return correct language-specific `<head>` tags and `<html lang>` in raw HTML with no JS; the toggle navigates rather than flipping state; and `/about` ↔ `/en/about` point at each other reciprocally.
+
+#### 12.C — Bilingual posts *(deferred — do not start before 12.A/12.B are live)*
+
+The model already supports this: `post.model.js` carries `lang` (es/en) and `translationSlug`, and `injectMeta.js` already emits reciprocal post-level hreflang (11.C.1) — which has **never been exercised against a real ES/EN pair**, so its first genuine use will also be its first real test.
+
+⚠️ **On machine translation, decided with svei:** MT is viable *as a drafting aid only, never auto-published*. Two reasons, both concrete: the content is fiscal (CFDI, RESICO, DIOT, SAT) where terminology is legally precise and a wrong term is a wrong answer, not a clumsy sentence; and bulk unreviewed translation is exactly what Google classifies as thin/duplicate content — the same trap Phase 9 already warns about, and it would be spent against the domain authority Phase 5/11 built. A client-side translate widget is worth **zero** for SEO and is ruled out. The workflow is: MT draft → svei reviews → publish with `lang` + `translationSlug` set.
+
+---
+
 ## Part 4 — Git workflow
 
 - **One branch per phase**: `phase-1-quick-fixes`, `phase-2-editor`, … Inside a phase, **one commit per task** (`fix: correct AdSense publisher ID in ads.txt`) — reviewable, individually revertable.
