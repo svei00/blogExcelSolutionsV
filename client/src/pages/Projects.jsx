@@ -1,12 +1,13 @@
+import { Bot, EyeOff, FolderTree, FileSpreadsheet } from "lucide-react";
 import CallToAction from "../components/CallToAction";
 
 // Featured projects — each is a real tool that came out of a concrete
-// despacho problem, not a practice exercise. Structured blocks
-// ("El problema", "Qué hace", ...) render as bold lead-ins, not headings,
-// so the page keeps a single h1 → h2 (per project) heading order.
+// despacho problem, not a practice exercise. The structured blocks
+// ("El problema", "Qué hace", ...) render as bold lead-ins, not
+// headings, so the page keeps a single h1 → h2 (per project) order.
 const featured = [
   {
-    n: "1",
+    icon: <Bot size={22} />,
     title: "Automatizador SAT → sistema contable",
     blocks: [
       [
@@ -25,7 +26,7 @@ const featured = [
     tools: ["Python", "scikit-learn", "SQLite"],
   },
   {
-    n: "2",
+    icon: <EyeOff size={22} />,
     title: "Anonimizador de CFDI",
     blocks: [
       [
@@ -44,7 +45,7 @@ const featured = [
     tools: ["Python", "lxml", "SQLite"],
   },
   {
-    n: "3",
+    icon: <FolderTree size={22} />,
     title: "Procesador de CFDI",
     blocks: [
       [
@@ -59,7 +60,7 @@ const featured = [
     tools: ["Python", "PySide6", "pandas", "openpyxl"],
   },
   {
-    n: "4",
+    icon: <FileSpreadsheet size={22} />,
     title: "Papeles de trabajo contable-fiscal",
     blocks: [
       [
@@ -108,23 +109,23 @@ export default function Projects() {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
             Proyectos
           </h1>
-          <p className="text-gray-700 dark:text-gray-200 leading-relaxed">
+          <p className="text-gray-700 dark:text-gray-200 leading-relaxed text-justify">
             Construyo herramientas de trabajo: automatización, papeles de trabajo
             y procesos que convierten datos dispersos en información ordenada,
             revisable y utilizable.
           </p>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed text-justify">
             No son ejercicios de práctica. Cada uno salió de un problema real:
             horas de captura manual, archivos que no cuadran, procesos que solo
             una persona sabía hacer.
           </p>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed text-justify">
             La mayoría nacen del terreno contable y fiscal, pero el criterio es
             siempre el mismo: Excel cuando el usuario final tiene que poder abrir,
             entender y auditar el resultado; Python cuando el volumen o la
             repetición hacen que hacerlo a mano deje de tener sentido.
           </p>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed text-justify">
             Buena parte de estas herramientas conectan con el SAT (Servicio de
             Administración Tributaria) del lado de los datos —CFDI, DIOT— y con
             sistemas contables como CONTPAQi del lado de la carga y el registro.
@@ -132,20 +133,24 @@ export default function Projects() {
         </div>
 
         {/* Featured projects */}
-        {featured.map(({ n, title, blocks, tools }) => (
+        {featured.map(({ icon, title, blocks, tools }) => (
           <article
-            key={n}
+            key={title}
             className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8 flex flex-col gap-4"
           >
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-              <span className="text-primaryText dark:text-primary">{n} — </span>
-              {title}
-            </h2>
+            <div className="flex items-center gap-3">
+              <span className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 text-primaryText dark:bg-blue-900 dark:text-blue-200 flex items-center justify-center">
+                {icon}
+              </span>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                {title}
+              </h2>
+            </div>
             <div className="flex flex-col gap-3">
               {blocks.map(([label, text]) => (
                 <p
                   key={label}
-                  className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed"
+                  className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed text-justify"
                 >
                   <span className="font-semibold text-gray-800 dark:text-white">
                     {label}.{" "}
@@ -170,7 +175,7 @@ export default function Projects() {
           </article>
         ))}
 
-        {/* Other tools */}
+        {/* Other tools — deliberately the plain, compact list */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
             Otras herramientas
@@ -182,7 +187,7 @@ export default function Projects() {
                   <span className="shrink-0 text-sm font-medium text-gray-800 dark:text-white">
                     {name}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="text-sm text-gray-600 dark:text-gray-300 text-justify">
                     {desc}
                   </span>
                 </div>
