@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Spinner } from "flowbite-react";
 import Home from "./pages/Home";
@@ -35,15 +35,24 @@ function RouteFallback() {
 }
 
 export default function App() {
-  // REBUILD_PLAN 12.A.2 - keep <html lang> honest for the active locale.
-  // Client-side counterpart of 12.B.4's server-side per-URL lang; both
-  // must agree. index.html ships lang="es" for the no-JS/crawler case.
   const { locale } = useLocale();
+
+  // REBUILD_PLAN 12.A.2/12.A.3 - keep <html lang> honest for the active
+  // locale. Set directly rather than through <Helmet htmlAttributes>:
+  // this app's react-helmet-async setup doesn't reconcile that Helmet at
+  // all (the <title>/<meta> it declares never reach the DOM either), and
+  // <html lang> is a single attribute this code is the sole owner of, so
+  // a plain effect is both simpler and actually works. Client-side
+  // counterpart of 12.B.4's server-side per-URL lang; both must agree.
+  // index.html ships lang="es" for the no-JS / crawler case.
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <Helmet htmlAttributes={{ lang: locale }}>
+        <Helmet>
           <title>ExcelSolutionsV Blog</title>
           <meta name="description" content="Welcome to ExcelSolutionsV Blog!" />
         </Helmet>

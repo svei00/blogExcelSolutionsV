@@ -5,6 +5,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { FaDesktop, FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme, setTheme } from "../redux/theme/themeSlice";
+import { toggleLocale } from "../redux/locale/localeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import NavLinkEx from "./NavLinkEx";
@@ -26,6 +27,7 @@ export default function Header() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
+  const { locale } = useSelector((state) => state.locale);
   const [searchTerm, setSearchTerm] = useState("");
   // console.log(searchTerm); // For testing purposes
 
@@ -158,6 +160,27 @@ export default function Header() {
         <AiOutlineSearch />
       </Button>
       <div className="flex gap-2 md:order-2">
+        {/* Language toggle (REBUILD_PLAN 12.A.3), beside the theme button.
+            TODO(12.B.1): once /en/* routes exist this must NAVIGATE to the
+            counterpart URL - and render as a <Link> so a crawler follows
+            the alternate - not just flip state; the URL is authoritative
+            from 12.B on. State-only here because no counterpart URL
+            exists yet. TODO(12.A.5): also surface it below the sm
+            breakpoint with the nav i18n pass - the theme button has the
+            same hidden-on-mobile gap and both should be fixed together. */}
+        <Button
+          className="w-12 h-10 hidden sm:inline"
+          color="gray"
+          pill
+          onClick={() => dispatch(toggleLocale())}
+          aria-label={
+            locale === "es"
+              ? "Idioma: español. Cambiar a English."
+              : "Idioma: English. Cambiar a español."
+          }
+        >
+          <span className="text-xs font-bold">{locale.toUpperCase()}</span>
+        </Button>
         <Button
           className="w-12 h-10 hidden sm:inline"
           color="gray"
