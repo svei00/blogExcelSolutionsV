@@ -14,6 +14,7 @@ import Search from "./pages/Search";
 import HeaderLayout from "./components/HeaderLayout";
 import Analytics from "./components/Analytics";
 import { HelmetProvider, Helmet } from "react-helmet-async";
+import useLocale from "./hooks/useLocale";
 
 // Code-split the pages a reader never needs: signing in/up and every
 // admin page (dashboard, create/update post) pull in real weight -
@@ -34,10 +35,15 @@ function RouteFallback() {
 }
 
 export default function App() {
+  // REBUILD_PLAN 12.A.2 - keep <html lang> honest for the active locale.
+  // Client-side counterpart of 12.B.4's server-side per-URL lang; both
+  // must agree. index.html ships lang="es" for the no-JS/crawler case.
+  const { locale } = useLocale();
+
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <Helmet>
+        <Helmet htmlAttributes={{ lang: locale }}>
           <title>ExcelSolutionsV Blog</title>
           <meta name="description" content="Welcome to ExcelSolutionsV Blog!" />
         </Helmet>
