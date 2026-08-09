@@ -1,9 +1,22 @@
-import { Bot, EyeOff, FolderTree, FileSpreadsheet } from "lucide-react";
+import {
+  Bot,
+  EyeOff,
+  FolderTree,
+  FileSpreadsheet,
+  Sparkles,
+  Info,
+} from "lucide-react";
 import CallToAction from "../components/CallToAction";
+
+// Block labels that get the callout treatment (tinted panel + accent
+// rail) instead of a plain eyebrow+text - the differentiator and the
+// honest caveat are the two lines that carry the "why this, why me", so
+// the design lifts them out of the paragraph flow.
+const CALLOUT_LABELS = new Set(["Lo que lo hace distinto", "Nota honesta"]);
 
 // Featured projects — each is a real tool that came out of a concrete
 // despacho problem, not a practice exercise. The structured blocks
-// ("El problema", "Qué hace", ...) render as bold lead-ins, not
+// ("El problema", "Qué hace", ...) render as eyebrow labels + text, not
 // headings, so the page keeps a single h1 → h2 (per project) order.
 const featured = [
   {
@@ -105,7 +118,7 @@ export default function Projects() {
       <div className="max-w-4xl mx-auto flex flex-col gap-6">
 
         {/* Intro */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-8 flex flex-col gap-4">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md ring-1 ring-gray-100 dark:ring-white/5 p-8 flex flex-col gap-4">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
             Proyectos
           </h1>
@@ -136,47 +149,94 @@ export default function Projects() {
         {featured.map(({ icon, title, blocks, tools }) => (
           <article
             key={title}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8 flex flex-col gap-4"
+            className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-md ring-1 ring-gray-100 dark:ring-white/5 transition duration-200 hover:shadow-lg hover:-translate-y-0.5"
           >
-            <div className="flex items-center gap-3">
-              <span className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 text-primaryText dark:bg-blue-900 dark:text-blue-200 flex items-center justify-center">
-                {icon}
-              </span>
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-                {title}
-              </h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              {blocks.map(([label, text]) => (
-                <p
-                  key={label}
-                  className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed text-justify"
-                >
-                  <span className="font-semibold text-gray-800 dark:text-white">
-                    {label}.{" "}
-                  </span>
-                  {text}
-                </p>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Herramientas
-              </span>
-              {tools.map((t) => (
-                <span
-                  key={t}
-                  className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-primaryText dark:bg-blue-900 dark:text-blue-200"
-                >
-                  {t}
+            {/* brand hairline caps the card */}
+            <div className="h-1 w-full bg-gradient-to-r from-secondaryText to-primaryText" />
+
+            <div className="flex flex-col gap-5 p-8">
+              <div className="flex items-center gap-4">
+                <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-secondaryText to-primaryText text-white flex items-center justify-center shadow-sm transition-transform duration-200 group-hover:scale-105">
+                  {icon}
                 </span>
-              ))}
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                  {title}
+                </h2>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {blocks.map(([label, text]) => {
+                  if (CALLOUT_LABELS.has(label)) {
+                    const honest = label === "Nota honesta";
+                    return (
+                      <div
+                        key={label}
+                        className={`rounded-xl border-l-2 p-4 ${
+                          honest
+                            ? "border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-900/50"
+                            : "border-primaryText bg-blue-50 dark:border-primary dark:bg-blue-900/30"
+                        }`}
+                      >
+                        <div className="mb-1.5 flex items-center gap-1.5">
+                          {honest ? (
+                            <Info
+                              size={13}
+                              className="text-gray-400 dark:text-gray-500"
+                            />
+                          ) : (
+                            <Sparkles
+                              size={13}
+                              className="text-primaryText dark:text-primary"
+                            />
+                          )}
+                          <span
+                            className={`text-[11px] font-semibold uppercase tracking-wider ${
+                              honest
+                                ? "text-gray-400 dark:text-gray-500"
+                                : "text-primaryText dark:text-primary"
+                            }`}
+                          >
+                            {label}
+                          </span>
+                        </div>
+                        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 text-justify">
+                          {text}
+                        </p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={label}>
+                      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                        {label}
+                      </span>
+                      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 text-justify">
+                        {text}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 border-t border-gray-100 dark:border-gray-700 pt-4">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  Herramientas
+                </span>
+                {tools.map((t) => (
+                  <span
+                    key={t}
+                    className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-primaryText dark:bg-blue-900 dark:text-blue-200"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
           </article>
         ))}
 
         {/* Other tools — deliberately the plain, compact list */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md ring-1 ring-gray-100 dark:ring-white/5 p-8">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
             Otras herramientas
           </h2>
