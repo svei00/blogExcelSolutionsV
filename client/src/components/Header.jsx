@@ -9,6 +9,22 @@ import { toggleLocale } from "../redux/locale/localeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import NavLinkEx from "./NavLinkEx";
+import useLocale from "../hooks/useLocale";
+
+// REBUILD_PLAN 12.A.5 - chrome strings as { es, en } pairs.
+const ui = {
+  searchPlaceholder: { es: "Buscar...", en: "Search..." },
+  searchAria: { es: "Buscar", en: "Search" },
+  navHome: { es: "Inicio", en: "Home" },
+  navSearch: { es: "Buscar", en: "Search" },
+  navAbout: { es: "Acerca de", en: "About" },
+  navProjects: { es: "Proyectos", en: "Projects" },
+  profile: { es: "Perfil", en: "Profile" },
+  signOut: { es: "Cerrar sesión", en: "Sign Out" },
+  signIn: { es: "Iniciar sesión", en: "Sign In" },
+  mobileLocale: { es: "Idioma", en: "Language" },
+  mobileTheme: { es: "Tema", en: "Theme" },
+};
 
 // Detect System Preferences
 const getSystemThemePreference = () => {
@@ -28,6 +44,7 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
   const { locale } = useSelector((state) => state.locale);
+  const { t } = useLocale();
   const [searchTerm, setSearchTerm] = useState("");
   // console.log(searchTerm); // For testing purposes
 
@@ -140,7 +157,7 @@ export default function Header() {
       <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
-          placeholder="Search..."
+          placeholder={t(ui.searchPlaceholder)}
           rightIcon={AiOutlineSearch}
           className="hidden lg:inline"
           value={searchTerm}
@@ -155,19 +172,20 @@ export default function Header() {
         color="gray"
         pill
         onClick={handleSubmit}
-        aria-label="Search"
+        aria-label={t(ui.searchAria)}
       >
         <AiOutlineSearch />
       </Button>
       <div className="flex gap-2 md:order-2">
         {/* Language toggle (REBUILD_PLAN 12.A.3), beside the theme button.
+            Mobile access closed in 12.A.5 - see the sm:hidden <li> pair
+            in Navbar.Collapse below, which covers exactly the width
+            range this button hides itself in.
             TODO(12.B.1): once /en/* routes exist this must NAVIGATE to the
             counterpart URL - and render as a <Link> so a crawler follows
             the alternate - not just flip state; the URL is authoritative
             from 12.B on. State-only here because no counterpart URL
-            exists yet. TODO(12.A.5): also surface it below the sm
-            breakpoint with the nav i18n pass - the theme button has the
-            same hidden-on-mobile gap and both should be fixed together. */}
+            exists yet. */}
         <Button
           className="w-12 h-10 hidden sm:inline"
           color="gray"
@@ -211,10 +229,10 @@ export default function Header() {
               </span>
             </Dropdown.Header>
             <Link to="/dashboard?tab=profile">
-              <Dropdown.Item>Profile</Dropdown.Item>
+              <Dropdown.Item>{t(ui.profile)}</Dropdown.Item>
             </Link>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={handleSignout}>Sign Out</Dropdown.Item>
+            <Dropdown.Item onClick={handleSignout}>{t(ui.signOut)}</Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to={"/sign-in"}>
@@ -223,7 +241,7 @@ export default function Header() {
               outline
               tabIndex={-1}
             >
-              Sign In
+              {t(ui.signIn)}
             </Button>
           </Link>
         )}
@@ -252,7 +270,7 @@ export default function Header() {
             Navbar.Collapse renders a <ul>, and a <ul> may only contain
             <li> (REBUILD_PLAN 7.5 audit: axe "list" violation). */}
         <li>
-          <NavLinkEx to="/">Home</NavLinkEx>
+          <NavLinkEx to="/">{t(ui.navHome)}</NavLinkEx>
         </li>
         {/* Categories dropdown removed (REBUILD_PLAN search redesign) -
             a flat list of a dozen+ categories doesn't scale as a nav
@@ -263,13 +281,47 @@ export default function Header() {
             empty term and just lands on /search). Neither tells a reader
             "you can browse everything here" - a plain nav link does. */}
         <li>
-          <NavLinkEx to="/search">Search</NavLinkEx>
+          <NavLinkEx to="/search">{t(ui.navSearch)}</NavLinkEx>
         </li>
         <li>
-          <NavLinkEx to="/about">About</NavLinkEx>
+          <NavLinkEx to="/about">{t(ui.navAbout)}</NavLinkEx>
         </li>
         <li>
-          <NavLinkEx to="/projects">Projects</NavLinkEx>
+          <NavLinkEx to="/projects">{t(ui.navProjects)}</NavLinkEx>
+        </li>
+        {/* REBUILD_PLAN 12.A.5 - closes the 12.A.3 TODO: the top-bar
+            language/theme buttons are `hidden sm:inline`, so below the
+            sm breakpoint neither was reachable at all. Duplicated here
+            as plain list items, gated `sm:hidden` so they disappear
+            the instant the top-bar versions appear - no double
+            controls at any width. */}
+        <li className="sm:hidden">
+          <button
+            type="button"
+            onClick={() => dispatch(toggleLocale())}
+            className="flex items-center gap-2 font-bold text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
+          >
+            <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700">
+              {locale.toUpperCase()}
+            </span>
+            {t(ui.mobileLocale)}
+          </button>
+        </li>
+        <li className="sm:hidden">
+          <button
+            type="button"
+            onClick={() => dispatch(toggleTheme())}
+            className="flex items-center gap-2 font-bold text-gray-500 dark:text-gray-400 hover:text-secondaryText dark:hover:text-secondary"
+          >
+            {theme === "light" ? (
+              <FaSun />
+            ) : theme === "dark" ? (
+              <FaMoon />
+            ) : (
+              <FaDesktop />
+            )}
+            {t(ui.mobileTheme)}
+          </button>
         </li>
       </Navbar.Collapse>
     </Navbar>

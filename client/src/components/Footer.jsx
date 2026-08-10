@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import logo from "../assets/LogoExcelv2_Trim_803x230.png";
 import { categoryLabel } from "../config/categories";
 import useCategories from "../hooks/useCategories";
+import useLocale from "../hooks/useLocale";
 import {
   FaGithub,
   FaLinkedin,
@@ -29,6 +30,23 @@ const footerLinkHover = {
 // still render under the icon.
 const footerIconLinkHover = { href: "hover:no-underline" };
 
+// REBUILD_PLAN 12.A.5 - chrome strings as { es, en } pairs. Category
+// labels (categoryLabel()) are post-content, not chrome - out of scope
+// here, deferred to Phase 12.C along with post-level i18n.
+const ui = {
+  explore: { es: "Explorar", en: "Explore" },
+  home: { es: "Inicio", en: "Home" },
+  allPosts: { es: "Todas las publicaciones", en: "All Posts" },
+  servicesContact: { es: "Servicios / Contacto", en: "Services / Contact" },
+  categories: { es: "Categorías", en: "Categories" },
+  about: { es: "Acerca de", en: "About" },
+  portfolio: { es: "Portafolio", en: "Portfolio" },
+  followUs: { es: "Síguenos", en: "Follow Us" },
+  legal: { es: "Legal", en: "Legal" },
+  privacyPolicy: { es: "Aviso de Privacidad", en: "Privacy Policy" },
+  terms: { es: "Términos y Condiciones", en: "Terms & Conditions" },
+};
+
 export default function FooterComponent() {
   // The "lost reader's" fallback (REBUILD_PLAN 6.7): a footer with real
   // navigation, not just social links, so someone who scrolls to the
@@ -36,6 +54,7 @@ export default function FooterComponent() {
   // Shared cache (useCategories) - Search.jsx fetches the same list on
   // /search, and this footer renders there too (REBUILD_PLAN 11.A.6).
   const categories = useCategories();
+  const { t } = useLocale();
 
   return (
     <Footer container className="border border-t-8 border-primary">
@@ -58,22 +77,22 @@ export default function FooterComponent() {
           </div>
           <div className="grid grid-cols-2 gap-3 mt-4 sm:grid-cols-3 lg:grid-cols-5 sm:gap-6">
             <div>
-              <Footer.Title title="Explore" />
+              <Footer.Title title={t(ui.explore)} />
               <Footer.LinkGroup col>
                 <Footer.Link as={Link} to="/" theme={footerLinkHover}>
-                  Home
+                  {t(ui.home)}
                 </Footer.Link>
                 <Footer.Link as={Link} to="/search" theme={footerLinkHover}>
-                  All Posts
+                  {t(ui.allPosts)}
                 </Footer.Link>
                 <Footer.Link as={Link} to="/contact" theme={footerLinkHover}>
-                  Services / Contact
+                  {t(ui.servicesContact)}
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
             {categories.length > 0 && (
               <div>
-                <Footer.Title title="Categories" />
+                <Footer.Title title={t(ui.categories)} />
                 <Footer.LinkGroup col>
                   {categories.map((category) => (
                     <Footer.Link
@@ -89,7 +108,7 @@ export default function FooterComponent() {
               </div>
             )}
             <div>
-              <Footer.Title title="About" />
+              <Footer.Title title={t(ui.about)} />
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="https://portfolio.excelsolutionsv.com"
@@ -97,15 +116,15 @@ export default function FooterComponent() {
                   rel="noopener noreferrer"
                   theme={footerLinkHover}
                 >
-                  Portfolio
+                  {t(ui.portfolio)}
                 </Footer.Link>
                 <Footer.Link as={Link} to="/about" theme={footerLinkHover}>
-                  About
+                  {t(ui.about)}
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
             <div>
-              <Footer.Title title="Follow Us" />
+              <Footer.Title title={t(ui.followUs)} />
               <Footer.LinkGroup className="text-xl">
                 {/* was <Footer.LinkGroup row className="text-xl"> */}
                 <Footer.Link
@@ -138,7 +157,7 @@ export default function FooterComponent() {
               </Footer.LinkGroup>
             </div>
             <div>
-              <Footer.Title title="Legal" />
+              <Footer.Title title={t(ui.legal)} />
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="#"
@@ -146,7 +165,7 @@ export default function FooterComponent() {
                   rel="noopener noreferrer"
                   theme={footerLinkHover}
                 >
-                  Privacy Policy
+                  {t(ui.privacyPolicy)}
                 </Footer.Link>
                 <Footer.Link
                   href="#"
@@ -154,7 +173,7 @@ export default function FooterComponent() {
                   rel="noopener noreferrer"
                   theme={footerLinkHover}
                 >
-                  Terms & Conditions
+                  {t(ui.terms)}
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>

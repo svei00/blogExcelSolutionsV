@@ -3,6 +3,21 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import ButtonEx from "./Buttons";
 import trackCtaClick from "../utils/trackCtaClick";
+import useLocale from "../hooks/useLocale";
+
+// REBUILD_PLAN 12.A.5 - content as { es, en } pairs read through
+// useLocale().t(), same pattern as About/Projects.
+const ui = {
+  heading: {
+    es: "¿Necesitas ayuda con tu flujo de trabajo en Excel?",
+    en: "Need help with your Excel workflow?",
+  },
+  body: {
+    es: "Depuración de fórmulas, automatización, tableros a medida o consultoría general: cuéntame en qué estás atorado y te respondo en un plazo de dos días hábiles.",
+    en: "Formula troubleshooting, automation, custom dashboards, or general consulting — tell me what you're stuck on and I'll reply within two business days.",
+  },
+  button: { es: "Solicitar ayuda con Excel", en: "Get Excel help" },
+};
 
 // Brand tokens, not re-imported from theme.js on purpose - that file
 // exports Tailwind-config-shaped values (theme.js is consumed by
@@ -44,6 +59,7 @@ const PULSE_INTERVAL_MS = 7000;
 // green base only - which also covers battery-saver / low-end devices
 // that set that hint.
 export default function CallToAction({ ctaId = "band" }) {
+  const { t } = useLocale();
   const containerRef = useRef(null);
   const sweepRef = useRef(null);
   const [box, setBox] = useState({ width: 0, height: 0 });
@@ -224,13 +240,11 @@ export default function CallToAction({ ctaId = "band" }) {
           <rect ref={sweepRef} {...rectProps} stroke={BRAND_BLUE} strokeWidth={1.5} opacity={0} />
         </svg>
       )}
-      <h2 className="text-2xl">¿Necesitas ayuda con tu flujo de trabajo en Excel?</h2>
-      <p className="text-gray-600 dark:text-gray-300 my-2 max-w-md">
-        Depuración de fórmulas, automatización, tableros a medida o
-        consultoría general: cuéntame en qué estás atorado y te respondo
-        en un plazo de dos días hábiles.
+      <h2 className="text-2xl">{t(ui.heading)}</h2>
+      <p className="text-gray-600 dark:text-gray-300 my-2 max-w-md text-justify">
+        {t(ui.body)}
       </p>
-      <ButtonEx title="Solicitar ayuda con Excel" to="/contact" onClick={() => trackCtaClick(ctaId)} />
+      <ButtonEx title={t(ui.button)} to="/contact" onClick={() => trackCtaClick(ctaId)} />
     </div>
   );
 }
