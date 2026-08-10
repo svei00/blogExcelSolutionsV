@@ -51,17 +51,17 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-3 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl font-bold lg:text-5xl">
-            Excel Skills That Solve Real Work Problems
+            Habilidades de Excel que resuelven problemas reales de trabajo
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
-            Step-by-step tutorials on formulas, automation, and data
-            analysis — including CFDI and SAT workflows for Mexican
-            accountants. No fluff, just spreadsheets that work.
+          <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg text-justify">
+            Tutoriales paso a paso de fórmulas, automatización y análisis
+            de datos, incluidos los flujos de CFDI y SAT para contadores
+            mexicanos. Sin relleno: solo hojas de cálculo que funcionan.
           </p>
           <div className="flex flex-wrap gap-3">
-            <ButtonEx title="Browse Articles" to="/search" />
+            <ButtonEx title="Ver artículos" to="/search" />
             <ButtonEx
-              title="Get Excel Help"
+              title="Solicitar ayuda con Excel"
               to="/contact"
               outline
               onClick={() => trackCtaClick("hero")}
@@ -92,7 +92,7 @@ export default function Home() {
             />
             <div className="p-4 bg-gray-50 dark:bg-gray-800">
               <span className="text-xs uppercase tracking-wide text-secondaryText dark:text-secondary font-semibold">
-                Latest Article
+                Último artículo
               </span>
               <h2 className="text-lg font-semibold mt-1 group-hover:text-primaryText dark:group-hover:text-primary transition-colors">
                 {featuredPost.title}
@@ -111,7 +111,7 @@ export default function Home() {
         {restPosts.length > 0 && (
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-center gap-4">
-              <h2 className="text-2xl font-semibold">Recent Posts</h2>
+              <h2 className="text-2xl font-semibold">Publicaciones recientes</h2>
               <PostViewToggle view={view} onChange={setView} />
             </div>
             {view === "grid" ? (
@@ -140,7 +140,7 @@ export default function Home() {
               to="/search"
               className="text-lg font-semibold text-secondaryText dark:text-secondary hover:text-primaryText dark:hover:text-primary text-center"
             >
-              View all Posts
+              Ver todas las publicaciones
             </Link>
           </div>
         )}

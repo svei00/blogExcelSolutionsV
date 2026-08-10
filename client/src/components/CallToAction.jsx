@@ -154,13 +154,13 @@ export default function CallToAction({ ctaId = "band" }) {
           <rect ref={sweepRef} {...rectProps} stroke={BRAND_BLUE} strokeWidth={1.5} opacity={0} />
         </svg>
       )}
-      <h2 className="text-2xl">Need help with your Excel workflow?</h2>
+      <h2 className="text-2xl">¿Necesitas ayuda con tu flujo de trabajo en Excel?</h2>
       <p className="text-gray-600 dark:text-gray-300 my-2 max-w-md">
-        Formula troubleshooting, automation, custom dashboards, or general
-        consulting - tell me what you're stuck on and I'll reply within two
-        business days.
+        Depuración de fórmulas, automatización, tableros a medida o
+        consultoría general: cuéntame en qué estás atorado y te respondo
+        en un plazo de dos días hábiles.
       </p>
-      <ButtonEx title="Get Excel Help" to="/contact" onClick={() => trackCtaClick(ctaId)} />
+      <ButtonEx title="Solicitar ayuda con Excel" to="/contact" onClick={() => trackCtaClick(ctaId)} />
     </div>
   );
 }

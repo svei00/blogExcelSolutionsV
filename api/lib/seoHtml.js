@@ -104,17 +104,17 @@ export function buildHomeBody(posts) {
   return `${SSR_START}
     <div class="bg-white text-gray-700 min-h-screen">
       <div class="max-w-6xl mx-auto px-3 py-16">
-        <h1 class="text-3xl font-bold lg:text-5xl">Excel Skills That Solve Real Work Problems</h1>
-        <p class="mt-6 text-gray-500 text-base sm:text-lg max-w-2xl">Step-by-step tutorials on formulas, automation, and data analysis — including CFDI and SAT workflows for Mexican accountants. No fluff, just spreadsheets that work.</p>
+        <h1 class="text-3xl font-bold lg:text-5xl">Habilidades de Excel que resuelven problemas reales de trabajo</h1>
+        <p class="mt-6 text-gray-500 text-base sm:text-lg max-w-2xl">Tutoriales paso a paso de fórmulas, automatización y análisis de datos, incluidos los flujos de CFDI y SAT para contadores mexicanos. Sin relleno: solo hojas de cálculo que funcionan.</p>
         <nav class="mt-6 flex flex-wrap gap-4 text-sm font-medium text-primaryText">
-          <a href="/search">Browse Articles</a>
-          <a href="/contact">Get Excel Help</a>
-          <a href="/about">About</a>
-          <a href="/projects">Projects</a>
+          <a href="/search">Ver artículos</a>
+          <a href="/contact">Solicitar ayuda con Excel</a>
+          <a href="/about">Acerca</a>
+          <a href="/projects">Proyectos</a>
         </nav>
       </div>
       <div class="max-w-3xl mx-auto px-3 pb-16">
-        <h2 class="text-2xl font-semibold mb-2">Recent Posts</h2>
+        <h2 class="text-2xl font-semibold mb-2">Publicaciones recientes</h2>
         ${postItems}
       </div>
     </div>
