@@ -1,11 +1,8 @@
 import PropTypes from "prop-types";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ButtonEx from "./Buttons";
 import trackCtaClick from "../utils/trackCtaClick";
-
-gsap.registerPlugin(ScrollTrigger);
 
 // Brand tokens, not re-imported from theme.js on purpose - that file
 // exports Tailwind-config-shaped values (theme.js is consumed by
@@ -17,23 +14,35 @@ gsap.registerPlugin(ScrollTrigger);
 const BRAND_GREEN = "#21B868";
 const BRAND_BLUE = "#3182DF";
 
+// How often the blue sweep replays while the card sits in the viewport.
+// The sweep itself runs ~2.7s (1.4 draw + 0.5 hold + 0.8 fade), so this
+// leaves a few seconds of calm green between pulses.
+const PULSE_INTERVAL_MS = 7000;
+
 // Services-first CTA (REBUILD_PLAN 6.3) - replaced the generic
 // "Portfolio" link. Fires a GA4 event on click (task 6.8), tagged with
 // cta_id so placements sharing the same page path (e.g. the Home hero
 // button vs. this band) are still distinguishable in the data.
 //
-// Animated border (REBUILD_PLAN Phase 8 - requested in an earlier
-// session, never actually tracked or built until now): two stacked SVG
-// <rect>s over the card - a static green base (the resting state) and
-// a blue overlay whose stroke-dashoffset animates from fully-hidden to
-// fully-drawn, tracing the rounded rect's own perimeter. That's
-// naturally top edge left->right, right edge top->bottom, bottom edge
-// right->left, left edge bottom->top, in exactly that order, for free -
-// no manual per-edge choreography, that IS the direction a browser
-// draws a rect's stroke path. Border also thickens during the sweep,
-// and the blue rect gets a neon glow while visible. Fires once when the
-// card scrolls into view (ScrollTrigger), then fades back to the static
-// green base.
+// Animated border (REBUILD_PLAN Phase 8; trigger revised 2026-09): two
+// stacked SVG <rect>s over the card - a static green base (the resting
+// state) and a blue overlay whose stroke-dashoffset animates from
+// fully-hidden to fully-drawn, tracing the rounded rect's own perimeter.
+// That's naturally top edge left->right, right edge top->bottom, bottom
+// edge right->left, left edge bottom->top, in exactly that order, for
+// free - no manual per-edge choreography, that IS the direction a
+// browser draws a rect's stroke path. Border also thickens during the
+// sweep, and the blue rect gets a neon glow, then fades back to green.
+//
+// Trigger: the original one-shot-on-scroll-into-view meant a reader who
+// landed on a CTA at the end of a long post - after the trigger had
+// already fired - saw nothing when they finally got there. Now it's an
+// ATTENTION PULSE: the sweep replays every PULSE_INTERVAL_MS for as long
+// as the card is in the viewport (IntersectionObserver), and also fires
+// immediately on mouseenter. Fully idle while off-screen (interval
+// cleared). prefers-reduced-motion still disables it entirely - static
+// green base only - which also covers battery-saver / low-end devices
+// that set that hint.
 export default function CallToAction({ ctaId = "band" }) {
   const containerRef = useRef(null);
   const sweepRef = useRef(null);
@@ -45,14 +54,27 @@ export default function CallToAction({ ctaId = "band" }) {
   useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    // Bail out of the state update when the rounded dimensions haven't
+    // actually changed. ResizeObserver fires once on observe() and again
+    // on any sub-pixel layout shift, and a fresh {width,height} object
+    // each time would re-run the animation effect below (its dep is
+    // `box`) and restart the sweep before it can finish - so it must
+    // return the SAME reference when nothing meaningful moved.
+    const apply = (width, height) =>
+      setBox((prev) =>
+        Math.round(prev.width) === Math.round(width) &&
+        Math.round(prev.height) === Math.round(height)
+          ? prev
+          : { width, height }
+      );
     // Synchronous initial read (getBoundingClientRect), not just the
     // ResizeObserver callback - the observer still handles later
     // resizes, but the very first measurement doesn't wait on it.
     const r = el.getBoundingClientRect();
-    if (r.width > 0) setBox({ width: r.width, height: r.height });
+    if (r.width > 0) apply(r.width, r.height);
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
-      setBox({ width, height });
+      apply(width, height);
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -75,32 +97,29 @@ export default function CallToAction({ ctaId = "band" }) {
 
     if (prefersReducedMotion) {
       // No motion, no color sweep - just confirm the resting state
-      // (static green base) is what's shown. Nothing to animate.
+      // (static green base) is what's shown. No observer, no interval.
       gsap.set(sweep, { opacity: 0 });
       return;
     }
 
-    gsap.set(sweep, {
+    // One paused timeline, replayed on demand. The leading .set() re-runs
+    // on every restart(), so each pulse starts from the same clean state
+    // (fully hidden, thin, no glow) regardless of where the last one
+    // ended.
+    const tl = gsap.timeline({ paused: true });
+    tl.set(sweep, {
       strokeDasharray: length,
       strokeDashoffset: length, // fully hidden - nothing drawn yet
       strokeWidth: 1.5,
       opacity: 1,
-    });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: container,
-        start: "top 85%",
-        once: true, // a one-time flourish on first view, not a loop that fires every scroll past it
-      },
-    });
-
-    tl.to(sweep, {
-      strokeDashoffset: 0, // draws the full perimeter, in the browser's natural edge order
-      strokeWidth: 3,
-      duration: 1.4,
-      ease: "power2.inOut",
+      filter: "drop-shadow(0 0 0px transparent)",
     })
+      .to(sweep, {
+        strokeDashoffset: 0, // draws the full perimeter, in the browser's natural edge order
+        strokeWidth: 3,
+        duration: 1.4,
+        ease: "power2.inOut",
+      })
       // Neon glow ramps in alongside the draw, not just at the end -
       // makes the traveling edge itself read as glowing, not just the
       // final fully-blue state.
@@ -121,7 +140,58 @@ export default function CallToAction({ ctaId = "band" }) {
         ease: "power1.out",
       });
 
+    // play(0), not restart(): unambiguously "play forward from time 0" on
+    // a timeline created paused. Skip it when a sweep is already running
+    // so a second trigger doesn't yank it back to the start mid-draw.
+    const playSweep = () => {
+      if (!tl.isActive()) tl.play(0);
+    };
+
+    let intervalId = null;
+    let leaveTimer = null;
+    const startPulsing = () => {
+      if (leaveTimer !== null) {
+        window.clearTimeout(leaveTimer);
+        leaveTimer = null;
+      }
+      if (intervalId !== null) return;
+      playSweep(); // one right away when the card is reached
+      intervalId = window.setInterval(playSweep, PULSE_INTERVAL_MS);
+    };
+    const stopPulsing = () => {
+      if (intervalId !== null) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    // Pulse while the card is on screen; go fully idle when it isn't.
+    // The leave is debounced so a threshold wobble (or the sweep's own
+    // stroke-width change nudging layout) can't thrash start/stop.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startPulsing();
+        } else if (leaveTimer === null) {
+          leaveTimer = window.setTimeout(() => {
+            leaveTimer = null;
+            stopPulsing();
+          }, 800);
+        }
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(container);
+
+    // Hover fires an extra sweep on top of the ambient pulse.
+    const handleEnter = () => playSweep();
+    container.addEventListener("mouseenter", handleEnter);
+
     return () => {
+      if (leaveTimer !== null) window.clearTimeout(leaveTimer);
+      stopPulsing();
+      io.disconnect();
+      container.removeEventListener("mouseenter", handleEnter);
       tl.kill();
     };
   }, [box]);
